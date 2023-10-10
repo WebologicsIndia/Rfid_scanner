@@ -1,9 +1,11 @@
 import React from "react";
-import {Text} from "react-native";
+
+import Menu from "./Menu";
+
 
 const Screens = () => {
     return (
-        <Text>Hello Moto</Text>
+        <Menu />
     );
 };
 export default Screens;

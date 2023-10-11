@@ -1,16 +1,12 @@
 import React, {useState} from "react";
 import {
     borderRadius,
-    Container,
-    H4,
-    H5,
-    H6,
-    H7, H8,
-    height,
+    Container, H5,
+    H7, H8, H9, height,
+    Input,
     Insets,
     margin,
-    padding,
-    width
+    padding, width
 } from "@WebologicsIndia/react-native-components";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -18,12 +14,23 @@ import HamburgerSVG from "../../assets/hamburger.svg";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import CurrentLocationSVG from "../../assets/current-location.svg";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import PlaySVG from "../../assets/playSVG.svg";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import ReloadSVG from "../../assets/reloadSVG.svg";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import PauseSVG from "../../assets/pauseSVG.svg";
 
 import {StyleSheet, View} from "react-native";
 import {theme} from "../../config/theme";
 import DropDownPicker from "react-native-dropdown-picker";
+import Toast from "../../common/Toast";
+// import {BlurView} from "@react-native-community/blur";
+
+
 
 const Menu = () => {
     const [open, setOpen] = React.useState(false);
@@ -36,58 +43,128 @@ const Menu = () => {
         {label: "Starts With", value: "startsWith"},
         {label: "Ends With", value: "endsWith"},
     ]);
+    const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
+    const [icon, setIcon] = useState("PlaySVG");
+    const[openToast, setOpenToast] = useState(false);
+
+    const handleInputChange = (name: string, value: string | number) => {
+        console.log(name, value);
+    };
+    const handleLocationIconColor = () => {
+        if(locationIconColor === theme.PrimaryDark) {
+            setLocationIconColor("#009900");
+        } else {
+            setLocationIconColor(theme.PrimaryDark);
+        }
+    };
+
+    const handleIconClick = () => {
+        if(icon === "PlaySVG") {
+            setIcon("PauseSVG");
+        } else {
+            setIcon("PlaySVG");
+        }
+    };
+    const handleReload = () => {
+        setOpenToast(true);
+    };
+
     return (
-        <Container
-            style={styles.container}
-            fluid
-            backgroundColor={theme.White}
-            header
-            addIcon={<HamburgerSVG />}
-            headerText={"Tag Scanner"}
-            headerTextStyle={styles.headerText}
-            headerColor={theme.Primary}
-            bottom={Insets.bottom}
-        >
-            <View style={styles.bodyLogoView}>
-                <H7 style={styles.logoBody}>Logo</H7>
-                <CurrentLocationSVG color={theme.PrimaryDark} width="24" height= "24"/>
-            </View>
-            <View style={styles.filterModeView}>
-                <H8 style={styles.textHeading}>Filter Mode:</H8>
-                <DropDownPicker
-                    open={open}
-                    value={value}
-                    items={items}
-                    setOpen={setOpen}
-                    setValue={setValue}
-                    setItems={setItems}
-                    style={{
-                        borderWidth: 0,
-                        ...borderRadius.br4,
-                        backgroundColor: theme.White,
-                        width: "50%"
-                    }}
-                    textStyle={{
-                        fontFamily: "Lufga",
-                        fontSize: 16
-                    }}
-                    dropDownContainerStyle={{
-                        borderWidth: 0,
-                    }}
-                    placeholder={"Select Filter Option"}
-                    mode={"SIMPLE"}
-                />
-                <PlaySVG width="24" height= "24"/>
-                <ReloadSVG width="24" height= "24"/>
-            </View>
-        </Container>
+        <>
+            <Container
+                style={styles.container}
+                fluid
+                backgroundColor={theme.White}
+                header
+                addIcon={<HamburgerSVG />}
+                headerText={"Tag Scanner"}
+                headerTextStyle={styles.headerText}
+                headerColor={theme.Primary}
+                bottom={Insets.bottom}
+            >
+                <View>
+                    <View style={styles.bodyLogoView}>
+                        <H7 style={styles.logoBody}>Logo</H7>
+                        <CurrentLocationSVG color={locationIconColor} width="24" height= "24" onPress={handleLocationIconColor}/>
+                    </View>
+                    <View style={styles.filterModeView}>
+                        <H8 style={styles.textHeading}>Filter Mode:</H8>
+                        <DropDownPicker
+                            open={open}
+                            value={value}
+                            items={items}
+                            setOpen={setOpen}
+                            setValue={setValue}
+                            setItems={setItems}
+                            style={{
+                                borderWidth: 0,
+                                ...borderRadius.br4,
+                                backgroundColor: theme.White,
+                            }}
+                            textStyle={{
+                                fontFamily: "Lufga",
+                                fontSize: 16
+                            }}
+                            dropDownContainerStyle={{
+                                borderWidth: 0,
+                            }}
+                            containerStyle={{borderWidth: 0, width: "50%"}}
+                            placeholder={"Select Filter Option"}
+                            mode={"SIMPLE"}
+                        />
+                        { icon === "PlaySVG" ? (
+                            <PlaySVG width="24" height= "24" onPress={handleIconClick}/>
+                        ) : (
+                            <PauseSVG width="24" height= "24" onPress={handleIconClick}/>
+                        )}
+                        <ReloadSVG width="24" height= "24" onPress = {handleReload}/>
+                    </View>
+                    <View style={styles.filterMaskView}>
+                        <H8 style={styles.textHeading}>Filter Mask:</H8>
+                        <View style={{flex: 1}}>
+                            <Input
+                                inputStyle={{borderBottomWidth: 2, ...padding.py0}}
+                                textStyle={[{color: theme.PrimaryDark}, styles.input]}
+                                bgColor={theme.White}
+                                onChangeText={(value) => handleInputChange("filterMask", value)}
+                            />
+                        </View>
+                    </View>
+                </View>
+                <View style={styles.footer}>
+                    <View style={{flexDirection: "row", gap: 4, alignItems: "center"}}>
+                        <H9 style={styles.text}>Press</H9>
+                        <View style={styles.scanButton}><H9 style={styles.scanText}>SCAN</H9></View>
+                        <H9 style={styles.text}>Button</H9>
+                    </View>
+                    <H9 style={styles.text}>or Trigger to Read a Tag</H9>
+                    <H9 style={styles.text}>...</H9>
+
+                </View>
+            </Container>
+            {/*<Toast open={openToast} message={"List Cleared"} type={"warning"} />*/}
+            {/*<Toast open={openToast} message={"any"} type={"success"}/>*/}
+            {/*<Toast open={openToast} toastStyle={styles.toastStyle} top={48}>*/}
+            {/*    <BlurView*/}
+            {/*        style={{width: "100%", height: "100%"}}*/}
+            {/*        blurType="dark"*/}
+            {/*        blurAmount={5}*/}
+            {/*    >*/}
+            {/*        <View style={styles.toastContainer}>*/}
+            {/*            <H7 style={{color: theme.White, fontSize: 18, flex: 1}}>List Cleared</H7>*/}
+            {/*        </View>*/}
+            {/*    </BlurView>*/}
+            {/*</Toast>*/}
+        </>
+
     );
 };
 export default Menu;
 
 const styles= StyleSheet.create({
     container: {
-        ...padding.p5
+        ...padding.p5,
+        flex: 1,
     },
     headerText: {
         fontWeight: "600",
@@ -108,13 +185,57 @@ const styles= StyleSheet.create({
         fontWeight: "600"
     },
     text: {
-        color: theme.TextLight
+        color: theme.Primary
     },
     filterModeView: {
+        ...padding.py5,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-
+    },
+    filterMaskView: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 16
+    },
+    input: {
+        borderWidth: 0,
+        ...padding.py0,
+        ...margin.my0
+    },
+    footer: {
+        flex: 1,
+        justifyContent: "flex-end",
+        alignItems: "center",
+        flexDirection: "column",
+        gap: 4
+    },
+    scanText: {
+        textAlign: "center",
+        color: theme.PrimaryDark,
+        fontWeight: "600",
+        fontSize: 14
+    },
+    scanButton: {
+        width: width.w3.width,
+        backgroundColor: "#cc6600",
+        aspectRatio: 3.5,
+        borderWidth: StyleSheet.hairlineWidth,
+        ...borderRadius.br2,
+        // borderColor: theme.Accent
+    },
+    toastStyle: {
+        backgroundColor: "rgba( 255, 255, 255, 0.1 )",
+        width: "100%",
+        maxWidth: width.w22.width,
+        paddingHorizontal: 0,
+        paddingVertical: 0
+    },
+    toastContainer: {
+        ...padding.px5,
+        ...padding.py3,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 20,
     }
-
 });

@@ -1,14 +1,5 @@
 import React, {useState} from "react";
-import {
-    borderRadius,
-    Container,
-    H7,
-    H8,
-    H9,
-    Input,
-    margin,
-    padding,
-} from "@WebologicsIndia/react-native-components";
+import {borderRadius, Container, H7, H8, H9, Input, margin, padding} from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../assets/current-location.svg";
 import PlaySVG from "../../assets/playSVG.svg";
@@ -18,15 +9,21 @@ import {Pressable, StyleSheet, View} from "react-native";
 import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
+import {inventoryUrl} from "../../config/api";
 
 const Home = (props:any) => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     const [icon, setIcon] = useState("PlaySVG");
     const [value, setValue] = useState<string>("Contains");
+    const [item, setItems] = useState({
+        rfIdTags: "sdfsdf",
+        itemType: "towel",
+    });
 
     const handleInputChange = (name: string, value: string | number) => {
         console.log(name, value);
+
     };
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
@@ -39,6 +36,19 @@ const Home = (props:any) => {
     const handleIconClick = () => {
         if (icon === "PlaySVG") {
             setIcon("PauseSVG");
+            fetch(inventoryUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "accept": "application/json"
+                },
+                body: JSON.stringify(item)
+            }).then((res) => {
+                console.log("status", res.status);
+                if(res.status === 200){
+                    console.log("hello", item);
+                }
+            });
         } else {
             setIcon("PlaySVG");
         }
@@ -110,7 +120,7 @@ const Home = (props:any) => {
                     <H9 style={styles.colorFont500}>...</H9>
                 </View>
             </Container>
-            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setValue}/>
+            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setValue} />
         </>
     );
 };
@@ -124,7 +134,7 @@ const styles = StyleSheet.create({
     },
     rowAlignCenter: {
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: "center"
     },
     headerText: {
         fontWeight: "600",
@@ -155,7 +165,7 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 0,
-        ...padding.py0,
+        ...padding.py0
     },
     footer: {
         alignItems: "center",
@@ -164,7 +174,7 @@ const styles = StyleSheet.create({
     scanText: {
         textAlign: "center",
         color: theme.PrimaryDark,
-        fontWeight: "600",
+        fontWeight: "600"
     },
     scanButton: {
         backgroundColor: "#cc6600",

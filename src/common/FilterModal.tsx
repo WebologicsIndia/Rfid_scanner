@@ -18,7 +18,10 @@ const FilterModal = (props: {
             visible={props.modalVisible}
             transparent
         >
-            <View style={styles.centeredView}>
+            <Pressable
+                style={styles.centeredView}
+                onPress={() => props.setModalVisible(false)}
+            >
                 <View style={styles.modalView}>
                     {
                         modalData.map((item: string) => {
@@ -33,8 +36,7 @@ const FilterModal = (props: {
                         })
                     }
                 </View>
-
-            </View>
+            </Pressable>
         </Modal>
     );
 };

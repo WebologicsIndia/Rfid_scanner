@@ -1,11 +1,11 @@
 import React from "react";
 
-import Menu from "./Menu";
+import Home from "./Home";
 
 
 const Screens = () => {
     return (
-        <Menu />
+        <Home />
     );
 };
 export default Screens;

@@ -10,7 +10,6 @@ const Screens = () => {
     return (
         <NavigationContainer>
             <Drawer.Navigator
-                initialRouteName="Home"
                 screenOptions={{
                     headerShown: false,
                 }}

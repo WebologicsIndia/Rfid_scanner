@@ -19,7 +19,7 @@ import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
 
-const Home = () => {
+const Home = (props:any) => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     const [icon, setIcon] = useState("PlaySVG");
@@ -54,7 +54,7 @@ const Home = () => {
                 fluid
                 backgroundColor={theme.White}
                 header
-                addIcon={<Pressable><HamburgerSVG /></Pressable>}
+                addIcon={<Pressable onPress={() => props.navigation.openDrawer()}><HamburgerSVG /></Pressable>}
                 headerText={"Tag Scanner"}
                 headerTextStyle={styles.headerText}
                 headerColor={theme.Primary}

@@ -1,38 +1,27 @@
 import React, {useState} from "react";
 import {
     borderRadius,
-    Container, H5,
-    H7, H8, H9, height,
+    Container,
+    H7, H8, H9,
     Input,
     Insets,
     margin,
     padding, width
 } from "@WebologicsIndia/react-native-components";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import HamburgerSVG from "../../assets/hamburger.svg";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import CurrentLocationSVG from "../../assets/current-location.svg";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import PlaySVG from "../../assets/playSVG.svg";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import ReloadSVG from "../../assets/reloadSVG.svg";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import PauseSVG from "../../assets/pauseSVG.svg";
-
-import {StyleSheet, View} from "react-native";
+import {Pressable, StyleSheet, View} from "react-native";
 import {theme} from "../../config/theme";
 import DropDownPicker from "react-native-dropdown-picker";
-import Toast from "../../common/Toast";
-// import {BlurView} from "@react-native-community/blur";
+// import Toast from "../../common/Toast";
 
 
 
 const Menu = () => {
+    const [insets] = useState(Insets.getInsets());
     const [open, setOpen] = React.useState(false);
     const [value, setValue] = useState(null);
     const [items, setItems] = useState([
@@ -80,7 +69,7 @@ const Menu = () => {
                 headerText={"Tag Scanner"}
                 headerTextStyle={styles.headerText}
                 headerColor={theme.Primary}
-                bottom={Insets.bottom}
+                bottom={insets.bottom}
             >
                 <View>
                     <View style={styles.bodyLogoView}>
@@ -113,11 +102,17 @@ const Menu = () => {
                             mode={"SIMPLE"}
                         />
                         { icon === "PlaySVG" ? (
-                            <PlaySVG width="24" height= "24" onPress={handleIconClick}/>
+                            <Pressable onPress={handleIconClick}>
+                                <PlaySVG width="24" height= "24" />
+                            </Pressable>
                         ) : (
-                            <PauseSVG width="24" height= "24" onPress={handleIconClick}/>
+                            <Pressable onPress={handleIconClick}>
+                                <PauseSVG width="24" height= "24" />
+                            </Pressable>
                         )}
-                        <ReloadSVG width="24" height= "24" onPress = {handleReload}/>
+                        <Pressable onPress = {handleReload}>
+                            <ReloadSVG width="24" height= "24" />
+                        </Pressable>
                     </View>
                     <View style={styles.filterMaskView}>
                         <H8 style={styles.textHeading}>Filter Mask:</H8>

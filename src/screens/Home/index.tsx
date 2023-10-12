@@ -1,12 +1,13 @@
 import React, {useState} from "react";
 import {
     borderRadius,
-    Container, Drawer,
-    H7, H8, H9,
+    Container,
+    H7,
+    H8,
+    H9,
     Input,
-    Insets,
     margin,
-    padding, width
+    padding,
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../assets/current-location.svg";
@@ -15,35 +16,20 @@ import ReloadSVG from "../../assets/reloadSVG.svg";
 import PauseSVG from "../../assets/pauseSVG.svg";
 import {Pressable, StyleSheet, View} from "react-native";
 import {theme} from "../../config/theme";
-import DropDownPicker from "react-native-dropdown-picker";
-import TrackingDrawer from "../Menu";
-// import Toast from "../../common/Toast";
-
-
+import FilterModal from "../../common/FilterModal";
+import DownSvg from "../../assets/downArrow.svg";
 
 const Home = () => {
-    const [insets] = useState(Insets.getInsets());
-    const [open, setOpen] = React.useState(false);
-    const [value, setValue] = useState(null);
-    const [items, setItems] = useState([
-        {label: "Contains", value: "contains"},
-        {label: "Does Not Contain", value: "notContain"},
-        {label: "Equals", value: "equals"},
-        {label: "Not Equal", value: "notEquals"},
-        {label: "Starts With", value: "startsWith"},
-        {label: "Ends With", value: "endsWith"},
-    ]);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     const [icon, setIcon] = useState("PlaySVG");
-    const[openToast, setOpenToast] = useState(false);
-    const [drawerOpen, setDrawerOpen] = useState(false);
-
+    const [value, setValue] = useState<string>("Contains");
 
     const handleInputChange = (name: string, value: string | number) => {
         console.log(name, value);
     };
     const handleLocationIconColor = () => {
-        if(locationIconColor === theme.PrimaryDark) {
+        if (locationIconColor === theme.PrimaryDark) {
             setLocationIconColor("#009900");
         } else {
             setLocationIconColor(theme.PrimaryDark);
@@ -51,16 +37,16 @@ const Home = () => {
     };
 
     const handleIconClick = () => {
-        if(icon === "PlaySVG") {
+        if (icon === "PlaySVG") {
             setIcon("PauseSVG");
         } else {
             setIcon("PlaySVG");
         }
     };
-    const handleReload = () => {
-        setOpenToast(true);
-    };
 
+    const showModal = () => {
+        setModalVisible(true);
+    };
     return (
         <>
             <Container
@@ -68,62 +54,45 @@ const Home = () => {
                 fluid
                 backgroundColor={theme.White}
                 header
-                addIcon={<Pressable onPress={() => setDrawerOpen(true)}><HamburgerSVG/></Pressable>}
+                addIcon={<Pressable><HamburgerSVG /></Pressable>}
                 headerText={"Tag Scanner"}
                 headerTextStyle={styles.headerText}
                 headerColor={theme.Primary}
-                bottom={insets.bottom}
+                bottom={padding.pb5.paddingBottom}
             >
                 <View>
-                    <View style={styles.bodyLogoView}>
+                    <View style={[styles.bodyLogoView, styles.rowAlignCenter]}>
                         <H7 style={styles.logoBody}>Logo</H7>
                         <Pressable onPress={handleLocationIconColor}>
-                            <CurrentLocationSVG color={locationIconColor} width="24" height= "24" />
+                            <CurrentLocationSVG color={locationIconColor} width="24" height="24" />
                         </Pressable>
                     </View>
-                    <View style={styles.filterModeView}>
+                    <View style={[styles.filterModeView, styles.rowAlignCenter]}>
                         <H8 style={styles.textHeading}>Filter Mode:</H8>
-                        <DropDownPicker
-                            open={open}
-                            value={value}
-                            items={items}
-                            setOpen={setOpen}
-                            setValue={setValue}
-                            setItems={setItems}
-                            style={{
-                                borderWidth: 0,
-                                ...borderRadius.br4,
-                                backgroundColor: theme.White,
-                            }}
-                            textStyle={{
-                                fontFamily: "Lufga",
-                                fontSize: 16
-                            }}
-                            dropDownContainerStyle={{
-                                borderWidth: 0,
-                            }}
-                            containerStyle={{borderWidth: 0, width: "50%"}}
-                            placeholder={"Select Filter Option"}
-                            mode={"SIMPLE"}
-                        />
-                        { icon === "PlaySVG" ? (
-                            <Pressable onPress={handleIconClick}>
-                                <PlaySVG width="24" height= "24" />
-                            </Pressable>
-                        ) : (
-                            <Pressable onPress={handleIconClick}>
-                                <PauseSVG width="24" height= "24" />
-                            </Pressable>
-                        )}
-                        <Pressable onPress = {handleReload}>
-                            <ReloadSVG width="24" height= "24" />
+                        <Pressable onPress={showModal} style={[styles.modalOpen, styles.rowAlignCenter]}>
+                            <H7 style={{color: theme.PrimaryDark}}>{value}</H7>
+                            <DownSvg color={theme.Primary} />
                         </Pressable>
+                        <View style={[styles.rowAlignCenter, styles.svgGap]}>
+                            {icon === "PlaySVG" ? (
+                                <Pressable onPress={handleIconClick}>
+                                    <PlaySVG width="24" height="24" />
+                                </Pressable>
+                            ) : (
+                                <Pressable onPress={handleIconClick}>
+                                    <PauseSVG width="24" height="24" />
+                                </Pressable>
+                            )}
+                            <Pressable>
+                                <ReloadSVG width="24" height="24" />
+                            </Pressable>
+                        </View>
                     </View>
-                    <View style={styles.filterMaskView}>
+                    <View style={[styles.filterMaskView, styles.rowAlignCenter]}>
                         <H8 style={styles.textHeading}>Filter Mask:</H8>
                         <View style={{flex: 1}}>
                             <Input
-                                inputStyle={{borderBottomWidth: 2, ...padding.py0}}
+                                inputStyle={{borderBottomWidth: 1}}
                                 textStyle={[{color: theme.PrimaryDark}, styles.input]}
                                 bgColor={theme.White}
                                 onChangeText={(value) => handleInputChange("filterMask", value)}
@@ -132,44 +101,38 @@ const Home = () => {
                     </View>
                 </View>
                 <View style={styles.footer}>
-                    <View style={{flexDirection: "row", gap: 4, alignItems: "center"}}>
-                        <H9 style={styles.text}>Press</H9>
-                        <View style={styles.scanButton}><H9 style={styles.scanText}>SCAN</H9></View>
-                        <H9 style={styles.text}>Button</H9>
+                    <View style={[styles.rowAlignCenter, styles.svgGap]}>
+                        <H8 style={styles.text}>Press</H8>
+                        <Pressable style={styles.scanButton}><H8 style={styles.scanText}>SCAN</H8></Pressable>
+                        <H8 style={styles.text}>Button</H8>
                     </View>
                     <H9 style={styles.text}>or Trigger to Read a Tag</H9>
                     <H9 style={styles.text}>...</H9>
 
                 </View>
             </Container>
-            {/*<Toast open={openToast} message={"List Cleared"} type={"warning"} />*/}
-            <Drawer
-                open={drawerOpen}
-                position={"left"}
-                width={"35%"}
-                onBackdropPress={() => setDrawerOpen(false)}
-            >
-                <TrackingDrawer/>
-            </Drawer>
-
+            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setValue}/>
         </>
 
     );
 };
 export default Home;
 
-const styles= StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         ...padding.p5,
         flex: 1,
+        justifyContent: "space-between"
+    },
+    rowAlignCenter: {
+        flexDirection: "row",
+        alignItems: "center",
     },
     headerText: {
         fontWeight: "600",
-        ...margin.ms4,
+        ...margin.ms4
     },
     bodyLogoView: {
-        flexDirection: "row",
-        alignItems: "center",
         justifyContent: "space-between"
     },
     logoBody: {
@@ -186,53 +149,37 @@ const styles= StyleSheet.create({
     },
     filterModeView: {
         ...padding.py5,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "space-between"
     },
     filterMaskView: {
-        flexDirection: "row",
-        alignItems: "center",
         gap: 16
     },
     input: {
         borderWidth: 0,
         ...padding.py0,
-        ...margin.my0
     },
     footer: {
-        flex: 1,
-        justifyContent: "flex-end",
         alignItems: "center",
-        flexDirection: "column",
         gap: 4
     },
     scanText: {
         textAlign: "center",
         color: theme.PrimaryDark,
         fontWeight: "600",
-        fontSize: 14
     },
     scanButton: {
-        width: width.w3.width,
         backgroundColor: "#cc6600",
-        aspectRatio: 3.5,
-        borderWidth: StyleSheet.hairlineWidth,
-        ...borderRadius.br2,
-        // borderColor: theme.Accent
-    },
-    toastStyle: {
-        backgroundColor: "rgba( 255, 255, 255, 0.1 )",
-        width: "100%",
-        maxWidth: width.w22.width,
-        paddingHorizontal: 0,
-        paddingVertical: 0
-    },
-    toastContainer: {
+        ...padding.py1,
         ...padding.px5,
-        ...padding.py3,
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 20,
-    }
+        ...borderRadius.br4
+    },
+    modalOpen: {
+        flex: 1,
+        justifyContent: "space-between",
+        ...margin.ms4,
+        ...margin.me5
+    },
+    svgGap: {
+        gap: 10
+    },
 });

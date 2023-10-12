@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {
     borderRadius,
-    Container, Drawer,
+    Container,
     H7, H8, H9,
     Input,
     Insets,
@@ -16,12 +16,12 @@ import PauseSVG from "../../assets/pauseSVG.svg";
 import {Pressable, StyleSheet, View} from "react-native";
 import {theme} from "../../config/theme";
 import DropDownPicker from "react-native-dropdown-picker";
-import TrackingDrawer from "../Menu";
+// import TrackingDrawer from "../Menu";
 // import Toast from "../../common/Toast";
 
 
 
-const Home = () => {
+const Home = (props:any) => {
     const [insets] = useState(Insets.getInsets());
     const [open, setOpen] = React.useState(false);
     const [value, setValue] = useState(null);
@@ -36,7 +36,6 @@ const Home = () => {
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     const [icon, setIcon] = useState("PlaySVG");
     const[openToast, setOpenToast] = useState(false);
-    const [drawerOpen, setDrawerOpen] = useState(false);
 
 
     const handleInputChange = (name: string, value: string | number) => {
@@ -68,7 +67,7 @@ const Home = () => {
                 fluid
                 backgroundColor={theme.White}
                 header
-                addIcon={<Pressable onPress={() => setDrawerOpen(true)}><HamburgerSVG/></Pressable>}
+                addIcon={<Pressable onPress={() => props.navigation.openDrawer()}><HamburgerSVG/></Pressable>}
                 headerText={"Tag Scanner"}
                 headerTextStyle={styles.headerText}
                 headerColor={theme.Primary}
@@ -143,14 +142,14 @@ const Home = () => {
                 </View>
             </Container>
             {/*<Toast open={openToast} message={"List Cleared"} type={"warning"} />*/}
-            <Drawer
-                open={drawerOpen}
-                position={"left"}
-                width={"35%"}
-                onBackdropPress={() => setDrawerOpen(false)}
-            >
-                <TrackingDrawer/>
-            </Drawer>
+            {/*<Drawer*/}
+            {/*    open={drawerOpen}*/}
+            {/*    position={"left"}*/}
+            {/*    width={"35%"}*/}
+            {/*    onBackdropPress={() => setDrawerOpen(false)}*/}
+            {/*>*/}
+            {/*    <TrackingDrawer/>*/}
+            {/*</Drawer>*/}
 
         </>
 

@@ -102,18 +102,16 @@ const Home = () => {
                 </View>
                 <View style={styles.footer}>
                     <View style={[styles.rowAlignCenter, styles.svgGap]}>
-                        <H8 style={styles.text}>Press</H8>
+                        <H8 style={styles.colorFont500}>Press</H8>
                         <Pressable style={styles.scanButton}><H8 style={styles.scanText}>SCAN</H8></Pressable>
-                        <H8 style={styles.text}>Button</H8>
+                        <H8 style={styles.colorFont500}>Button</H8>
                     </View>
-                    <H9 style={styles.text}>or Trigger to Read a Tag</H9>
-                    <H9 style={styles.text}>...</H9>
-
+                    <H9 style={styles.colorFont500}>or Trigger to Read a Tag</H9>
+                    <H9 style={styles.colorFont500}>...</H9>
                 </View>
             </Container>
             <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setValue}/>
         </>
-
     );
 };
 export default Home;
@@ -144,8 +142,9 @@ const styles = StyleSheet.create({
         color: theme.PrimaryDark,
         fontWeight: "600"
     },
-    text: {
-        color: theme.Primary
+    colorFont500: {
+        color: theme.Primary,
+        fontWeight: "500"
     },
     filterModeView: {
         ...padding.py5,
@@ -181,5 +180,5 @@ const styles = StyleSheet.create({
     },
     svgGap: {
         gap: 10
-    },
+    }
 });

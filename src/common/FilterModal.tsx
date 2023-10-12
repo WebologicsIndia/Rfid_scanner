@@ -27,7 +27,7 @@ const FilterModal = (props: {
                         modalData.map((item: string) => {
                             return (
                                 <Pressable onPress={() => handleModelItem(item)} key={item}>
-                                    <H7 style={{color: theme.Text, ...margin.my2}}>{item}</H7>
+                                    <H7 style={{color: theme.PrimaryDark, ...margin.my2}}>{item}</H7>
                                 </Pressable>
                             );
                         })

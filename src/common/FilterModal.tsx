@@ -9,7 +9,7 @@ const FilterModal = (props: {
     setModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
     setValue: React.Dispatch<React.SetStateAction<string>>
 }) => {
-    const handleModelItem= (item: string) => {
+    const handleModelItem = (item: string) => {
         props.setValue(item);
         props.setModalVisible(!props.modalVisible);
     };
@@ -26,12 +26,9 @@ const FilterModal = (props: {
                     {
                         modalData.map((item: string) => {
                             return (
-                                <React.Fragment key={item}>
-                                    <Pressable onPress={() => handleModelItem(item)}>
-                                        <H7 style={{color: theme.White, ...margin.my2}}>{item}</H7>
-                                    </Pressable>
-                                    <View style={styles.hairlineBorder}/>
-                                </React.Fragment>
+                                <Pressable onPress={() => handleModelItem(item)} key={item}>
+                                    <H7 style={{color: theme.Text, ...margin.my2}}>{item}</H7>
+                                </Pressable>
                             );
                         })
                     }
@@ -46,7 +43,7 @@ const styles = StyleSheet.create({
     centeredView: {
         height: "100%",
         width: "100%",
-        backgroundColor: theme.PrimaryLight + "60"
+        backgroundColor: theme.PrimaryLight + "80"
     },
     modalView: {
         ...width.w18,
@@ -57,13 +54,13 @@ const styles = StyleSheet.create({
         shadowColor: theme.Primary,
         ...padding.p4,
         elevation: 3,
-        backgroundColor: theme.PrimaryLight,
+        backgroundColor: theme.White,
         overflow: "hidden"
     },
     hairlineBorder: {
         height: StyleSheet.hairlineWidth,
         ...width.w24,
         marginLeft: -width.w1.width,
-        backgroundColor: theme.TextLight + "60",
+        backgroundColor: theme.TextLight + "60"
     }
 });

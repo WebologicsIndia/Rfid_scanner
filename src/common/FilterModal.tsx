@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     centeredView: {
         height: "100%",
         width: "100%",
-        backgroundColor: theme.PrimaryLight + "44"
+        backgroundColor: theme.PrimaryLight + "60"
     },
     modalView: {
         ...width.w18,

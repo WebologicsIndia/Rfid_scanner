@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     },
     modalView: {
         ...width.w18,
-        aspectRatio: 1,
+        // aspectRatio: 1,
         ...borderRadius.br4,
         marginHorizontal: width.w3.width,
         marginVertical: (height.h24.height - width.w18.width) / 2,

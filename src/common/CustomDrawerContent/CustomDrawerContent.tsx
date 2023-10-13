@@ -1,12 +1,11 @@
 import React from "react";
 import {DrawerContentScrollView} from "@react-navigation/drawer";
-import {TouchableOpacity, View} from "react-native";
+import {Image, TouchableOpacity, View} from "react-native";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import {theme} from "../../config/theme";
-import {H7, height, padding} from "@WebologicsIndia/react-native-components";
+import {H7, H8,  height, padding} from "@WebologicsIndia/react-native-components";
 import LinearGradient from "react-native-linear-gradient";
-
-
+import drawerLogo from "../../assets/drawerLogo.png";
 const CustomDrawerItem = (props: { focused: any, label: any, icon: any, onPress: any }) => {
     return (
         <TouchableOpacity onPress={props.onPress}>
@@ -17,7 +16,7 @@ const CustomDrawerItem = (props: { focused: any, label: any, icon: any, onPress:
                     padding: 16,
                     backgroundColor: props.focused ? theme.PrimaryDark + 80 : theme.PrimaryDark + 10,
                     gap: 10,
-                    marginTop: 10
+                    marginTop: 5
 
                 }}
             >
@@ -36,15 +35,18 @@ const CustomDrawerContent = (props: any) => {
     return (
         <DrawerContentScrollView {...props}>
             <LinearGradient
-                style={[height.h4, padding.py5, {backgroundColor: theme.PrimaryDark}]}
+                style={[height.h5, padding.py5, {backgroundColor: theme.PrimaryDark}]}
                 colors={[theme.PrimaryDark, theme.PrimaryLight]}
                 start={{x: 0, y: 0}} end={{x: 1, y: 0}}
             >
                 <View style={padding.p3}>
-                    <H7>Logo</H7>
-                    <H7 style={{fontWeight: "500", color: "white"}}>
-                      App Name
-                    </H7>
+                    <Image source={drawerLogo} style={[{height: 65, width: 65}]}/>
+                    <H8 style={{color: theme.White}}>
+                      Bertrack
+                    </H8>
+                    <H8 style={{color: theme.PrimaryLight}}>
+                    Tag Scanner
+                    </H8>
                 </View>
             </LinearGradient>
             {props.state.routes.map((route: any, index: any) => (

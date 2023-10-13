@@ -1,14 +1,24 @@
 import React, {useState} from "react";
-import {borderRadius, Container, H7, H8, H9, Input, margin, padding} from "@WebologicsIndia/react-native-components";
+import {
+    borderRadius,
+    Container,
+    H7,
+    H8,
+    H9,
+    Input,
+    margin,
+    padding,
+} from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../assets/current-location.svg";
 import PlaySVG from "../../assets/playSVG.svg";
 import ReloadSVG from "../../assets/reloadSVG.svg";
 import PauseSVG from "../../assets/pauseSVG.svg";
-import {Pressable, StyleSheet, View} from "react-native";
+import {Image, Pressable, StyleSheet, View} from "react-native";
 import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
+import Logo from "../../assets/dr_company_logo.jpg";
 import {inventoryUrl} from "../../config/api";
 
 const Home = (props:any) => {
@@ -71,16 +81,18 @@ const Home = (props:any) => {
                 bottom={padding.pb5.paddingBottom}
             >
                 <View>
-                    <View style={[styles.bodyLogoView, styles.rowAlignCenter]}>
-                        <H7 style={styles.logoBody}>Logo</H7>
-                        <Pressable onPress={handleLocationIconColor}>
+                    <View style={{flexDirection: "row", justifyContent: "center"}}>
+                        <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                            <Image source={Logo} style={{width: 120, height: 95}} />
+                        </View>
+                        <Pressable onPress={handleLocationIconColor} style={margin.mt3}>
                             <CurrentLocationSVG color={locationIconColor} width="24" height="24" />
                         </Pressable>
                     </View>
                     <View style={[styles.filterModeView, styles.rowAlignCenter]}>
                         <H8 style={styles.textHeading}>Filter Mode:</H8>
                         <Pressable onPress={showModal} style={[styles.modalOpen, styles.rowAlignCenter]}>
-                            <H7 style={{color: theme.PrimaryDark}}>{value}</H7>
+                            <H7 style={{color: theme.PrimaryLight, fontWeight: "500"}}>{value}</H7>
                             <DownSvg color={theme.Primary} />
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
@@ -128,7 +140,9 @@ export default Home;
 
 const styles = StyleSheet.create({
     container: {
-        ...padding.p5,
+        ...padding.pt3,
+        ...padding.pb5,
+        ...padding.px5,
         flex: 1,
         justifyContent: "space-between"
     },
@@ -142,11 +156,6 @@ const styles = StyleSheet.create({
     },
     bodyLogoView: {
         justifyContent: "space-between"
-    },
-    logoBody: {
-        color: theme.PrimaryDark,
-        textAlign: "center",
-        flex: 1
     },
     textHeading: {
         color: theme.PrimaryDark,

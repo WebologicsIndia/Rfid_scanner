@@ -10,24 +10,39 @@ import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
 import {inventoryUrl} from "../../config/api";
+import Geolocation from "react-native-geolocation-service";
 
 const Home = (props:any) => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     const [icon, setIcon] = useState("PlaySVG");
     const [value, setValue] = useState<string>("Contains");
+    const [latitude, setLatitude] = useState(0);
+    const [longitude, setLongitude] = useState(0);
     const [item, setItems] = useState({
-        rfIdTags: "sdfsdf",
-        itemType: "towel",
+        tag: "sdfsdf",
+        name: "towel",
     });
 
     const handleInputChange = (name: string, value: string | number) => {
         console.log(name, value);
 
     };
-    const handleLocationIconColor = () => {
+    const captureLocation = () => {
         if (locationIconColor === theme.PrimaryDark) {
+            Geolocation.getCurrentPosition(
+                (position) => {
+                    setLatitude(position.coords.latitude);
+                    setLongitude(position.coords.longitude);
+                },
+
+                (error) => {
+                    console.error(error);
+                },
+                {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
+            );
             setLocationIconColor("#009900");
+
         } else {
             setLocationIconColor(theme.PrimaryDark);
         }
@@ -73,7 +88,7 @@ const Home = (props:any) => {
                 <View>
                     <View style={[styles.bodyLogoView, styles.rowAlignCenter]}>
                         <H7 style={styles.logoBody}>Logo</H7>
-                        <Pressable onPress={handleLocationIconColor}>
+                        <Pressable onPress={captureLocation}>
                             <CurrentLocationSVG color={locationIconColor} width="24" height="24" />
                         </Pressable>
                     </View>

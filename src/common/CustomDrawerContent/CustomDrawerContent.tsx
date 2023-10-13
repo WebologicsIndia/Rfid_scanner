@@ -35,11 +35,11 @@ const CustomDrawerContent = (props: any) => {
     return (
         <DrawerContentScrollView {...props}>
             <LinearGradient
-                style={[height.h5, padding.py5, {backgroundColor: theme.PrimaryDark}]}
+                style={[padding.p5]}
                 colors={[theme.PrimaryDark, theme.PrimaryLight]}
-                start={{x: 0, y: 0}} end={{x: 1, y: 0}}
+                start={{x: 0, y: 0.5}} end={{x: 1, y: 0.5}}
             >
-                <View style={padding.p3}>
+                <View>
                     <Image source={drawerLogo} style={[{height: 65, width: 65}]}/>
                     <H8 style={{color: theme.White}}>
                       Bertrack

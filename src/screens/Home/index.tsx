@@ -14,27 +14,82 @@ import CurrentLocationSVG from "../../assets/current-location.svg";
 import PlaySVG from "../../assets/playSVG.svg";
 import ReloadSVG from "../../assets/reloadSVG.svg";
 import PauseSVG from "../../assets/pauseSVG.svg";
-import {Image, Pressable, StyleSheet, View} from "react-native";
+import {Image, Pressable, ScrollView, StyleSheet, View} from "react-native";
 import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
 import Logo from "../../assets/dr_company_logo.jpg";
-import {inventoryUrl} from "../../config/api";
+// import {inventoryUrl} from "../../config/api";
+import BatchModal from "./components/batchModal";
 
 const Home = (props:any) => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const[inventoryModal, setInventoryMOdal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     const [icon, setIcon] = useState("PlaySVG");
-    const [value, setValue] = useState<string>("Contains");
+    const [selectedFilter, setSelectedFilter] = useState<string>("Contains");
     const [item, setItems] = useState({
         rfIdTags: "sdfsdf",
         itemType: "towel",
     });
 
-    const handleInputChange = (name: string, value: string | number) => {
-        console.log(name, value);
+    const [filteredData, setFilteredData] = useState<string[]>([]);
 
+    const handleInputChange = (name: string, value: string) => {
+        if (name === "filterMask") {
+            const filtered = filterData(value, item, selectedFilter);
+            setFilteredData(filtered);
+        }
     };
+
+    const filterData = (value: string, item: { rfIdTags: string; itemType: string; }, selectedFilter: any) => {
+        switch (selectedFilter) {
+            case "Contains":
+                return generateMockData(value, 10, true);
+            case "Does Not Contain":
+                return generateMockData(value, 10, false);
+            case "Equals":
+                return generateMockData(value, 1, true);
+            case "Not Equal":
+                return generateMockData(value, 10, true);
+            case "Starts With":
+                return generateMockData(value, 5, true, true);
+            case "Ends With":
+                return generateMockData(value, 5, true, false);
+            default:
+                return [];
+        }
+    };
+
+    const generateMockData = (value: string, count: number, includeValue: boolean, startsWith = false) => {
+        const data = [];
+        for (let i = 0; i < count; i++) {
+            let entry = "";
+            if (startsWith) {
+                entry = value + generateRandomString(15);
+            } else {
+                entry = generateRandomString(15) + value;
+            }
+            if (includeValue) {
+                data.push(entry);
+            } else {
+                data.push(generateRandomString(15));
+            }
+        }
+        return data;
+    };
+
+    const generateRandomString = (length:any) => {
+        let result = "";
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    };
+
+
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
             setLocationIconColor("#009900");
@@ -46,27 +101,29 @@ const Home = (props:any) => {
     const handleIconClick = () => {
         if (icon === "PlaySVG") {
             setIcon("PauseSVG");
-            fetch(inventoryUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "accept": "application/json"
-                },
-                body: JSON.stringify(item)
-            }).then((res) => {
-                console.log("status", res.status);
-                if(res.status === 200){
-                    console.log("hello", item);
-                }
-            });
+            // fetch(inventoryUrl, {
+            //     method: "POST",
+            //     headers: {
+            //         "Content-Type": "application/json",
+            //         "accept": "application/json"
+            //     },
+            //     body: JSON.stringify(item)
+            // }).then((res) => {
+            //     console.log("status", res.status);
+            //     if(res.status === 200){
+            //         console.log("hello", item);
+            //     }
+            // });
         } else {
             setIcon("PlaySVG");
+            setInventoryMOdal(true);
         }
     };
 
     const showModal = () => {
         setModalVisible(true);
     };
+    console.log(filteredData);
     return (
         <>
             <Container
@@ -83,16 +140,16 @@ const Home = (props:any) => {
                 <View>
                     <View style={{flexDirection: "row", justifyContent: "center"}}>
                         <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                            <Image source={Logo} style={{width: 120, height: 95}} />
+                            <Image source={Logo} style={{width: 110, height: 85}} />
                         </View>
-                        <Pressable onPress={handleLocationIconColor} style={margin.mt3}>
+                        <Pressable onPress={handleLocationIconColor} style={margin.mt2}>
                             <CurrentLocationSVG color={locationIconColor} width="24" height="24" />
                         </Pressable>
                     </View>
                     <View style={[styles.filterModeView, styles.rowAlignCenter]}>
                         <H8 style={styles.textHeading}>Filter Mode:</H8>
                         <Pressable onPress={showModal} style={[styles.modalOpen, styles.rowAlignCenter]}>
-                            <H7 style={{color: theme.PrimaryLight, fontWeight: "500"}}>{value}</H7>
+                            <H7 style={{color: theme.PrimaryLight, fontWeight: "500"}}>{selectedFilter}</H7>
                             <DownSvg color={theme.Primary} />
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
@@ -121,6 +178,15 @@ const Home = (props:any) => {
                             />
                         </View>
                     </View>
+                    <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
+                        {filteredData.map((data, index) => {
+                            return(
+                                <View key={index} style={[padding.py5]}>
+                                    <H9 style={{color: theme.PrimaryDark}}>{data}</H9>
+                                </View>
+                            );
+                        })}
+                    </ScrollView>
                 </View>
                 <View style={styles.footer}>
                     <View style={[styles.rowAlignCenter, styles.svgGap]}>
@@ -132,7 +198,8 @@ const Home = (props:any) => {
                     <H9 style={styles.colorFont500}>...</H9>
                 </View>
             </Container>
-            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setValue} />
+            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} />
+            <BatchModal modalVisible={inventoryModal} setModalVisible={setInventoryMOdal}/>
         </>
     );
 };
@@ -166,7 +233,7 @@ const styles = StyleSheet.create({
         fontWeight: "500"
     },
     filterModeView: {
-        ...padding.py5,
+        ...padding.py3,
         justifyContent: "space-between"
     },
     filterMaskView: {
@@ -199,5 +266,12 @@ const styles = StyleSheet.create({
     },
     svgGap: {
         gap: 10
-    }
+    },
+    scrollView: {
+        height: 450,
+    },
+    scrollContent: {
+        flexGrow: 1,
+        paddingVertical: 10,
+    },
 });

@@ -50,14 +50,15 @@ const TrackingDrawer = (props: any) => {
                 {
                     inventoryData.length ?
                         inventoryData.map((item: any) => {
+                            console.log(item);
                             return (
                                 <View key={item._id}
                                     style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                                     <View style={padding.pb3}>
                                         <H7 style={{color: theme.PrimaryDark}}>Name</H7>
-                                        <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>{item.itemType}</H7>
+                                        <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>{item.name}</H7>
                                         <H7 style={{color: theme.PrimaryDark}}>Tags</H7>
-                                        <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>0</H7>
+                                        <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>{item.tag}</H7>
                                     </View>
                                     <View>
                                         <H7 style={{color: theme.PrimaryDark}}>Created</H7>

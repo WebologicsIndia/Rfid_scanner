@@ -18,6 +18,8 @@ import {Image, Pressable, ScrollView, StyleSheet, View} from "react-native";
 import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
+import {inventoryUrl} from "../../config/api";
+import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
 // import {inventoryUrl} from "../../config/api";
 import BatchModal from "./components/batchModal";
@@ -27,10 +29,13 @@ const Home = (props:any) => {
     const[inventoryModal, setInventoryMOdal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     const [icon, setIcon] = useState("PlaySVG");
+    const [value, setValue] = useState<string>("Contains");
+    const [latitude, setLatitude] = useState(0);
+    const [longitude, setLongitude] = useState(0);
     const [selectedFilter, setSelectedFilter] = useState<string>("Contains");
     const [item, setItems] = useState({
-        rfIdTags: "sdfsdf",
-        itemType: "towel",
+        tag: "sdfsdf",
+        name: "towel",
     });
 
     const [filteredData, setFilteredData] = useState<string[]>([]);
@@ -88,11 +93,24 @@ const Home = (props:any) => {
         }
         return result;
     };
+    const captureLocation = () => {
 
 
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
+            Geolocation.getCurrentPosition(
+                (position) => {
+                    setLatitude(position.coords.latitude);
+                    setLongitude(position.coords.longitude);
+                },
+
+                (error) => {
+                    console.error(error);
+                },
+                {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
+            );
             setLocationIconColor("#009900");
+
         } else {
             setLocationIconColor(theme.PrimaryDark);
         }
@@ -138,6 +156,9 @@ const Home = (props:any) => {
                 bottom={padding.pb5.paddingBottom}
             >
                 <View>
+                    <View style={[styles.bodyLogoView, styles.rowAlignCenter]}>
+                        <H7 style={styles.logoBody}>Logo</H7>
+                        <Pressable onPress={captureLocation}>
                     <View style={{flexDirection: "row", justifyContent: "center"}}>
                         <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
                             <Image source={Logo} style={{width: 110, height: 85}} />
@@ -223,6 +244,11 @@ const styles = StyleSheet.create({
     },
     bodyLogoView: {
         justifyContent: "space-between"
+    },
+    logoBody: {
+        color: theme.PrimaryDark,
+        textAlign: "center",
+        flex: 1
     },
     textHeading: {
         color: theme.PrimaryDark,

@@ -5,9 +5,9 @@ import {
     H7,
     H8,
     H9,
-    Input,
+    Input, Insets,
     margin,
-    padding,
+    padding
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../assets/current-location.svg";
@@ -18,7 +18,7 @@ import {Image, Pressable, ScrollView, StyleSheet, View} from "react-native";
 import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
-import {inventoryUrl} from "../../config/api";
+// import {inventoryUrl} from "../../config/api";
 import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
 // import {inventoryUrl} from "../../config/api";
@@ -26,10 +26,9 @@ import BatchModal from "./components/batchModal";
 
 const Home = (props:any) => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const[inventoryModal, setInventoryMOdal] = useState<boolean>(false);
+    const[inventoryModal, setInventoryModal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     const [icon, setIcon] = useState("PlaySVG");
-    const [value, setValue] = useState<string>("Contains");
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [selectedFilter, setSelectedFilter] = useState<string>("Contains");
@@ -47,7 +46,7 @@ const Home = (props:any) => {
         }
     };
 
-    const filterData = (value: string, item: { rfIdTags: string; itemType: string; }, selectedFilter: any) => {
+    const filterData = (value: string, item: { name: string; tag: string }, selectedFilter: any) => {
         switch (selectedFilter) {
             case "Contains":
                 return generateMockData(value, 10, true);
@@ -93,18 +92,16 @@ const Home = (props:any) => {
         }
         return result;
     };
-    const captureLocation = () => {
-
 
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
             Geolocation.getCurrentPosition(
-                (position) => {
+                (position:any) => {
                     setLatitude(position.coords.latitude);
                     setLongitude(position.coords.longitude);
                 },
 
-                (error) => {
+                (error:any) => {
                     console.error(error);
                 },
                 {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
@@ -134,14 +131,13 @@ const Home = (props:any) => {
             // });
         } else {
             setIcon("PlaySVG");
-            setInventoryMOdal(true);
+            setInventoryModal(true);
         }
     };
 
     const showModal = () => {
         setModalVisible(true);
     };
-    console.log(filteredData);
     return (
         <>
             <Container
@@ -156,12 +152,9 @@ const Home = (props:any) => {
                 bottom={padding.pb5.paddingBottom}
             >
                 <View>
-                    <View style={[styles.bodyLogoView, styles.rowAlignCenter]}>
-                        <H7 style={styles.logoBody}>Logo</H7>
-                        <Pressable onPress={captureLocation}>
                     <View style={{flexDirection: "row", justifyContent: "center"}}>
                         <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                            <Image source={Logo} style={{width: 110, height: 85}} />
+                            <Image source={Logo} style={{width: 100, height: 85}} />
                         </View>
                         <Pressable onPress={handleLocationIconColor} style={margin.mt2}>
                             <CurrentLocationSVG color={locationIconColor} width="24" height="24" />
@@ -218,9 +211,10 @@ const Home = (props:any) => {
                     <H9 style={styles.colorFont500}>or Trigger to Read a Tag</H9>
                     <H9 style={styles.colorFont500}>...</H9>
                 </View>
+
             </Container>
             <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} />
-            <BatchModal modalVisible={inventoryModal} setModalVisible={setInventoryMOdal}/>
+            <BatchModal modalVisible={inventoryModal} setModalVisible={setInventoryModal}/>
         </>
     );
 };

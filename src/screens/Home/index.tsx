@@ -5,7 +5,7 @@ import {
     H7,
     H8,
     H9,
-    Input, Insets,
+    Input,
     margin,
     padding
 } from "@WebologicsIndia/react-native-components";
@@ -37,8 +37,7 @@ const Home = (props:any) => {
         name: "towel",
     });
 
-    const [filteredData, setFilteredData] = useState<string[]>([]);
-
+    const [filteredData, setFilteredData] = useState<string[]>(["3453abc"]);
     const handleInputChange = (name: string, value: string) => {
         if (name === "filterMask") {
             const filtered = filterData(value, item, selectedFilter);
@@ -49,13 +48,13 @@ const Home = (props:any) => {
     const filterData = (value: string, item: { name: string; tag: string }, selectedFilter: any) => {
         switch (selectedFilter) {
             case "Contains":
-                return generateMockData(value, 10, true);
+                return generateMockData(value, 5, true);
             case "Does Not Contain":
-                return generateMockData(value, 10, false);
+                return generateMockData(value, 5, false);
             case "Equals":
                 return generateMockData(value, 1, true);
             case "Not Equal":
-                return generateMockData(value, 10, true);
+                return generateMockData(value, 5, true);
             case "Starts With":
                 return generateMockData(value, 5, true, true);
             case "Ends With":
@@ -70,14 +69,14 @@ const Home = (props:any) => {
         for (let i = 0; i < count; i++) {
             let entry = "";
             if (startsWith) {
-                entry = value + generateRandomString(15);
+                entry = generateRandomString(5);
             } else {
-                entry = generateRandomString(15) + value;
+                entry = generateRandomString(5) + value;
             }
             if (includeValue) {
                 data.push(entry);
             } else {
-                data.push(generateRandomString(15));
+                data.push(generateRandomString(5));
             }
         }
         return data;
@@ -214,7 +213,13 @@ const Home = (props:any) => {
 
             </Container>
             <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} />
-            <BatchModal modalVisible={inventoryModal} setModalVisible={setInventoryModal}/>
+            <BatchModal
+                modalVisible={inventoryModal}
+                setModalVisible={setInventoryModal}
+                latitude={latitude}
+                longitude={longitude}
+                filteredData={filteredData}
+            />
         </>
     );
 };

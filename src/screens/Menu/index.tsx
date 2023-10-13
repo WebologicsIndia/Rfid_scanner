@@ -50,7 +50,6 @@ const TrackingDrawer = (props: any) => {
                 {
                     inventoryData.length ?
                         inventoryData.map((item: any) => {
-                            console.log(item);
                             return (
                                 <View key={item._id}
                                     style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>

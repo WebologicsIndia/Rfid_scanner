@@ -2,12 +2,49 @@ import React, {useState} from "react";
 import {Modal, Pressable, StyleSheet, View} from "react-native";
 import {theme} from "../../../config/theme";
 import {borderRadius, H7, height, Input, padding, width} from "@WebologicsIndia/react-native-components";
+import {batchUrl} from "../../../config/api";
 const BatchModal = (props:{
     modalVisible:boolean,
     setModalVisible:React.Dispatch<React.SetStateAction<boolean>>
+    latitude:number,
+    longitude:number,
+    filteredData:any
 }) => {
     const [isFocused, setIsFocused] = useState(false);
     const handleFocus = () => setIsFocused(true);
+    const[value, setValue] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const handleInputChange = (value:any) => {
+        setValue(value);
+    };
+    const batchApi = () => {
+        setLoading(true);
+        fetch(batchUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "accept": "application/json"
+            },
+            body: JSON.stringify({
+                latitude: props.latitude,
+                longitude: props.longitude,
+                name: value,
+                tags: props.filteredData
+            })
+        }).then((resp) => {
+            console.log("status", resp.status);
+            if (resp.status === 200){
+                console.log("hello");
+                setValue("");
+                props.setModalVisible(false);
+            }
+        }).catch(() => {
+            setLoading(false);
+        }).finally(() => {
+            setLoading(false);
+        });
+    };
     return (
         <Modal
             visible={props.modalVisible}
@@ -21,13 +58,14 @@ const BatchModal = (props:{
                 // }}
             >
                 <View style={styles.modalView}>
-                    <H7 style={{color: theme.PrimaryDark, fontWeight: "500"}}>New Inventory</H7>
+                    <H7 style={{color: theme.PrimaryDark, fontWeight: "500"}}>New Batch</H7>
                     <View style={{flex: 1, marginTop: 35}}>
                         <Input
                             inputStyle={{borderBottomWidth: 1, borderBottomColor: isFocused ? theme.Accent : theme.PrimaryDark}}
                             textStyle={[{color: theme.PrimaryDark}, styles.input]}
                             bgColor={theme.White}
                             onFocus={handleFocus}
+                            onChangeText={(value) => handleInputChange(value)}
                         />
                     </View>
                     <View style={{flexDirection: "row", gap: 30, marginLeft: "auto"}}>
@@ -37,7 +75,7 @@ const BatchModal = (props:{
                         }}>
                             <H7 style={{textTransform: "uppercase", color: theme.Accent}}>Cancle</H7>
                         </Pressable>
-                        <Pressable>
+                        <Pressable onPress={batchApi}>
                             <H7 style={{textTransform: "uppercase", color: theme.Accent}}>oK</H7>
                         </Pressable>
                     </View>

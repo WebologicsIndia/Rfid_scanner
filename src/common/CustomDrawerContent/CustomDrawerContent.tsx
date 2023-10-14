@@ -32,7 +32,6 @@ const CustomDrawerItem = (props: { focused: any, label: any, icon: any, onPress:
     );
 };
 const CustomDrawerContent = (props: any) => {
-    console.log(props);
     return (
         <DrawerContentScrollView {...props}>
             <LinearGradient
@@ -51,7 +50,6 @@ const CustomDrawerContent = (props: any) => {
                 </View>
             </LinearGradient>
             {props.state.routes.map((route: any, index: any) => {
-                console.log("rote", route);
                 return(
                     <CustomDrawerItem
                         key={index}

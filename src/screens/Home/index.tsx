@@ -33,32 +33,38 @@ const Home = (props:any) => {
     const [longitude, setLongitude] = useState(0);
     const [selectedFilter, setSelectedFilter] = useState<string>("Contains");
     const [item, setItems] = useState({
-        tag: "sdfsdf",
+        tags: ["3453abc"],
         name: "towel",
     });
 
-    const [filteredData, setFilteredData] = useState<string[]>(["3453abc"]);
+    // const [filteredData, setFilteredData] = useState<string[]>(["3453abc"]);
     const handleInputChange = (name: string, value: string) => {
         if (name === "filterMask") {
             const filtered = filterData(value, item, selectedFilter);
-            setFilteredData(filtered);
+            setItems((prevItems:any) => ({
+                ...prevItems,
+                tags: filtered
+            }));
         }
     };
 
-    const filterData = (value: string, item: { name: string; tag: string }, selectedFilter: any) => {
+    const filterData = (value: string, item: { name: string; tags: any[] }, selectedFilter: any) => {
         switch (selectedFilter) {
             case "Contains":
                 return generateMockData(value, 5, true);
             case "Does Not Contain":
                 return generateMockData(value, 5, false);
             case "Equals":
-                return generateMockData(value, 1, true);
+                console.log("Value:", value, "Tags:", item.tags);
+                const filteredTags = item.tags.filter((tag) => tag.toString() === value);
+                console.log("Filtered Tags:", filteredTags);
+                return filteredTags;
             case "Not Equal":
-                return generateMockData(value, 5, true);
+                return item.tags.filter((tag) => tag !== value);
             case "Starts With":
-                return generateMockData(value, 5, true, true);
+                return item.tags.filter((tag) => tag.startsWith(value));
             case "Ends With":
-                return generateMockData(value, 5, true, false);
+                return item.tags.filter((tag) => tag.endsWith(value));
             default:
                 return [];
         }
@@ -84,7 +90,7 @@ const Home = (props:any) => {
 
     const generateRandomString = (length:any) => {
         let result = "";
-        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const characters = "ABCDEFabcdef0123456789";
         const charactersLength = characters.length;
         for (let i = 0; i < length; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -192,19 +198,17 @@ const Home = (props:any) => {
                         </View>
                     </View>
                     <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
-                        {filteredData.map((data, index) => {
-                            return(
-                                <View key={index} style={[padding.py5]}>
-                                    <H9 style={{color: theme.PrimaryDark}}>{data}</H9>
-                                </View>
-                            );
-                        })}
+                        {item.tags.map((data, index) => (
+                            <View key={index} style={[padding.py5]}>
+                                <H9 style={{color: theme.PrimaryDark}}>{data}</H9>
+                            </View>
+                        ))}
                     </ScrollView>
                 </View>
                 <View style={styles.footer}>
                     <View style={[styles.rowAlignCenter, styles.svgGap]}>
                         <H8 style={styles.colorFont500}>Press</H8>
-                        <Pressable style={styles.scanButton}><H8 style={styles.scanText}>SCAN</H8></Pressable>
+                        <Pressable><Image source={require("../../assets/dr_scan_button.png")}/></Pressable>
                         <H8 style={styles.colorFont500}>Button</H8>
                     </View>
                     <H9 style={styles.colorFont500}>or Trigger to Read a Tag</H9>
@@ -218,7 +222,7 @@ const Home = (props:any) => {
                 setModalVisible={setInventoryModal}
                 latitude={latitude}
                 longitude={longitude}
-                filteredData={filteredData}
+                filteredData={item.tags}
             />
         </>
     );
@@ -276,12 +280,6 @@ const styles = StyleSheet.create({
         textAlign: "center",
         color: theme.PrimaryDark,
         fontWeight: "600"
-    },
-    scanButton: {
-        backgroundColor: "#cc6600",
-        ...padding.py1,
-        ...padding.px5,
-        ...borderRadius.br4
     },
     modalOpen: {
         flex: 1,

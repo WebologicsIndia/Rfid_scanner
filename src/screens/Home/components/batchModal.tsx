@@ -33,9 +33,7 @@ const BatchModal = (props:{
                 tags: props.filteredData
             })
         }).then((resp) => {
-            console.log("status", resp.status);
             if (resp.status === 200){
-                console.log("hello");
                 setValue("");
                 props.setModalVisible(false);
             }

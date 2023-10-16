@@ -14,7 +14,7 @@ import CurrentLocationSVG from "../../assets/current-location.svg";
 import PlaySVG from "../../assets/playSVG.svg";
 import ReloadSVG from "../../assets/reloadSVG.svg";
 import PauseSVG from "../../assets/pauseSVG.svg";
-import {Image, Pressable, ScrollView, StyleSheet, View} from "react-native";
+import {Image, Pressable, ScrollView, StyleSheet, View, NativeModules} from "react-native";
 import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
@@ -23,6 +23,7 @@ import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
 // import {inventoryUrl} from "../../config/api";
 import BatchModal from "./components/batchModal";
+
 
 const Home = (props:any) => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -36,7 +37,8 @@ const Home = (props:any) => {
         tag: "sdfsdf",
         name: "towel",
     });
-
+    const {RFIDModule} = NativeModules;
+    console.log("RFID: ", RFIDModule);
     const [filteredData, setFilteredData] = useState<string[]>(["3453abc"]);
     const handleInputChange = (name: string, value: string) => {
         if (name === "filterMask") {

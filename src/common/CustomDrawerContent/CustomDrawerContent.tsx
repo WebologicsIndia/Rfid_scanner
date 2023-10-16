@@ -1,9 +1,9 @@
 import React from "react";
 import {DrawerContentScrollView} from "@react-navigation/drawer";
 import {Image, TouchableOpacity, View} from "react-native";
-import HamburgerSVG from "../../assets/hamburger.svg";
+import DrawerIcon from "../../assets/drawerIcon.svg";
 import {theme} from "../../config/theme";
-import {H7, H8,  height, padding} from "@WebologicsIndia/react-native-components";
+import {H7, H8, padding} from "@WebologicsIndia/react-native-components";
 import LinearGradient from "react-native-linear-gradient";
 import drawerLogo from "../../assets/drawerLogo.png";
 const CustomDrawerItem = (props: { focused: any, label: any, icon: any, onPress: any }) => {
@@ -35,7 +35,7 @@ const CustomDrawerContent = (props: any) => {
     return (
         <DrawerContentScrollView {...props}>
             <LinearGradient
-                style={[padding.p5]}
+                style={[padding.p5, {marginTop: -5}]}
                 colors={[theme.PrimaryDark, theme.PrimaryLight]}
                 start={{x: 0, y: 0.5}} end={{x: 1, y: 0.5}}
             >
@@ -49,17 +49,19 @@ const CustomDrawerContent = (props: any) => {
                     </H8>
                 </View>
             </LinearGradient>
-            {props.state.routes.map((route: any, index: any) => (
-                <CustomDrawerItem
-                    key={index}
-                    label={route.name}
-                    icon={() => <HamburgerSVG />}
-                    focused={route.name === props.state.routes[props.state.index].name}
-                    onPress={() => {
-                        props.navigation.navigate(route.name);
-                    }}
-                />
-            ))}
+            {props.state.routes.map((route: any, index: any) => {
+                return(
+                    <CustomDrawerItem
+                        key={index}
+                        label={route.name}
+                        icon={() => <DrawerIcon />}
+                        focused={route.name === props.state.routes[props.state.index].name}
+                        onPress={() => {
+                            props.navigation.navigate(route.name);
+                        }}
+                    />
+                );
+            })}
         </DrawerContentScrollView>
     );
 };

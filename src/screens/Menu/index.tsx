@@ -1,7 +1,7 @@
 import React, {useState} from "react";
-import {Container, H5, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
+import {Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
 import {theme} from "../../config/theme";
-import {Pressable, ScrollView, StyleSheet, View} from "react-native";
+import {ActivityIndicator, Pressable, ScrollView, StyleSheet, View} from "react-native";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import {inventoryUrl} from "../../config/api";
 import dayjs from "dayjs";
@@ -32,7 +32,7 @@ const TrackingDrawer = (props: any) => {
     }, []);
 
     if (loading) {
-        return <H5 style={{color: theme.PrimaryDark, textAlign: "center", fontWeight: "500"}}>Loading...</H5>;
+        return <View style={{justifyContent: "center", alignItems: "center"}}><ActivityIndicator size={"large"} color={theme.PrimaryDark}/></View>;
     }
     return (
         <Container
@@ -62,7 +62,7 @@ const TrackingDrawer = (props: any) => {
                                     <View>
                                         <H7 style={{color: theme.PrimaryDark}}>Created</H7>
                                         <H7
-                                            style={{color: theme.PrimaryDark}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH-MM-A")}</H7>
+                                            style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH-MM-A")}</H7>
                                     </View>
                                 </View>
                             );

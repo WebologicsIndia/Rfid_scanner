@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Modal, Pressable, StyleSheet, View} from "react-native";
+import {Modal, Pressable, StyleSheet, View, ActivityIndicator} from "react-native";
 import {theme} from "../../../config/theme";
 import {borderRadius, H7, height, Input, padding, width} from "@WebologicsIndia/react-native-components";
 import {batchUrl} from "../../../config/api";
@@ -43,6 +43,10 @@ const BatchModal = (props:{
             setLoading(false);
         });
     };
+
+    if(loading){
+        return <ActivityIndicator size={"large"}/>;
+    }
     return (
         <Modal
             visible={props.modalVisible}
@@ -71,7 +75,7 @@ const BatchModal = (props:{
                             props.setModalVisible(false);
                             setIsFocused(false);
                         }}>
-                            <H7 style={{textTransform: "uppercase", color: theme.Accent}}>Cancle</H7>
+                            <H7 style={{textTransform: "uppercase", color: theme.Accent}}>Cancel</H7>
                         </Pressable>
                         <Pressable onPress={batchApi}>
                             <H7 style={{textTransform: "uppercase", color: theme.Accent}}>oK</H7>

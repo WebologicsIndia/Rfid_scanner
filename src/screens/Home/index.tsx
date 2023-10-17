@@ -117,11 +117,33 @@ const Home = (props:any) => {
     const handleIconClick = () => {
         if (icon === "PlaySVG"){
             console.log(RFIDModule);
-            RFIDModule.initRFID();
-            RFIDModule.scanRFID().then((result: any) => {
-                console.log("RFID Scan Results: "+ result);
-            });
+            RFIDModule.init(
+                (successMessage: any) => {
+                    console.log(successMessage);
+                    RFIDModule.startInventory(
+                        (success: any) => {
+                            console.log(success);
+                            RFIDModule.readTagfromBuffer(
+                                (data: any) => {
+                                    console.log(data);
+                                },
+                                (error: any) => {
+                                    console.log(error);
+                                }
+                            );
+                        },
+                        (error: any) => {
+                            console.log(error);
+                        }
+
+                    );
+                },
+                (errorMessage: any) => {
+                    console.error(errorMessage);
+                }
+            );
             setIcon("PauseSVG");
+
             // fetch(inventoryUrl, {
             //     method: "POST",
             //     headers: {
@@ -136,6 +158,14 @@ const Home = (props:any) => {
             //     }
             // });
         } else {
+            RFIDModule.stopInventory(
+                (success: any) => {
+                    console.log(success);
+                },
+                (error: any) => {
+                    console.log(error);
+                }
+            );
             setIcon("PlaySVG");
             setInventoryModal(true);
         }

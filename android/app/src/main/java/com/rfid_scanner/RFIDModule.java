@@ -1,10 +1,12 @@
 package com.rfid_scanner;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -26,6 +28,7 @@ public class RFIDModule  extends ReactContextBaseJavaModule {
         rfidChannel = new RFIDChannel();
         initRFIDChannel();
 
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -43,21 +46,53 @@ public class RFIDModule  extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initRFID() {
-
+//        rfidChannel.init();
+//        rfidChannel.getReader();
         // Add your initialization code for the RFID scanner here.
     }
 
     @ReactMethod
     public void scanRFID(Promise promise) {
         try {
-            promise.resolve("RFID scan successful");
+
+            promise.resolve("RFID scan successful: "+promise);
         } catch (Exception e) {
             // Handle any errors and reject the promise.
             promise.reject("RFID_ERROR", e.getMessage());
         }
     }
         private void initRFIDChannel() {
-            // Initialize the RFID channel. You can use an AsyncTask as you did in your previous code.
+            rfidChannel.free();
+            if (rfidChannel.getReader() == null) {
+                //new RFIDChannelAsync(RFIDAction.INIT).execute();
+                new InitTask().execute();
+            } else {
+//                initRFID();
+            }
         }
 
+    public class InitTask extends AsyncTask<String, Integer, Boolean> {
+        ProgressDialog mypDialog;
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            // TODO Auto-generated method stub
+            boolean result = rfidChannel.init();
+            if (result) {
+                rfidChannel.getReader().setPower(30);
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+
+            mypDialog.cancel();
+
+        }
+
+
+
+    }
 }

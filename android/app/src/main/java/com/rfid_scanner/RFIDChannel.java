@@ -1,5 +1,7 @@
 package com.rfid_scanner;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.facebook.react.ReactPackage;
@@ -12,6 +14,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class RFIDChannel implements Serializable, ReactPackage, NativeModule {
     private String TAG = "RFIDChannel";
     private RFIDWithUHFUART reader;
@@ -20,6 +23,7 @@ public class RFIDChannel implements Serializable, ReactPackage, NativeModule {
     }
 
     public void free() {
+        Log.d("reader", "Reader: "+reader);
         if (reader != null) {
             reader.free();
             reader = null;
@@ -30,6 +34,7 @@ public class RFIDChannel implements Serializable, ReactPackage, NativeModule {
         if (reader == null) {
             try {
                 reader = RFIDWithUHFUART.getInstance();
+                Log.d("getReader", "Reader: "+reader);
             } catch (Exception e) {
                 reader = null;
             }

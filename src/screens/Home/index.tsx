@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
     borderRadius,
     Container,
@@ -23,7 +23,7 @@ import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
 // import {inventoryUrl} from "../../config/api";
 import BatchModal from "./components/batchModal";
-
+const {RFIDModule} = NativeModules;
 
 const Home = (props:any) => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -37,8 +37,8 @@ const Home = (props:any) => {
         tag: "sdfsdf",
         name: "towel",
     });
-    const {RFIDModule} = NativeModules;
-    console.log("RFID: ", RFIDModule);
+
+
     const [filteredData, setFilteredData] = useState<string[]>(["3453abc"]);
     const handleInputChange = (name: string, value: string) => {
         if (name === "filterMask") {
@@ -115,7 +115,12 @@ const Home = (props:any) => {
     };
 
     const handleIconClick = () => {
-        if (icon === "PlaySVG") {
+        if (icon === "PlaySVG"){
+            console.log(RFIDModule);
+            RFIDModule.initRFID();
+            RFIDModule.scanRFID().then((result: any) => {
+                console.log("RFID Scan Results: "+ result);
+            });
             setIcon("PauseSVG");
             // fetch(inventoryUrl, {
             //     method: "POST",

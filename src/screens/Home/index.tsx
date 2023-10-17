@@ -28,10 +28,18 @@ const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Start
 const Home = (props:any) => {
     const [insets] = useState(Insets.getInsets());
     const tempObj:any={};
-    const [rfIdData, setRfIdData] = useState<any>([{
-        epc: "98760ABC",
-        userData: "hand towel"
-    }]);
+    const generateRandomEPC = () => {
+        let result = "";
+        const characters = "0123456789ABCDEF";
+        const charactersLength = characters.length;
+        for (let i = 0; i < 8; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    };
+    const [rfIdData, setRfIdData] = useState<any>(Array.from({length: 10}, () => ({
+        epc: generateRandomEPC(),
+    })));
     const [rfIdOpen, setRfIdOpen] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [inventoryModal, setInventoryModal] = useState<boolean>(false);
@@ -190,6 +198,10 @@ const Home = (props:any) => {
     const showModal = () => {
         setModalVisible(true);
     };
+    const handleRefreshSvg = () => {
+        setRfIdData([]);
+        console.log("data cleared");
+    };
     return (
         <>
             <Container
@@ -228,7 +240,7 @@ const Home = (props:any) => {
                                     <PauseSVG width="24" height="24" />
                                 </Pressable>
                             )}
-                            <Pressable>
+                            <Pressable onPress={handleRefreshSvg}>
                                 <ReloadSVG width="24" height="24" />
                             </Pressable>
                         </View>
@@ -248,7 +260,6 @@ const Home = (props:any) => {
                         <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
                             {rfIdData.map((data:any, index:number) => (
                                 <View key={index} style={[padding.py5]}>
-                                    <H8 style={{color: theme.PrimaryDark}}>Tags</H8>
                                     <H9 style={{color: theme.PrimaryDark}}>{data.epc}</H9>
                                 </View>
                             ))}

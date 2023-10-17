@@ -29,8 +29,8 @@ const Home = (props:any) => {
     const [insets] = useState(Insets.getInsets());
     const tempObj:any={};
     const [rfIdData, setRfIdData] = useState<any>([{
-        epc: "98760ABC",
-        userData: "hand towel"
+        epc: "",
+        userData: ""
     }]);
     const [rfIdOpen, setRfIdOpen] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -248,7 +248,7 @@ const Home = (props:any) => {
                         <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
                             {rfIdData.map((data:any, index:number) => (
                                 <View key={index} style={[padding.py5]}>
-                                    <H8 style={{color: theme.PrimaryDark}}>Tags</H8>
+                                    {/*<H8 style={{color: theme.PrimaryDark}}>Tags</H8>*/}
                                     <H9 style={{color: theme.PrimaryDark}}>{data.epc}</H9>
                                 </View>
                             ))}
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontWeight: "600",
-        ...margin.ms4
+        ...margin.ms4,
     },
     bodyLogoView: {
         justifyContent: "space-between"

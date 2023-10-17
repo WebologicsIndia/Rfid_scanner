@@ -27,6 +27,7 @@ const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Start
 const Home = (props:any) => {
     const tempObj:any={};
     const [rfIdData, setRfIdData] = useState([tempObj]);
+    const [rfIdOpen, setRfIdOpen] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [inventoryModal, setInventoryModal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
@@ -132,6 +133,7 @@ const Home = (props:any) => {
                                             tempObj[key] = data[key];
                                         }
                                     }
+                                    setRfIdOpen(true);
                                 },
                                 (error: any) => {
                                     console.log(error);
@@ -247,7 +249,7 @@ const Home = (props:any) => {
 
             </Container>
             <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} modelData={modalData}/>
-            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setRfIdData} modelData={rfIdData}/>
+            <FilterModal modalVisible={rfIdOpen} setModalVisible={setRfIdOpen} setValue={setRfIdData} modelData={rfIdData}/>
             <BatchModal
                 modalVisible={inventoryModal}
                 setModalVisible={setInventoryModal}

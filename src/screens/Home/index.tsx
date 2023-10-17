@@ -14,7 +14,7 @@ import CurrentLocationSVG from "../../assets/current-location.svg";
 import PlaySVG from "../../assets/playSVG.svg";
 import ReloadSVG from "../../assets/reloadSVG.svg";
 import PauseSVG from "../../assets/pauseSVG.svg";
-import {Image, Pressable, StyleSheet, View, NativeModules} from "react-native";
+import {Image, Pressable, StyleSheet, View, NativeModules, ScrollView} from "react-native";
 import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
@@ -41,7 +41,7 @@ const Home = (props:any) => {
     });
 
 
-    const [filteredData, setFilteredData] = useState<string[]>(["3453abc"]);
+    const [filteredData, setFilteredData] = useState<string[]>([]);
     const handleInputChange = (name: string, value: string) => {
         if (name === "filterMask") {
             const filtered = filterData(value, item, selectedFilter);
@@ -127,7 +127,6 @@ const Home = (props:any) => {
                             console.log("success", success);
                             RFIDModule.readTagfromBuffer(
                                 (data: any) => {
-                                    console.log("data", data);
                                     for (const key of Object.keys(data)){
                                         if(data[key]){
                                             tempObj[key] = data[key];
@@ -236,6 +235,16 @@ const Home = (props:any) => {
                             />
                         </View>
                     </View>
+                    {rfIdData &&
+                        <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
+                            {rfIdData.map((data, index) => (
+                                <View key={index} style={[padding.py5]}>
+                                    <H8 style={{color: theme.PrimaryDark}}>Tags</H8>
+                                    <H9 style={{color: theme.PrimaryDark}}>{data.epc}</H9>
+                                </View>
+                            ))}
+                        </ScrollView>
+                    }
                 </View>
                 <View style={styles.footer}>
                     <View style={[styles.rowAlignCenter, styles.svgGap]}>

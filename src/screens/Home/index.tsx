@@ -190,6 +190,10 @@ const Home = (props:any) => {
     const showModal = () => {
         setModalVisible(true);
     };
+    const handleRefreshSvg = () => {
+        setRfIdData([]);
+        console.log("data cleared");
+    };
     return (
         <>
             <Container
@@ -228,7 +232,7 @@ const Home = (props:any) => {
                                     <PauseSVG width="24" height="24" />
                                 </Pressable>
                             )}
-                            <Pressable>
+                            <Pressable onPress={handleRefreshSvg}>
                                 <ReloadSVG width="24" height="24" />
                             </Pressable>
                         </View>
@@ -293,7 +297,7 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontWeight: "600",
-        ...margin.ms4,
+        ...margin.ms4
     },
     bodyLogoView: {
         justifyContent: "space-between"

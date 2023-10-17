@@ -28,18 +28,10 @@ const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Start
 const Home = (props:any) => {
     const [insets] = useState(Insets.getInsets());
     const tempObj:any={};
-    const generateRandomEPC = () => {
-        let result = "";
-        const characters = "0123456789ABCDEF";
-        const charactersLength = characters.length;
-        for (let i = 0; i < 8; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return result;
-    };
-    const [rfIdData, setRfIdData] = useState<any>(Array.from({length: 10}, () => ({
-        epc: generateRandomEPC(),
-    })));
+    const [rfIdData, setRfIdData] = useState<any>([{
+        epc: "98760ABC",
+        userData: "hand towel"
+    }]);
     const [rfIdOpen, setRfIdOpen] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [inventoryModal, setInventoryModal] = useState<boolean>(false);
@@ -52,7 +44,6 @@ const Home = (props:any) => {
         tag: "sdfsdf",
         name: "towel",
     });
-
 
     const [filteredData, setFilteredData] = useState<string[]>([]);
     const handleInputChange = (name: string, value: string) => {

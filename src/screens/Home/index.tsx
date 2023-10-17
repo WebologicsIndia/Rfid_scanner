@@ -7,7 +7,8 @@ import {
     H9,
     Input,
     margin,
-    padding
+    padding,
+    Insets
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../assets/current-location.svg";
@@ -25,6 +26,7 @@ const {RFIDModule} = NativeModules;
 
 const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
 const Home = (props:any) => {
+    const [insets] = useState(Insets.getInsets());
     const tempObj:any={};
     const [rfIdData, setRfIdData] = useState([tempObj]);
     const [rfIdOpen, setRfIdOpen] = useState(false);
@@ -192,14 +194,14 @@ const Home = (props:any) => {
                 headerText={"Tag Scanner"}
                 headerTextStyle={styles.headerText}
                 headerColor={theme.Primary}
-                bottom={padding.pb5.paddingBottom}
+                bottom={insets.bottom * 1.6}
             >
                 <View>
                     <View style={{flexDirection: "row", justifyContent: "center"}}>
                         <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
                             <Image source={Logo} style={{width: 100, height: 85}} />
                         </View>
-                        <Pressable onPress={handleLocationIconColor} style={margin.mt2}>
+                        <Pressable onPress={handleLocationIconColor} style={margin.mt5}>
                             <CurrentLocationSVG color={locationIconColor} width="24" height="24" />
                         </Pressable>
                     </View>
@@ -273,7 +275,6 @@ export default Home;
 
 const styles = StyleSheet.create({
     container: {
-        ...padding.pt3,
         ...padding.pb5,
         ...padding.px5,
         flex: 1,

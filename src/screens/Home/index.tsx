@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {
     borderRadius,
     Container,
@@ -14,20 +14,21 @@ import CurrentLocationSVG from "../../assets/current-location.svg";
 import PlaySVG from "../../assets/playSVG.svg";
 import ReloadSVG from "../../assets/reloadSVG.svg";
 import PauseSVG from "../../assets/pauseSVG.svg";
-import {Image, Pressable, ScrollView, StyleSheet, View, NativeModules} from "react-native";
+import {Image, Pressable, StyleSheet, View, NativeModules} from "react-native";
 import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
-// import {inventoryUrl} from "../../config/api";
 import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
-// import {inventoryUrl} from "../../config/api";
 import BatchModal from "./components/batchModal";
 const {RFIDModule} = NativeModules;
 
+const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
 const Home = (props:any) => {
+    const tempObj:any={};
+    const [rfIdData, setRfIdData] = useState([tempObj]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const[inventoryModal, setInventoryModal] = useState<boolean>(false);
+    const [inventoryModal, setInventoryModal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     const [icon, setIcon] = useState("PlaySVG");
     const [latitude, setLatitude] = useState(0);
@@ -116,16 +117,21 @@ const Home = (props:any) => {
 
     const handleIconClick = () => {
         if (icon === "PlaySVG"){
-            console.log(RFIDModule);
+            console.log("rfid", RFIDModule);
             RFIDModule.init(
                 (successMessage: any) => {
-                    console.log(successMessage);
+                    console.log("msg", successMessage);
                     RFIDModule.startInventory(
                         (success: any) => {
-                            console.log(success);
+                            console.log("success", success);
                             RFIDModule.readTagfromBuffer(
                                 (data: any) => {
-                                    console.log(data);
+                                    console.log("data", data);
+                                    for (const key of Object.keys(data)){
+                                        if(data[key]){
+                                            tempObj[key] = data[key];
+                                        }
+                                    }
                                 },
                                 (error: any) => {
                                     console.log(error);
@@ -228,15 +234,6 @@ const Home = (props:any) => {
                             />
                         </View>
                     </View>
-                    <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
-                        {filteredData.map((data, index) => {
-                            return(
-                                <View key={index} style={[padding.py5]}>
-                                    <H9 style={{color: theme.PrimaryDark}}>{data}</H9>
-                                </View>
-                            );
-                        })}
-                    </ScrollView>
                 </View>
                 <View style={styles.footer}>
                     <View style={[styles.rowAlignCenter, styles.svgGap]}>
@@ -249,7 +246,8 @@ const Home = (props:any) => {
                 </View>
 
             </Container>
-            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} />
+            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} modelData={modalData}/>
+            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setRfIdData} modelData={rfIdData}/>
             <BatchModal
                 modalVisible={inventoryModal}
                 setModalVisible={setInventoryModal}

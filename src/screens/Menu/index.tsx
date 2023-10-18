@@ -3,7 +3,7 @@ import {Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-nat
 import {theme} from "../../config/theme";
 import {ActivityIndicator, Pressable, ScrollView, StyleSheet, View} from "react-native";
 import HamburgerSVG from "../../assets/hamburger.svg";
-import {inventoryUrl} from "../../config/api";
+import {batchUrl} from "../../config/api";
 import dayjs from "dayjs";
 
 const TrackingDrawer = (props: any) => {
@@ -14,9 +14,10 @@ const TrackingDrawer = (props: any) => {
 
     const getInventories = () => {
         setLoading(true);
-        fetch(`${inventoryUrl}?page=1&results=10`).then((res) => {
+        fetch(`${batchUrl}?page=1&results=10`).then((res) => {
             if (res.status === 200) {
                 res.json().then((data) => {
+                    console.log(data);
                     setInventoryData(data.results);
                     setTotal(data.total);
                 });
@@ -57,7 +58,7 @@ const TrackingDrawer = (props: any) => {
                                         <H7 style={{color: theme.PrimaryDark}}>Name</H7>
                                         <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>{item.name}</H7>
                                         <H7 style={{color: theme.PrimaryDark}}>Tags</H7>
-                                        <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>{item.tag}</H7>
+                                        <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>{item.quantity}</H7>
                                     </View>
                                     <View>
                                         <H7 style={{color: theme.PrimaryDark}}>Created</H7>

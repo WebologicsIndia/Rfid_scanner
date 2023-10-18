@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {
     borderRadius,
     Container,
@@ -7,27 +7,34 @@ import {
     H9,
     Input,
     margin,
-    padding
+    padding,
+    Insets
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../assets/current-location.svg";
 import PlaySVG from "../../assets/playSVG.svg";
 import ReloadSVG from "../../assets/reloadSVG.svg";
 import PauseSVG from "../../assets/pauseSVG.svg";
-import {Image, Pressable, ScrollView, StyleSheet, View, NativeModules} from "react-native";
+import {Image, Pressable, StyleSheet, View, NativeModules, ScrollView} from "react-native";
 import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
-// import {inventoryUrl} from "../../config/api";
 import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
-// import {inventoryUrl} from "../../config/api";
 import BatchModal from "./components/batchModal";
 const {RFIDModule} = NativeModules;
 
+const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
 const Home = (props:any) => {
+    const [insets] = useState(Insets.getInsets());
+    const tempObj:any={};
+    const [rfIdData, setRfIdData] = useState<any>([{
+        epc: "",
+        userData: ""
+    }]);
+    const [rfIdOpen, setRfIdOpen] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const[inventoryModal, setInventoryModal] = useState<boolean>(false);
+    const [inventoryModal, setInventoryModal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     const [icon, setIcon] = useState("PlaySVG");
     const [latitude, setLatitude] = useState(0);
@@ -39,7 +46,7 @@ const Home = (props:any) => {
     });
 
 
-    const [filteredData, setFilteredData] = useState<string[]>(["3453abc"]);
+    const [filteredData, setFilteredData] = useState<string[]>([]);
     const handleInputChange = (name: string, value: string) => {
         if (name === "filterMask") {
             const filtered = filterData(value, item, selectedFilter);
@@ -116,12 +123,43 @@ const Home = (props:any) => {
 
     const handleIconClick = () => {
         if (icon === "PlaySVG"){
-            console.log(RFIDModule);
-            RFIDModule.initRFID();
-            RFIDModule.scanRFID().then((result: any) => {
-                console.log("RFID Scan Results: "+ result);
-            });
+            console.log("rfid", RFIDModule);
+            RFIDModule.init(
+                (successMessage: any) => {
+                    console.log("msg", successMessage);
+                    RFIDModule.startInventory(
+                        (success: any) => {
+                            console.log("success", success);
+                            RFIDModule.readTagfromBuffer(
+                                (data: any) => {
+                                    let updatedRfIdData = [...rfIdData];
+                                    for (const key of Object.keys(data)){
+                                        if(data[key]){
+                                            tempObj[key] = data[key];
+                                            const updatedData = {...updatedRfIdData[0], epc: data[key]};
+                                            updatedRfIdData = [updatedData];
+                                        }
+                                    }
+                                    setRfIdData(updatedRfIdData);
+                                    setRfIdOpen(true);
+                                },
+                                (error: any) => {
+                                    console.log(error);
+                                }
+                            );
+                        },
+                        (error: any) => {
+                            console.log(error);
+                        }
+
+                    );
+                },
+                (errorMessage: any) => {
+                    console.error(errorMessage);
+                }
+            );
             setIcon("PauseSVG");
+
             // fetch(inventoryUrl, {
             //     method: "POST",
             //     headers: {
@@ -136,6 +174,14 @@ const Home = (props:any) => {
             //     }
             // });
         } else {
+            RFIDModule.stopInventory(
+                (success: any) => {
+                    console.log(success);
+                },
+                (error: any) => {
+                    console.log(error);
+                }
+            );
             setIcon("PlaySVG");
             setInventoryModal(true);
         }
@@ -143,6 +189,10 @@ const Home = (props:any) => {
 
     const showModal = () => {
         setModalVisible(true);
+    };
+    const handleRefreshSvg = () => {
+        setRfIdData([]);
+        console.log("data cleared");
     };
     return (
         <>
@@ -155,14 +205,14 @@ const Home = (props:any) => {
                 headerText={"Tag Scanner"}
                 headerTextStyle={styles.headerText}
                 headerColor={theme.Primary}
-                bottom={padding.pb5.paddingBottom}
+                bottom={insets.bottom * 1.6}
             >
                 <View>
                     <View style={{flexDirection: "row", justifyContent: "center"}}>
                         <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
                             <Image source={Logo} style={{width: 100, height: 85}} />
                         </View>
-                        <Pressable onPress={handleLocationIconColor} style={margin.mt2}>
+                        <Pressable onPress={handleLocationIconColor} style={margin.mt5}>
                             <CurrentLocationSVG color={locationIconColor} width="24" height="24" />
                         </Pressable>
                     </View>
@@ -182,7 +232,7 @@ const Home = (props:any) => {
                                     <PauseSVG width="24" height="24" />
                                 </Pressable>
                             )}
-                            <Pressable>
+                            <Pressable onPress={handleRefreshSvg}>
                                 <ReloadSVG width="24" height="24" />
                             </Pressable>
                         </View>
@@ -198,15 +248,16 @@ const Home = (props:any) => {
                             />
                         </View>
                     </View>
-                    <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
-                        {filteredData.map((data, index) => {
-                            return(
+                    {rfIdData &&
+                        <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
+                            {rfIdData.map((data:any, index:number) => (
                                 <View key={index} style={[padding.py5]}>
-                                    <H9 style={{color: theme.PrimaryDark}}>{data}</H9>
+                                    {/*<H8 style={{color: theme.PrimaryDark}}>Tags</H8>*/}
+                                    <H9 style={{color: theme.PrimaryDark}}>{data.epc}</H9>
                                 </View>
-                            );
-                        })}
-                    </ScrollView>
+                            ))}
+                        </ScrollView>
+                    }
                 </View>
                 <View style={styles.footer}>
                     <View style={[styles.rowAlignCenter, styles.svgGap]}>
@@ -219,13 +270,14 @@ const Home = (props:any) => {
                 </View>
 
             </Container>
-            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} />
+            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} modelData={modalData}/>
+            <FilterModal modalVisible={rfIdOpen} setModalVisible={setRfIdOpen} setValue={setRfIdData} modelData={rfIdData}/>
             <BatchModal
                 modalVisible={inventoryModal}
                 setModalVisible={setInventoryModal}
                 latitude={latitude}
                 longitude={longitude}
-                filteredData={filteredData}
+                filteredData={rfIdData}
             />
         </>
     );
@@ -234,7 +286,6 @@ export default Home;
 
 const styles = StyleSheet.create({
     container: {
-        ...padding.pt3,
         ...padding.pb5,
         ...padding.px5,
         flex: 1,

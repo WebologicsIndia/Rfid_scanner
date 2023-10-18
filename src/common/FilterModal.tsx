@@ -3,11 +3,12 @@ import {Modal, Pressable, StyleSheet, View} from "react-native";
 import {borderRadius, H7, height, margin, padding, width} from "@WebologicsIndia/react-native-components";
 import {theme} from "../config/theme";
 
-const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
+
 const FilterModal = (props: {
     modalVisible: boolean,
     setModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
-    setValue: React.Dispatch<React.SetStateAction<string>>
+    setValue: any
+    modelData:any[]
 }) => {
     const handleModelItem = (item: string) => {
         props.setValue(item);
@@ -24,10 +25,16 @@ const FilterModal = (props: {
             >
                 <View style={styles.modalView}>
                     {
-                        modalData.map((item: string) => {
+                        props.modelData.map((item: any) => {
                             return (
                                 <Pressable onPress={() => handleModelItem(item)} key={item}>
-                                    <H7 style={{color: theme.PrimaryDark, ...margin.my2}}>{item}</H7>
+                                    {
+
+                                        typeof item === "string" ?
+                                            <H7 style={{color: theme.PrimaryDark, ...margin.my2}}>{item}</H7>
+                                            :
+                                            <H7 style={{color: theme.PrimaryDark, ...margin.my2}}>{item.freq}</H7>
+                                    }
                                 </Pressable>
                             );
                         })

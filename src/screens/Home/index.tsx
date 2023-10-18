@@ -19,14 +19,15 @@ import DownSvg from "../../assets/downArrow.svg";
 import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
 import BatchModal from "./components/batchModal";
+import Toast from "react-native-toast-message";
 const {RFIDModule} = NativeModules;
 
 const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
 const Home = () => {
     const tempObj:any={};
     const [rfIdData, setRfIdData] = useState<any>([{
-        epc: "",
-        userData: ""
+        epc: "789CDA",
+        userData: "hand towel"
     }]);
     const [rfIdOpen, setRfIdOpen] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -188,7 +189,13 @@ const Home = () => {
     };
     const handleRefreshSvg = () => {
         setRfIdData([]);
-        console.log("data cleared");
+        Toast.show({
+            type: "success",
+            text2: "Data Cleared Successfully",
+            position: "bottom",
+            visibilityTime: 4000,
+            autoHide: true,
+        });
     };
     return (
         <View style={styles.container}>

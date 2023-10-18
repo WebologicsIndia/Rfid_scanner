@@ -3,6 +3,7 @@ import {Modal, Pressable, StyleSheet, View} from "react-native";
 import {theme} from "../../../config/theme";
 import {borderRadius, H7, height, Input, padding, width} from "@WebologicsIndia/react-native-components";
 import {batchUrl} from "../../../config/api";
+import Toast from "react-native-toast-message";
 const BatchModal = (props:{
     modalVisible:boolean,
     setModalVisible:React.Dispatch<React.SetStateAction<boolean>>
@@ -34,14 +35,34 @@ const BatchModal = (props:{
             })
         }).then((resp) => {
             if (resp.status === 200){
-                setValue("");
-                props.setModalVisible(false);
+                resp.json().then((data) => {
+                    Toast.show({
+                        type: "success",
+                        text2: data.message,
+                        position: "bottom",
+                        visibilityTime: 4000,
+                        autoHide: true,
+                    });
+                    setValue("");
+                    props.setModalVisible(false);
+                });
+
+            } else {
+                resp.json().then((data) => {
+                    Toast.show({
+                        type: "error",
+                        text2: data.message,
+                        position: "bottom",
+                        visibilityTime: 4000,
+                        autoHide: true,
+                    });
+                    setLoading(false);
+                });
             }
-        }).catch(() => {
-            setLoading(false);
         }).finally(() => {
             setLoading(false);
         });
+
     };
     return (
         <Modal

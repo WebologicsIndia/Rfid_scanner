@@ -15,7 +15,12 @@ import com.rfid_scanner.RFIDPackage;
 import java.util.Arrays;
 import java.util.List;
 
+// import the package
+import com.christopherdro.htmltopdf.RNHTMLtoPDFPackage;
 
+// include package
+// new MainReactPackage(),
+// new RNHTMLtoPDFPackage()
 
 
 public class MainApplication extends Application implements ReactApplication {

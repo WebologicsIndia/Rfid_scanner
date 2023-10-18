@@ -109,7 +109,7 @@ dependencies {
 //    implementation fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
     implementation files("libs/DeviceAPI_ver20230301_release.aar")
 //    implementation files('libs/cw-deviceapi20190815.jar')
-
+//     compile project(':react-native-html-to-pdf')
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'

@@ -4,6 +4,7 @@ import {NavigationContainer} from "@react-navigation/native";
 import HomeScreen from "./Home";
 import TrackingDrawer from "./Menu";
 import CustomDrawerContent from "../common/CustomDrawerContent/CustomDrawerContent";
+import {theme} from "../config/theme";
 
 const Drawer = createDrawerNavigator();
 const Screens = () => {
@@ -11,7 +12,12 @@ const Screens = () => {
         <NavigationContainer>
             <Drawer.Navigator
                 screenOptions={{
-                    headerShown: false,
+                    // headerShown: false,
+                    headerStatusBarHeight: 0,
+                    headerStyle: {
+                        backgroundColor: theme.Primary,
+                    },
+                    headerTintColor: theme.White,
                 }}
                 drawerContent={(props) => <CustomDrawerContent {...props}/>}
             >

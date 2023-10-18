@@ -5,7 +5,8 @@ import {ActivityIndicator, Pressable, ScrollView, StyleSheet, View} from "react-
 import HamburgerSVG from "../../assets/hamburger.svg";
 import {batchUrl} from "../../config/api";
 import dayjs from "dayjs";
-
+import ShareSvg from "../../assets/share.svg";
+import RNHTMLtoPDF from "react-native-html-to-pdf";
 const TrackingDrawer = (props: any) => {
     const [insets] = useState(Insets.getInsets());
     const [loading, setLoading] = useState(false);
@@ -31,6 +32,68 @@ const TrackingDrawer = (props: any) => {
     React.useEffect(() => {
         getInventories();
     }, []);
+    const createPdf = async() => {
+        const htmlText= `
+        <html>
+          <head>
+            <style>
+              body {
+                font-family: 'Helvetica';
+                font-size: 12px;
+              }
+              header, footer {
+                height: 50px;
+                background-color: #fff;
+                color: #000;
+                display: flex;
+                justify-content: center;
+                padding: 0 20px;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+              }
+              th, td {
+                border: 1px solid #000;
+                padding: 5px;
+              }
+              th {
+                background-color: #ccc;
+              }
+            </style>
+          </head>
+          <body>
+            <header>
+              <h1>Invoice for Order #${inventoryData.length}</h1>
+            </header>
+            <h1>Order Details</h1>
+            <table>
+            
+              <tr>
+                <th>NAME</th>
+                <th>TOTAL</th>
+              
+              </tr>
+                     
+             
+            </table>
+          
+            <footer>
+              <p>Thank you for your business!</p>
+            </footer>
+          </body>
+        </html>
+      `;
+        const options = {
+            html: htmlText,
+            fileName: "test",
+            directory: "Documents",
+        };
+
+        const file = await RNHTMLtoPDF.convert(options);
+        console.log(file.filePath);
+        // alert(file.filePath);
+    };
 
     if (loading) {
         return <View style={{justifyContent: "center", alignItems: "center"}}><ActivityIndicator size={"large"} color={theme.PrimaryDark}/></View>;
@@ -45,6 +108,7 @@ const TrackingDrawer = (props: any) => {
             headerTextStyle={styles.headerText}
             headerColor={theme.Primary}
             bottom={insets.bottom}
+            headerRight={<Pressable onPress={createPdf}><ShareSvg color={theme.White}/></Pressable>}
         >
             <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {total}</H7>
             <ScrollView showsVerticalScrollIndicator={false}>

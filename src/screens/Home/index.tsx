@@ -1,12 +1,12 @@
 import React, {useState} from "react";
 import {
-    borderRadius,
+    borderRadius, Container,
     H7,
     H8,
     H9,
-    Input,
+    Input, Insets,
     margin,
-    padding,
+    padding
 } from "@WebologicsIndia/react-native-components";
 import CurrentLocationSVG from "../../assets/current-location.svg";
 import PlaySVG from "../../assets/playSVG.svg";
@@ -21,9 +21,11 @@ import Logo from "../../assets/dr_company_logo.jpg";
 import BatchModal from "./components/batchModal";
 import Toast from "react-native-toast-message";
 const {RFIDModule} = NativeModules;
+import HamburgerSVG from "../../assets/hamburger.svg";
 
 const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
-const Home = () => {
+const Home = (props:any) => {
+    const [insets] = useState(Insets.getInsets());
     const tempObj:any={};
     const [rfIdData, setRfIdData] = useState<any>([{
         epc: "789CDA",
@@ -198,60 +200,60 @@ const Home = () => {
         });
     };
     return (
-        <View style={styles.container}>
-            {/*<Container*/}
-            {/*    style={styles.container}*/}
-            {/*    fluid*/}
-            {/*    backgroundColor={theme.White}*/}
-            {/*    header*/}
-            {/*    addIcon={<Pressable onPress={() => props.navigation.openDrawer()}><HamburgerSVG /></Pressable>}*/}
-            {/*    headerText={"Tag Scanner"}*/}
-            {/*    headerTextStyle={styles.headerText}*/}
-            {/*    headerColor={theme.Primary}*/}
-            {/*    bottom={insets.bottom * 1.6}*/}
-            {/*>*/}
-            <View>
-                <View style={{flexDirection: "row", justifyContent: "center"}}>
-                    <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-                        <Image source={Logo} style={{width: 100, height: 85}} />
-                    </View>
-                    <Pressable onPress={handleLocationIconColor} style={margin.mt5}>
-                        <CurrentLocationSVG color={locationIconColor} width="24" height="24" />
-                    </Pressable>
-                </View>
-                <View style={[styles.filterModeView, styles.rowAlignCenter]}>
-                    <H8 style={styles.textHeading}>Filter Mode:</H8>
-                    <Pressable onPress={showModal} style={[styles.modalOpen, styles.rowAlignCenter]}>
-                        <H7 style={{color: theme.PrimaryLight, fontWeight: "500"}}>{selectedFilter}</H7>
-                        <DownSvg color={theme.Primary} />
-                    </Pressable>
-                    <View style={[styles.rowAlignCenter, styles.svgGap]}>
-                        {icon === "PlaySVG" ? (
-                            <Pressable onPress={handleIconClick}>
-                                <PlaySVG width="24" height="24" />
-                            </Pressable>
-                        ) : (
-                            <Pressable onPress={handleIconClick}>
-                                <PauseSVG width="24" height="24" />
-                            </Pressable>
-                        )}
-                        <Pressable onPress={handleRefreshSvg}>
-                            <ReloadSVG width="24" height="24" />
+        <>
+            <Container
+                style={styles.container}
+                fluid
+                backgroundColor={theme.White}
+                header
+                addIcon={<Pressable onPress={() => props.navigation.openDrawer()}><HamburgerSVG /></Pressable>}
+                headerText={"Tag Scanner"}
+                headerTextStyle={styles.headerText}
+                headerColor={theme.Primary}
+                bottom={insets.bottom * 1.6}
+            >
+                <View>
+                    <View style={{flexDirection: "row", justifyContent: "center"}}>
+                        <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                            <Image source={Logo} style={{width: 100, height: 85}} />
+                        </View>
+                        <Pressable onPress={handleLocationIconColor} style={margin.mt5}>
+                            <CurrentLocationSVG color={locationIconColor} width="24" height="24" />
                         </Pressable>
                     </View>
-                </View>
-                <View style={[styles.filterMaskView, styles.rowAlignCenter]}>
-                    <H8 style={styles.textHeading}>Filter Mask:</H8>
-                    <View style={{flex: 1}}>
-                        <Input
-                            inputStyle={{borderBottomWidth: 1}}
-                            textStyle={[{color: theme.PrimaryDark}, styles.input]}
-                            bgColor={theme.White}
-                            onChangeText={(value) => handleInputChange("filterMask", value)}
-                        />
+                    <View style={[styles.filterModeView, styles.rowAlignCenter]}>
+                        <H8 style={styles.textHeading}>Filter Mode:</H8>
+                        <Pressable onPress={showModal} style={[styles.modalOpen, styles.rowAlignCenter]}>
+                            <H7 style={{color: theme.PrimaryLight, fontWeight: "500"}}>{selectedFilter}</H7>
+                            <DownSvg color={theme.Primary} />
+                        </Pressable>
+                        <View style={[styles.rowAlignCenter, styles.svgGap]}>
+                            {icon === "PlaySVG" ? (
+                                <Pressable onPress={handleIconClick}>
+                                    <PlaySVG width="24" height="24" />
+                                </Pressable>
+                            ) : (
+                                <Pressable onPress={handleIconClick}>
+                                    <PauseSVG width="24" height="24" />
+                                </Pressable>
+                            )}
+                            <Pressable onPress={handleRefreshSvg}>
+                                <ReloadSVG width="24" height="24" />
+                            </Pressable>
+                        </View>
                     </View>
-                </View>
-                {rfIdData &&
+                    <View style={[styles.filterMaskView, styles.rowAlignCenter]}>
+                        <H8 style={styles.textHeading}>Filter Mask:</H8>
+                        <View style={{flex: 1}}>
+                            <Input
+                                inputStyle={{borderBottomWidth: 1}}
+                                textStyle={[{color: theme.PrimaryDark}, styles.input]}
+                                bgColor={theme.White}
+                                onChangeText={(value) => handleInputChange("filterMask", value)}
+                            />
+                        </View>
+                    </View>
+                    {rfIdData &&
                         <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
                             {rfIdData.map((data:any, index:number) => (
                                 <View key={index} style={[padding.py5]}>
@@ -260,19 +262,19 @@ const Home = () => {
                                 </View>
                             ))}
                         </ScrollView>
-                }
-            </View>
-            <View style={styles.footer}>
-                <View style={[styles.rowAlignCenter, styles.svgGap]}>
-                    <H8 style={styles.colorFont500}>Press</H8>
-                    <Pressable style={styles.scanButton}><H8 style={styles.scanText}>SCAN</H8></Pressable>
-                    <H8 style={styles.colorFont500}>Button</H8>
+                    }
                 </View>
-                <H9 style={styles.colorFont500}>or Trigger to Read a Tag</H9>
-                <H9 style={styles.colorFont500}>...</H9>
-            </View>
+                <View style={styles.footer}>
+                    <View style={[styles.rowAlignCenter, styles.svgGap]}>
+                        <H8 style={styles.colorFont500}>Press</H8>
+                        <Pressable style={styles.scanButton}><H8 style={styles.scanText}>SCAN</H8></Pressable>
+                        <H8 style={styles.colorFont500}>Button</H8>
+                    </View>
+                    <H9 style={styles.colorFont500}>or Trigger to Read a Tag</H9>
+                    <H9 style={styles.colorFont500}>...</H9>
+                </View>
 
-            {/*</Container>*/}
+            </Container>
             <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} modelData={modalData}/>
             <FilterModal modalVisible={rfIdOpen} setModalVisible={setRfIdOpen} setValue={setRfIdData} modelData={rfIdData}/>
             <BatchModal
@@ -282,7 +284,7 @@ const Home = () => {
                 longitude={longitude}
                 filteredData={rfIdData}
             />
-        </View>
+        </>
     );
 };
 export default Home;

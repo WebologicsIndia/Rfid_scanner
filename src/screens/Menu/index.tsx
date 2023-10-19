@@ -1,87 +1,17 @@
-import React, {useState} from "react";
-import {H7,  margin, padding} from "@WebologicsIndia/react-native-components";
-import {theme} from "../../config/theme";
-import {ActivityIndicator,  ScrollView, StyleSheet, View} from "react-native";
-import {batchUrl} from "../../config/api";
-import dayjs from "dayjs";
-
-const TrackingDrawer = () => {
-    const [loading, setLoading] = useState(false);
-    const [inventoryData, setInventoryData] = useState([]);
-    const [total, setTotal] = useState();
-
-    const getInventories = () => {
-        setLoading(true);
-        fetch(`${batchUrl}?page=1&results=10`).then((res) => {
-            if (res.status === 200) {
-                res.json().then((data) => {
-                    setInventoryData(data.results);
-                    setTotal(data.total);
-                });
-            }
-        }).catch(() => {
-            setLoading(false);
-        }).finally(() => {
-            setLoading(false);
-        });
-    };
-    React.useEffect(() => {
-        getInventories();
-    }, []);
-
-    if (loading) {
-        return <View style={{justifyContent: "center", alignItems: "center"}}><ActivityIndicator size={"large"} color={theme.PrimaryDark}/></View>;
-    }
+import React from "react";
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import Inventories from "./Inventories";
+import InventoryDetail from "./InventoryDetail";
+const Index = () => {
+    const Stack = createNativeStackNavigator();
     return (
-        <View style={styles.container}>
-            {/*<Container*/}
-            {/*    style={styles.container}*/}
-            {/*    backgroundColor={theme.White}*/}
-            {/*    header*/}
-            {/*    addIcon={<Pressable onPress={() => props.navigation.openDrawer()}><HamburgerSVG /></Pressable>}*/}
-            {/*    headerText={"Inventories"}*/}
-            {/*    headerTextStyle={styles.headerText}*/}
-            {/*    headerColor={theme.Primary}*/}
-            {/*    bottom={insets.bottom}*/}
-            {/*>*/}
-            <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {total}</H7>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {
-                    inventoryData.length ?
-                        inventoryData.map((item: any) => {
-                            return (
-                                <View key={item._id}
-                                    style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                                    <View style={padding.pb3}>
-                                        <H7 style={{color: theme.PrimaryDark}}>Name</H7>
-                                        <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>{item.name}</H7>
-                                        <H7 style={{color: theme.PrimaryDark}}>Tags</H7>
-                                        <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>{item.quantity}</H7>
-                                    </View>
-                                    <View>
-                                        <H7 style={{color: theme.PrimaryDark}}>Created</H7>
-                                        <H7
-                                            style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH-MM-A")}</H7>
-                                    </View>
-                                </View>
-                            );
-                        }) :
-                        <H7>No Data found</H7>
-                }
-            </ScrollView>
-            {/*</Container>*/}
-        </View>
+        <Stack.Navigator screenOptions={{
+            headerShown: false
+        }}>
+            <Stack.Screen name={"all_inventories"} component={Inventories}/>
+            <Stack.Screen name={"inventory_details"} component={InventoryDetail}/>
+        </Stack.Navigator>
     );
 };
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        ...padding.px5,
-        backgroundColor: theme.White
-    },
-    headerText: {
-        fontWeight: "600",
-        ...margin.ms4
-    }
-});
-export default TrackingDrawer;
+
+export default Index;

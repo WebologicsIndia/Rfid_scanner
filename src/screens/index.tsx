@@ -2,7 +2,7 @@ import React from "react";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import {NavigationContainer} from "@react-navigation/native";
 import HomeScreen from "./Home";
-import TrackingDrawer from "./Menu";
+import InventoryScreens from "./Menu";
 import CustomDrawerContent from "../common/CustomDrawerContent/CustomDrawerContent";
 import {theme} from "../config/theme";
 
@@ -12,7 +12,7 @@ const Screens = () => {
         <NavigationContainer>
             <Drawer.Navigator
                 screenOptions={{
-                    // headerShown: false,
+                    headerShown: false,
                     headerStatusBarHeight: 0,
                     headerStyle: {
                         backgroundColor: theme.Primary,
@@ -27,7 +27,7 @@ const Screens = () => {
                 />
                 <Drawer.Screen
                     name="Inventories"
-                    component={TrackingDrawer}
+                    component={InventoryScreens}
                 />
             </Drawer.Navigator>
         </NavigationContainer>

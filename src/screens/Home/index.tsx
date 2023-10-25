@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {
     borderRadius,
     Container,
@@ -121,58 +121,32 @@ const Home = (props:any) => {
         }
     };
 
+    useEffect(() => {
+        RFIDModule.startInventory();
+    }, []);
+
+    useEffect(() => {
+        let readInterval: string | number | NodeJS.Timeout | undefined;
+        if (icon === "PauseSVG") {
+            RFIDModule.init();
+            readInterval = setInterval(() => {
+                RFIDModule.readTag((tagData: any) => {
+                    console.log(tagData);
+                });
+            }, 1000);
+        }
+        return () => {
+            if (readInterval) {
+                clearInterval(readInterval);
+            }
+        };
+    }, [icon]);
+
     const handleIconClick = () => {
         if (icon === "PlaySVG"){
-            console.log("rfid", RFIDModule);
-            RFIDModule.init(
-                (successMessage: any) => {
-                    console.log("msg", successMessage);
-                    RFIDModule.startInventory(
-                        (success: any) => {
-                            console.log("success", success);
-                            RFIDModule.readTagfromBuffer(
-                                (data: any) => {
-                                    let updatedRfIdData = [...rfIdData];
-                                    for (const key of Object.keys(data)){
-                                        if(data[key]){
-                                            tempObj[key] = data[key];
-                                            const updatedData = {...updatedRfIdData[0], epc: data[key]};
-                                            updatedRfIdData = [updatedData];
-                                        }
-                                    }
-                                    setRfIdData(updatedRfIdData);
-                                    setRfIdOpen(true);
-                                },
-                                (error: any) => {
-                                    console.log(error);
-                                }
-                            );
-                        },
-                        (error: any) => {
-                            console.log(error);
-                        }
 
-                    );
-                },
-                (errorMessage: any) => {
-                    console.error(errorMessage);
-                }
-            );
             setIcon("PauseSVG");
 
-            // fetch(inventoryUrl, {
-            //     method: "POST",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //         "accept": "application/json"
-            //     },
-            //     body: JSON.stringify(item)
-            // }).then((res) => {
-            //     console.log("status", res.status);
-            //     if(res.status === 200){
-            //         console.log("hello", item);
-            //     }
-            // });
         } else {
             RFIDModule.stopInventory(
                 (success: any) => {

@@ -1,104 +1,20 @@
 package com.rfid_scanner;
 
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Promise;
 import com.rscja.deviceapi.RFIDWithUHFUART;
 import com.facebook.react.bridge.Callback;
 import com.rscja.deviceapi.entity.UHFTAGInfo;
-
-import java.util.HashMap;
+import com.rscja.deviceapi.exception.ConfigurationException;
+//import com.rscja.deviceapi.entity
 
 
 public class RFIDModule  extends ReactContextBaseJavaModule {
 
-//    private RFIDChannel rfidChannel;
-//    private BroadcastReceiver receiver;
-//    private HashMap<Integer, Integer> soundMap;
-//
-//    public RFIDModule(ReactApplicationContext reactContext) {
-//        super(reactContext);
-//
-//        rfidChannel = new RFIDChannel();
-//        initRFIDChannel();
-//
-//
-//        receiver = new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                // Handle RFID event and send data back to JavaScript.
-//            }
-//        };
-//        IntentFilter filter = new IntentFilter("RFID_EVENT");
-//        reactContext.registerReceiver(receiver, filter);
-//    }
-//
-//    @Override
-//    public String getName() {
-//        return "RFIDModule"; // This is the name by which this module can be called from JavaScript.
-//    }
-//
-//    @ReactMethod
-//    public void initRFID() {
-////        rfidChannel.init();
-////        rfidChannel.getReader();
-//        // Add your initialization code for the RFID scanner here.
-//    }
-//
-//    @ReactMethod
-//    public void scanRFID(Promise promise) {
-//        try {
-//
-//            promise.resolve("RFID scan successful: "+promise);
-//        } catch (Exception e) {
-//            // Handle any errors and reject the promise.
-//            promise.reject("RFID_ERROR", e.getMessage());
-//        }
-//    }
-//        private void initRFIDChannel() {
-//            rfidChannel.free();
-//            if (rfidChannel.getReader() == null) {
-//                //new RFIDChannelAsync(RFIDAction.INIT).execute();
-//                new InitTask().execute();
-//            } else {
-////                initRFID();
-//            }
-//        }
-//
-//    public class InitTask extends AsyncTask<String, Integer, Boolean> {
-//        ProgressDialog mypDialog;
-//
-//        @Override
-//        protected Boolean doInBackground(String... params) {
-//            // TODO Auto-generated method stub
-//            boolean result = rfidChannel.init();
-//            if (result) {
-//                rfidChannel.getReader().setPower(30);
-//            }
-//            return result;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean result) {
-//            super.onPostExecute(result);
-//
-//            mypDialog.cancel();
-//
-//        }
-//
-//
-//
-//    }
-private RFIDWithUHFUART reader;
+    private RFIDWithUHFUART reader;
 
     public RFIDModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -110,15 +26,16 @@ private RFIDWithUHFUART reader;
     }
 
     @ReactMethod
-    public void init(Callback successCallback, Callback errorCallback) {
+    public void init() {
         try {
-            reader = RFIDWithUHFUART.getInstance();
-
-            successCallback.invoke("Initialization successful ");
+//            reader = RFIDWithUHFUART.getInstance();
+            reader.init();
+            reader.setPower(5);
+            reader.isPowerOn();
         } catch (Exception e) {
             reader = null;
-            errorCallback.invoke("Initialization failed");
         }
+
     }
 
     @ReactMethod
@@ -129,22 +46,32 @@ private RFIDWithUHFUART reader;
         }
     }
 @ReactMethod
-    public void readTag(Callback successCallback, Callback errorCallback) {
-        if (reader != null) {
-            UHFTAGInfo tagInfo = reader.readTagFromBuffer();
-            if (tagInfo != null) {
-                String tagData = tagInfo.getEPC();
-                successCallback.invoke(tagData);
-            } else {
-                errorCallback.invoke("No tag found");
-            }
+    public void readTag(Callback callback) {
+    Log.d("Tag", "Uperwalatag: " + reader);
+    if (reader != null) {
+        Log.d("Tag", "tag: " + reader);
+        UHFTAGInfo tagInfo = reader.readTagFromBuffer();
+        Log.d("tagData", "tagInfo: " + tagInfo);
+        if (tagInfo != null) {
+            String tagData = tagInfo.getEPC();
+            Log.d("tagData", "tagData: " + tagData);
+            callback.invoke(tagData);
         } else {
-            errorCallback.invoke("RFID scanner not initialized");
+            reader.free();
+            reader = null;
+            init();
+            callback.invoke();
         }
+    } else {
+        callback.invoke();
+
     }
+}
+
     @ReactMethod
     public void writeTag(String epcData, Callback successCallback, Callback errorCallback) {
         if (reader != null) {
+
             boolean result = reader.writeDataToEpc(epcData, "NewDataToWrite");
             if (result) {
                 successCallback.invoke("Write successful");
@@ -157,18 +84,23 @@ private RFIDWithUHFUART reader;
     }
 
 @ReactMethod
-    public void startInventory(Callback successCallback, Callback errorCallback) {
+    public void startInventory() {
+    try {
+        reader = RFIDWithUHFUART.getInstance();
+//        reader.init();
+//        reader.setPower(10);
+//        reader.isPowerOn();
+        Log.d("Tag", "tagInventory: " + reader);
         if (reader != null) {
-            boolean result = reader.startInventoryTag();
-            if (result) {
-                successCallback.invoke("Inventory started");
-            } else {
-                errorCallback.invoke("Failed to start inventory");
-            }
+            reader.startInventoryTag();
         } else {
-            errorCallback.invoke("RFID scanner not initialized");
+            Log.d("InventoryTag", "Tag Not initialized");
         }
+    } catch (ConfigurationException ex) {
+        throw new RuntimeException(ex);
     }
+};
+
 @ReactMethod
     public void stopInventory(Callback successCallback, Callback errorCallback) {
         if (reader != null) {

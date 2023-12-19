@@ -6,10 +6,12 @@ import {batchUrl} from "../../../config/api";
 const BatchModal = (props:{
     modalVisible:boolean,
     setModalVisible:React.Dispatch<React.SetStateAction<boolean>>
+    setRfIdData: any,
     latitude:number,
     longitude:number,
     filteredData:any
 }) => {
+
     const [isFocused, setIsFocused] = useState(false);
     const handleFocus = () => setIsFocused(true);
     const[value, setValue] = useState("");
@@ -30,7 +32,7 @@ const BatchModal = (props:{
                 latitude: props.latitude,
                 longitude: props.longitude,
                 name: value,
-                tags: props.filteredData
+                tags: Array.from(props.filteredData)
             })
         }).then((resp) => {
             if (resp.status === 200){
@@ -41,6 +43,8 @@ const BatchModal = (props:{
             setLoading(false);
         }).finally(() => {
             setLoading(false);
+            props.setRfIdData(new Set());
+            props.setModalVisible(false);
         });
     };
 

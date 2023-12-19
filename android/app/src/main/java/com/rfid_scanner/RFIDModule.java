@@ -26,47 +26,45 @@ public class RFIDModule  extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void init() {
+    public void init(Callback successCallback, Callback errorCallback) {
         try {
-//            reader = RFIDWithUHFUART.getInstance();
+//            Log.e("Tag", "TagInit: " + reader);
+            reader = RFIDWithUHFUART.getInstance();
             reader.init();
-            reader.setPower(5);
+            reader.setPower(50);
             reader.isPowerOn();
-        } catch (Exception e) {
-            reader = null;
-        }
 
+            successCallback.invoke("RFID initialization successful");
+
+        } catch (Exception e) {
+            Log.e("RFIDModule", "Unexpected error during initialization: " + e.getMessage());
+            reader = null;
+            errorCallback.invoke("Unexpected error during RFID initialization");
+        }
     }
 
     @ReactMethod
-    public void free() {
+    public void readTag(Callback successCallback, Callback errorCallback) {
+        Log.d("Tag", "Uperwalatag: " + reader);
         if (reader != null) {
-            reader.free();
-            reader = null;
-        }
-    }
-@ReactMethod
-    public void readTag(Callback callback) {
-    Log.d("Tag", "Uperwalatag: " + reader);
-    if (reader != null) {
-        Log.d("Tag", "tag: " + reader);
-        UHFTAGInfo tagInfo = reader.readTagFromBuffer();
-        Log.d("tagData", "tagInfo: " + tagInfo);
-        if (tagInfo != null) {
-            String tagData = tagInfo.getEPC();
-            Log.d("tagData", "tagData: " + tagData);
-            callback.invoke(tagData);
+            try {
+                UHFTAGInfo tagInfo = reader.readTagFromBuffer();
+                Log.d("tagData", "tagInfo: " + tagInfo);
+                if (tagInfo != null) {
+                    String tagData = tagInfo.getEPC();
+                    Log.d("tagData", "tagData: " + tagData);
+                    successCallback.invoke(tagData);
+                } else {
+                    errorCallback.invoke("No tag data available in the buffer");
+                }
+            } catch (Exception e) {
+                Log.e("RFIDModule", "Error reading tag: " + e.getMessage());
+                errorCallback.invoke("Error reading RFID tag");
+            }
         } else {
-            reader.free();
-            reader = null;
-            init();
-            callback.invoke();
+            errorCallback.invoke("RFID scanner not initialized");
         }
-    } else {
-        callback.invoke();
-
     }
-}
 
     @ReactMethod
     public void writeTag(String epcData, Callback successCallback, Callback errorCallback) {
@@ -85,20 +83,18 @@ public class RFIDModule  extends ReactContextBaseJavaModule {
 
 @ReactMethod
     public void startInventory() {
-    try {
-        reader = RFIDWithUHFUART.getInstance();
+
+//        reader = RFIDWithUHFUART.getInstance();
 //        reader.init();
 //        reader.setPower(10);
 //        reader.isPowerOn();
-        Log.d("Tag", "tagInventory: " + reader);
+//ṣ        Log.d("Tag", "tagInventory: " + reader);
         if (reader != null) {
             reader.startInventoryTag();
         } else {
             Log.d("InventoryTag", "Tag Not initialized");
         }
-    } catch (ConfigurationException ex) {
-        throw new RuntimeException(ex);
-    }
+
 };
 
 @ReactMethod

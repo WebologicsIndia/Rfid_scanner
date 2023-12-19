@@ -23,6 +23,7 @@ const Screens = () => {
                     name="Inventories"
                     component={TrackingDrawer}
                 />
+
             </Drawer.Navigator>
         </NavigationContainer>
     );

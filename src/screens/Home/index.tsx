@@ -28,11 +28,8 @@ const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Start
 const Home = (props:any) => {
     const [insets] = useState(Insets.getInsets());
     const tempObj:any={};
-    const [rfIdData, setRfIdData] = useState<any>([{
-        epc: "",
-        userData: ""
-    }]);
-    const [rfIdOpen, setRfIdOpen] = useState(false);
+    const [rfIdData, setRfIdData] = useState<Set<any>>(new Set());
+    const [rfIdOpen, setRfdOpen] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [inventoryModal, setInventoryModal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
@@ -44,6 +41,8 @@ const Home = (props:any) => {
         tag: "sdfsdf",
         name: "towel",
     });
+    const[initialized, setInitialized] = useState(false);
+    const[active, setActive] = useState(false);
 
 
     const [filteredData, setFilteredData] = useState<string[]>([]);
@@ -122,41 +121,33 @@ const Home = (props:any) => {
     };
 
     useEffect(() => {
-        RFIDModule.startInventory();
+        RFIDModule.init(
+            (success: any) => {
+                console.log(success);
+                setInitialized(true);
+            },
+            (error: any) => {
+                console.log(error);
+            }
+        );
     }, []);
 
-    useEffect(() => {
-        let readInterval: string | number | NodeJS.Timeout | undefined;
-        if (icon === "PauseSVG") {
-            RFIDModule.init();
-            readInterval = setInterval(() => {
-                RFIDModule.readTag((tagData: any) => {
-                    console.log(tagData);
-                });
-            }, 1000);
-        }
-        return () => {
-            if (readInterval) {
-                clearInterval(readInterval);
-            }
-        };
-    }, [icon]);
 
     const handleIconClick = () => {
-        if (icon === "PlaySVG"){
-
-            setIcon("PauseSVG");
+        if (!active){
+            RFIDModule.startInventory();
+            setActive(true);
 
         } else {
             RFIDModule.stopInventory(
                 (success: any) => {
                     console.log(success);
+                    setActive(false);
                 },
                 (error: any) => {
                     console.log(error);
                 }
             );
-            setIcon("PlaySVG");
             setInventoryModal(true);
         }
     };
@@ -165,9 +156,31 @@ const Home = (props:any) => {
         setModalVisible(true);
     };
     const handleRefreshSvg = () => {
-        setRfIdData([]);
+        setRfIdData(new Set());
         console.log("data cleared");
     };
+
+    useEffect( () => {
+        let x: string | number | NodeJS.Timeout | undefined;
+        if(active) {
+            x = setInterval(() => {
+                RFIDModule.readTag(
+                    (tag: any) => {
+                        setRfIdData(new Set([...rfIdData, tag]));
+                    },
+                    (error: any) => {
+                        console.log(error);
+                    }
+                );
+            }, 100);
+        }
+        return () => {
+            if(x)
+                clearInterval(x);
+        };
+    }, [active]);
+
+
     return (
         <>
             <Container
@@ -197,7 +210,7 @@ const Home = (props:any) => {
                             <DownSvg color={theme.Primary} />
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
-                            {icon === "PlaySVG" ? (
+                            {!active ? (
                                 <Pressable onPress={handleIconClick}>
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
@@ -222,12 +235,12 @@ const Home = (props:any) => {
                             />
                         </View>
                     </View>
-                    {rfIdData &&
+                    {rfIdData.size > 0 &&
                         <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
-                            {rfIdData.map((data:any, index:number) => (
+                            {Array.from(rfIdData).map((data:any, index:number) => (
                                 <View key={index} style={[padding.py5]}>
-                                    {/*<H8 style={{color: theme.PrimaryDark}}>Tags</H8>*/}
-                                    <H9 style={{color: theme.PrimaryDark}}>{data.epc}</H9>
+                                    <H8 style={{color: theme.PrimaryDark}}>Tags</H8>
+                                    <H9 style={{color: theme.PrimaryDark}}>{data}</H9>
                                 </View>
                             ))}
                         </ScrollView>
@@ -244,14 +257,15 @@ const Home = (props:any) => {
                 </View>
 
             </Container>
-            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} modelData={modalData}/>
-            <FilterModal modalVisible={rfIdOpen} setModalVisible={setRfIdOpen} setValue={setRfIdData} modelData={rfIdData}/>
+            {/*<FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} modelData={modalData}/>*/}
+            {/*<FilterModal modalVisible={rfIdOpen} setModalVisible={setRfIdOpen} setValue={setRfIdData} modelData={rfIdData}/>*/}
             <BatchModal
                 modalVisible={inventoryModal}
                 setModalVisible={setInventoryModal}
                 latitude={latitude}
                 longitude={longitude}
                 filteredData={rfIdData}
+                setRfIdData = {setRfIdData}
             />
         </>
     );

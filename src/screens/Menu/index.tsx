@@ -11,13 +11,13 @@ const TrackingDrawer = (props: any) => {
     const [loading, setLoading] = useState(false);
     const [inventoryData, setInventoryData] = useState([]);
     const [total, setTotal] = useState();
+    const [update, setUpdate] = useState(false);
 
     const getInventories = () => {
         setLoading(true);
         fetch(`${batchUrl}?page=1&results=10`).then((res) => {
             if (res.status === 200) {
                 res.json().then((data) => {
-                    console.log(data);
                     setInventoryData(data.results);
                     setTotal(data.total);
                 });
@@ -30,21 +30,26 @@ const TrackingDrawer = (props: any) => {
     };
     React.useEffect(() => {
         getInventories();
-    }, []);
+        setUpdate(false);
+    }, [update]);
 
     if (loading) {
         return <View style={{justifyContent: "center", alignItems: "center"}}><ActivityIndicator size={"large"} color={theme.PrimaryDark}/></View>;
     }
+    const batchList = (() => {
+        props.navigation.openDrawer();
+        setUpdate(true);
+    });
     return (
         <Container
             style={styles.container}
             backgroundColor={theme.White}
             header
-            addIcon={<Pressable onPress={() => props.navigation.openDrawer()}><HamburgerSVG /></Pressable>}
+            addIcon={<Pressable onPress={batchList}><HamburgerSVG /></Pressable>}
             headerText={"Inventories"}
             headerTextStyle={styles.headerText}
             headerColor={theme.Primary}
-            bottom={insets.bottom}
+            bottom={insets.bottom*1.5}
         >
             <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {total}</H7>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -63,7 +68,7 @@ const TrackingDrawer = (props: any) => {
                                     <View>
                                         <H7 style={{color: theme.PrimaryDark}}>Created</H7>
                                         <H7
-                                            style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH-MM-A")}</H7>
+                                            style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH:MM A")}</H7>
                                     </View>
                                 </View>
                             );

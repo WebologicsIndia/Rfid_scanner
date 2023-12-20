@@ -1,10 +1,11 @@
 import React, {useState} from "react";
-import {Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
+import {borderRadius, Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
 import {theme} from "../../config/theme";
 import {ActivityIndicator, Pressable, ScrollView, StyleSheet, View} from "react-native";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import {batchUrl} from "../../config/api";
 import dayjs from "dayjs";
+import Accordian from "../../common/accordian";
 
 const TrackingDrawer = (props: any) => {
     const [insets] = useState(Insets.getInsets());
@@ -12,6 +13,7 @@ const TrackingDrawer = (props: any) => {
     const [inventoryData, setInventoryData] = useState([]);
     const [total, setTotal] = useState();
     const [update, setUpdate] = useState(false);
+    const [expanded, setExpanded] = useState<any>([]);
 
     const getInventories = () => {
         setLoading(true);
@@ -34,12 +36,19 @@ const TrackingDrawer = (props: any) => {
     }, [update]);
 
     if (loading) {
-        return <View style={{justifyContent: "center", alignItems: "center"}}><ActivityIndicator size={"large"} color={theme.PrimaryDark}/></View>;
+        return <View style={{justifyContent: "center", alignItems: "center"}}><ActivityIndicator size={"large"}
+            color={theme.PrimaryDark} /></View>;
     }
     const batchList = (() => {
         props.navigation.openDrawer();
         setUpdate(true);
     });
+    const toggle = (index: number) => {
+        const newExpanded = [...expanded];
+        newExpanded[index] = !newExpanded[index];
+        setExpanded(newExpanded);
+    };
+
     return (
         <Container
             style={styles.container}
@@ -49,32 +58,81 @@ const TrackingDrawer = (props: any) => {
             headerText={"Inventories"}
             headerTextStyle={styles.headerText}
             headerColor={theme.Primary}
-            bottom={insets.bottom*1.5}
+            bottom={insets.bottom * 1.5}
         >
             <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {total}</H7>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {
                     inventoryData.length ?
-                        inventoryData.map((item: any) => {
+                        inventoryData.map((item: any, index) => {
+
                             return (
-                                <View key={item._id}
-                                    style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                                    <View style={padding.pb3}>
-                                        <H7 style={{color: theme.PrimaryDark}}>Name</H7>
-                                        <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>{item.name}</H7>
-                                        <H7 style={{color: theme.PrimaryDark}}>Tags</H7>
-                                        <H7 style={{color: theme.PrimaryLight, textTransform: "capitalize"}}>{item.quantity}</H7>
-                                    </View>
-                                    <View>
-                                        <H7 style={{color: theme.PrimaryDark}}>Created</H7>
-                                        <H7
-                                            style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH:MM A")}</H7>
-                                    </View>
-                                </View>
+                                <Accordian
+                                    expanded={expanded[index]}
+                                    onPress={() => toggle(index)}
+                                    style={[padding.p0, margin.my2, borderRadius.br2]}
+                                    key={index}
+                                    title={
+                                        <View key={item._id}
+                                            style={{
+                                                flexDirection: "row",
+                                                justifyContent: "space-between",
+                                                alignItems: "center"
+                                            }}>
+                                            <View style={padding.pb3}>
+                                                <H7 style={{color: theme.PrimaryDark}}>Name</H7>
+                                                <H7 style={{
+                                                    color: theme.PrimaryLight,
+                                                    textTransform: "capitalize"
+                                                }}>{item.name}</H7>
+                                                <H7 style={{color: theme.PrimaryDark}}>Tags</H7>
+                                                <H7 style={{
+                                                    color: theme.PrimaryLight,
+                                                    textTransform: "capitalize"
+                                                }}>{item.quantity}</H7>
+                                            </View>
+                                            <View style={margin.ms5}>
+                                                <H7 style={{color: theme.PrimaryDark}}>Created</H7>
+                                                <H7
+                                                    style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH:MM A")}</H7>
+                                            </View>
+                                        </View>
+                                    }>
+                                    { item.tags.length ?
+                                        Object.entries(
+                                            item.tags.reduce((acc: { [x: string]: any; }, tag: { itemType: string | number; }) => {
+                                                acc[tag.itemType] = (acc[tag.itemType] || 0) + 1;
+                                                return acc;
+                                            }, {})
+                                        ).map(([itemType, count], index) => {
+
+                                            return(
+                                                <View
+                                                    key={index}
+                                                    style={{
+                                                        flexDirection: "row",
+                                                        justifyContent: "flex-start",
+                                                        alignItems: "center",
+                                                        ...padding.px5
+                                                    }}
+                                                >
+                                                    <H7 style={{color: theme.PrimaryDark, flex: 1}}>{itemType}</H7>
+                                                    <H7 style={{
+                                                        color: theme.PrimaryLight,
+                                                        flex: 1,
+                                                        textTransform: "capitalize"
+                                                    }}>{parseInt(count as string)}</H7>
+                                                </View>
+                                            );
+                                        })
+                                        :<></>
+                                    }
+                                </Accordian>
                             );
                         }) :
                         <H7>No Data found</H7>
                 }
+
             </ScrollView>
         </Container>
     );
@@ -88,4 +146,5 @@ const styles = StyleSheet.create({
         ...margin.ms4
     }
 });
+
 export default TrackingDrawer;

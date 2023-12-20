@@ -10,6 +10,7 @@ const FilterModal = (props: {
     setValue: any
     modelData:any[]
 }) => {
+
     const handleModelItem = (item: string) => {
         props.setValue(item);
         props.setModalVisible(!props.modalVisible);

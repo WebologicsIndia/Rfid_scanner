@@ -60,7 +60,8 @@ const Accordian = (props: any) => {
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
-                }}>
+                }}
+            >
                 <View
                     style={{
                         flex: 11,

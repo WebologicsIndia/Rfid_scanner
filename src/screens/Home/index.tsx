@@ -29,7 +29,7 @@ const Home = (props:any) => {
     const [insets] = useState(Insets.getInsets());
     const tempObj:any={};
     const [rfIdData, setRfIdData] = useState<Set<any>>(new Set());
-    const [rfIdOpen, setRfdOpen] = useState(false);
+    const [rfIdOpen, setRfIdOpen] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [inventoryModal, setInventoryModal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
@@ -257,8 +257,8 @@ const Home = (props:any) => {
                 </View>
 
             </Container>
-            {/*<FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} modelData={modalData}/>*/}
-            {/*<FilterModal modalVisible={rfIdOpen} setModalVisible={setRfIdOpen} setValue={setRfIdData} modelData={rfIdData}/>*/}
+            <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter} modelData={modalData}/>
+            <FilterModal modalVisible={rfIdOpen} setModalVisible={setRfIdOpen} setValue={setRfIdData} modelData={Array.from(rfIdData)}/>
             <BatchModal
                 modalVisible={inventoryModal}
                 setModalVisible={setInventoryModal}

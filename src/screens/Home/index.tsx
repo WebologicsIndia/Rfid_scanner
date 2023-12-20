@@ -27,13 +27,12 @@ const {RFIDModule} = NativeModules;
 const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
 const Home = (props:any) => {
     const [insets] = useState(Insets.getInsets());
-    const tempObj:any={};
     const [rfIdData, setRfIdData] = useState<Set<any>>(new Set());
     const [rfIdOpen, setRfIdOpen] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [inventoryModal, setInventoryModal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
-    const [icon, setIcon] = useState("PlaySVG");
+    // const [icon, setIcon] = useState("PlaySVG");
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [selectedFilter, setSelectedFilter] = useState<string>("Contains");

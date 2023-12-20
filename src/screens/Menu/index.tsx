@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {borderRadius, Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
+import {borderRadius, Button, Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
 import {theme} from "../../config/theme";
 import {ActivityIndicator, Pressable, ScrollView, StyleSheet, View} from "react-native";
 import HamburgerSVG from "../../assets/hamburger.svg";
@@ -14,6 +14,7 @@ const TrackingDrawer = (props: any) => {
     const [total, setTotal] = useState();
     const [update, setUpdate] = useState(false);
     const [expanded, setExpanded] = useState<any>([]);
+    const [batchStatus, setBatchStatus] = useState("");
 
     const getInventories = () => {
         setLoading(true);
@@ -30,10 +31,39 @@ const TrackingDrawer = (props: any) => {
             setLoading(false);
         });
     };
+
+    const updateBatchStatus = (batchId: any, status: string) => {
+        setLoading(true);
+        fetch(batchUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "accept": "application/json"
+            },
+            body: JSON.stringify({
+                batchId: batchId,
+                status: status === "Picked Up" ? "In Laundry" : status === "In Laundry" ? "Cleaned" : "Delivered"
+            })
+        }).then((res) => {
+            if (res.status === 200) {
+                res.json().then((data) => {
+                    console.log(data.message);
+                });
+            }
+        }).catch(() => {
+            setLoading(false);
+
+        }).finally(() => {
+            setLoading(false);
+            setUpdate(!update);
+        });
+    };
+
     React.useEffect(() => {
         getInventories();
-        setUpdate(false);
     }, [update]);
+
+
 
     if (loading) {
         return <View style={{justifyContent: "center", alignItems: "center"}}><ActivityIndicator size={"large"}
@@ -41,8 +71,9 @@ const TrackingDrawer = (props: any) => {
     }
     const batchList = (() => {
         props.navigation.openDrawer();
-        setUpdate(true);
+        setUpdate(!update);
     });
+
     const toggle = (index: number) => {
         const newExpanded = [...expanded];
         newExpanded[index] = !newExpanded[index];
@@ -65,7 +96,6 @@ const TrackingDrawer = (props: any) => {
                 {
                     inventoryData.length ?
                         inventoryData.map((item: any, index) => {
-
                             return (
                                 <Accordian
                                     expanded={expanded[index]}
@@ -95,6 +125,11 @@ const TrackingDrawer = (props: any) => {
                                                 <H7 style={{color: theme.PrimaryDark}}>Created</H7>
                                                 <H7
                                                     style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH:MM A")}</H7>
+                                                <H7 style={{color: theme.PrimaryDark}}>Current Status</H7>
+                                                <H7 style={{
+                                                    color: theme.PrimaryLight,
+                                                    textTransform: "capitalize"
+                                                }}>{item.status}</H7>
                                             </View>
                                         </View>
                                     }>
@@ -127,6 +162,16 @@ const TrackingDrawer = (props: any) => {
                                         })
                                         :<></>
                                     }
+                                    <Button
+                                        onPress={() => {
+                                            updateBatchStatus(item._id, item.status);
+                                        }} >
+                                        <H7 style={[{textTransform: "uppercase", color: theme.White, textAlign: "center"}]}>{
+                                            item.status === "Picked Up" ? "In Laundry" : item.status === "In Laundry" ? "Cleaned" : "Delivered"
+                                        }</H7>
+
+                                    </Button>
+
                                 </Accordian>
                             );
                         }) :

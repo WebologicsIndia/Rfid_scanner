@@ -3,6 +3,8 @@ import {View, StyleSheet, Animated, Easing, Pressable} from "react-native";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import EntypoIcons from "react-native-vector-icons/Entypo";
+import {borderRadius, width} from "@WebologicsIndia/react-native-components";
+import hairlineWidth = StyleSheet.hairlineWidth;
 
 
 const Accordian = (props: any) => {
@@ -53,7 +55,7 @@ const Accordian = (props: any) => {
     };
 
     return (
-        <View style={props.style}>
+        <View style={[props.style, borderRadius.br2, visible ? {borderWidth: hairlineWidth}: {borderWidth: 0}]}>
             <Pressable
                 onPress={props.onPress}
                 style={{
@@ -84,14 +86,25 @@ const Accordian = (props: any) => {
                 </View>
             </Pressable>
             {visible ? (
-                <Animated.ScrollView style={StyleSheet.flatten([contentHeight])}>
-                    {props.children}
-                </Animated.ScrollView>
+                <>
+                    <View style={styles.hairlineView}/>
+                    <Animated.ScrollView style={StyleSheet.flatten([contentHeight])}>
+                        {props.children}
+                    </Animated.ScrollView>
+                </>
             ) : (
                 <></>
             )}
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    hairlineView: {
+        height: StyleSheet.hairlineWidth,
+        ...width.w24,
+        backgroundColor: "#CBCCCD"
+    },
+});
 
 export default Accordian;

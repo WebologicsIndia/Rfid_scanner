@@ -1,12 +1,16 @@
-import React from "react";
+import React, {useState} from "react";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import {NavigationContainer} from "@react-navigation/native";
 import HomeScreen from "./Home";
 import TrackingDrawer from "./Menu";
+import InventoryButtonModel from "./Inventory";
 import CustomDrawerContent from "../common/CustomDrawerContent/CustomDrawerContent";
+import InventoryScreens from "./Inventory";
+
 
 const Drawer = createDrawerNavigator();
 const Screens = () => {
+
     return (
         <NavigationContainer>
             <Drawer.Navigator
@@ -20,12 +24,19 @@ const Screens = () => {
                     component={HomeScreen}
                 />
                 <Drawer.Screen
-                    name="Inventories"
+                    name="Batches"
                     component={TrackingDrawer}
+                />
+                <Drawer.Screen
+                    name="inventory"
+                    component={InventoryScreens}
                 />
 
             </Drawer.Navigator>
         </NavigationContainer>
+
+
     );
 };
+
 export default Screens;

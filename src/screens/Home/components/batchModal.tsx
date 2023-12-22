@@ -3,6 +3,7 @@ import {Modal, Pressable, StyleSheet, View, ActivityIndicator} from "react-nativ
 import {theme} from "../../../config/theme";
 import {borderRadius, H7, height, Input, padding, width} from "@WebologicsIndia/react-native-components";
 import {batchUrl} from "../../../config/api";
+import {fetchWithToken} from "../../../config/helper";
 const BatchModal = (props:{
     modalVisible:boolean,
     setModalVisible:React.Dispatch<React.SetStateAction<boolean>>
@@ -22,30 +23,25 @@ const BatchModal = (props:{
     };
     const batchApi = () => {
         setLoading(true);
-        fetch(batchUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "accept": "application/json"
-            },
-            body: JSON.stringify({
-                latitude: props.latitude,
-                longitude: props.longitude,
-                name: value,
-                tags: Array.from(props.filteredData)
-            })
-        }).then((resp) => {
-            if (resp.status === 200){
-                setValue("");
+        const body = {
+            latitude: props.latitude,
+            longitude: props.longitude,
+            name: value,
+            tags: Array.from(props.filteredData)
+        };
+        fetchWithToken(batchUrl, "POST", "", JSON.stringify(body))
+            .then((resp) => {
+                if (resp.status === 200){
+                    setValue("");
+                    props.setModalVisible(false);
+                }
+            }).catch(() => {
+                setLoading(false);
+            }).finally(() => {
+                setLoading(false);
+                props.setRfIdData(new Set());
                 props.setModalVisible(false);
-            }
-        }).catch(() => {
-            setLoading(false);
-        }).finally(() => {
-            setLoading(false);
-            props.setRfIdData(new Set());
-            props.setModalVisible(false);
-        });
+            });
     };
 
     if(loading){

@@ -6,6 +6,7 @@ import HamburgerSVG from "../../assets/hamburger.svg";
 import {batchUrl} from "../../config/api";
 import dayjs from "dayjs";
 import Accordian from "../../common/accordian";
+import {fetchWithToken} from "../../config/helper";
 
 const TrackingDrawer = (props: any) => {
     const [insets] = useState(Insets.getInsets());
@@ -14,11 +15,11 @@ const TrackingDrawer = (props: any) => {
     const [total, setTotal] = useState();
     const [update, setUpdate] = useState(false);
     const [expanded, setExpanded] = useState<any>([]);
-    const [batchStatus, setBatchStatus] = useState("");
+
 
     const getInventories = () => {
         setLoading(true);
-        fetch(`${batchUrl}?page=1&results=10`).then((res) => {
+        fetchWithToken(`${batchUrl}?page=1&results=10`, "get").then((res) => {
             if (res.status === 200) {
                 res.json().then((data) => {
                     setInventoryData(data.results);
@@ -34,17 +35,11 @@ const TrackingDrawer = (props: any) => {
 
     const updateBatchStatus = (batchId: any, status: string) => {
         setLoading(true);
-        fetch(batchUrl, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "accept": "application/json"
-            },
-            body: JSON.stringify({
-                batchId: batchId,
-                status: status === "Picked Up" ? "In Laundry" : status === "In Laundry" ? "Cleaned" : "Delivered"
-            })
-        }).then((res) => {
+        const body = {
+            batchId: batchId,
+            status: status === "Picked Up" ? "In Laundry" : status === "In Laundry" ? "Cleaned" : "Delivered"
+        };
+        fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body)).then((res) => {
             if (res.status === 200) {
                 res.json().then((data) => {
                     console.log(data.message);

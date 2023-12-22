@@ -156,7 +156,6 @@ const Home = (props:any) => {
     };
     const handleRefreshSvg = () => {
         setRfIdData(new Set());
-        console.log("data cleared");
     };
 
     useEffect( () => {

@@ -1,37 +1,41 @@
 
-import {Pressable, StyleSheet, View} from "react-native";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import ScanIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import {Modal, Pressable, StyleSheet, View} from "react-native";
 import {theme} from "../../../config/theme";
 import {borderRadius,  H7, height, padding, width} from "@WebologicsIndia/react-native-components";
 import React from "react";
 
 const ModalView = (props:any) => {
-    console.log(props);
-
     return (
-        <View
-            style = {styles.modalView}
+        <Modal
+            visible={props.modalVisible}
+            transparent
+
         >
-            {/*<Pressable onPress={props.setModalVisible} style={styles.close}>*/}
-            {/*    <ScanIcon name={"close-circle-outline"} color={theme.Primary} size={40}/>*/}
-            {/*</Pressable>*/}
+            <Pressable
+                style={styles.centeredView}
+                onPress={props.setModalVisible}
+            >
+                <View
+                    style = {[styles.modalView, {justifyContent: "center", alignItems: "center"}]}
+                >
+                    <View>
+                        <View style={{flexDirection: "row"}}>
+                            <H7 style = {{color: theme.Primary, fontWeight: "bold"}}>Message:   </H7>
+                            <H7 style = {{color: theme.Primary}}>{props.data.message ? props.data.message: "Error Scanning Tags"}</H7>
+                        </View>
+                        <View style={{flexDirection: "row"}}>
+                            <H7 style = {{color: theme.Primary, fontWeight: "bold"}}>Tags Added:    </H7>
+                            <H7 style = {{color: theme.Primary}}>{props.data.totalTagsAdded ? props.data.totalTagsAdded : 0}</H7>
+                        </View>
+                        <View style={{flexDirection: "row"}}>
+                            <H7 style = {{color: theme.Primary, fontWeight: "bold"}}>Duplicate Tags:    </H7>
+                            <H7 style = {{color: theme.Primary}}>{props.data.duplicateTags ? props.data.duplicateTags: 0}</H7>
+                        </View>
+                    </View>
 
-            <View style={{flexDirection: "row"}}>
-                <H7 style = {{color: theme.Primary}}>Message: </H7>
-                <H7 style = {{color: theme.Primary}}>{props.data.message ? props.data.message: props.data}</H7>
-            </View>
-            <View style={{flexDirection: "row"}}>
-                <H7 style = {{color: theme.Primary}}>Tags Added: </H7>
-                <H7 style = {{color: theme.Primary}}>{props.data.message ? props.data.totalTagsAdded : "0"}</H7>
-            </View>
-            <View style={{flexDirection: "row"}}>
-                <H7 style = {{color: theme.Primary}}>Duplicate Tags: </H7>
-                <H7 style = {{color: theme.Primary}}>{props.data.message ? props.data.duplicateTags: "0"}</H7>
-            </View>
-
-        </View>
+                </View>
+            </Pressable>
+        </Modal>
     );
 };
 const styles = StyleSheet.create({

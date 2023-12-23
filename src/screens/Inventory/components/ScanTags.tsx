@@ -48,12 +48,12 @@ const ScanTagsScreen = (props: any) => {
                     });
                 } else {
                     resp.json().then((data) => {
-                        setModalData(data.message);
+                        console.log(data.message);
+                        setModalData(data);
                     });
                 }
-            }).catch((error) => {
+            }).catch(() => {
                 setLoading(false);
-                setModalData(error.message);
             }).finally(() => {
                 setLoading(false);
                 setRfIdData(new Set());
@@ -103,10 +103,6 @@ const ScanTagsScreen = (props: any) => {
 
 
 
-    if(loading){
-        return <ActivityIndicator size={"large"}/>;
-    }
-
     return (
         <>
             <Container
@@ -151,6 +147,7 @@ const ScanTagsScreen = (props: any) => {
                     </View>
                     <View style={{flexDirection: "row", justifyContent: "center"}}>
                         <Button
+                            loading={loading}
                             padding={padding.p5}
                             borderRadius={borderRadius.br4}
                             onPress={handleButtonClick}
@@ -182,7 +179,7 @@ const ScanTagsScreen = (props: any) => {
                 </View>
 
             </Container>
-            {modalVisible && <ModalView data={modalData} />}
+            <ModalView data={modalData} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
         </>
 
     );

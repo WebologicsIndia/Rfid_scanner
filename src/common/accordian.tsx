@@ -2,7 +2,7 @@ import React, {useState, useRef, useEffect} from "react";
 import {View, StyleSheet, Animated, Easing, Pressable} from "react-native";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import EntypoIcons from "react-native-vector-icons/Entypo";
+// import EntypoIcons from "react-native-vector-icons/Entypo";
 import {borderRadius, width} from "@WebologicsIndia/react-native-components";
 import hairlineWidth = StyleSheet.hairlineWidth;
 
@@ -78,11 +78,11 @@ const Accordian = (props: any) => {
                         justifyContent: "space-between",
                         alignItems: "center",
                     }}>
-                    <EntypoIcons
-                        name={props.expanded ? "chevron-up" : "chevron-down"}
-                        color={"#999999"}
-                        size={20}
-                    />
+                    {/*<EntypoIcons*/}
+                    {/*    name={props.expanded ? "chevron-up" : "chevron-down"}*/}
+                    {/*    color={"#999999"}*/}
+                    {/*    size={20}*/}
+                    {/*/>*/}
                 </View>
             </Pressable>
             {visible ? (

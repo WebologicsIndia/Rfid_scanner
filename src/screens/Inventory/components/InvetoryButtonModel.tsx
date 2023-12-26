@@ -1,5 +1,6 @@
 
 import {Pressable, StyleSheet, View} from "react-native";
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import ScanIcon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -29,7 +30,8 @@ const InvetoryButtonModal = (props:any) => {
                 <Button
                     padding={[padding.px3, padding.py5]}
                     borderRadius={borderRadius.br4}
-                    left={<ScanIcon name={"file-upload"} color={theme.White} size={20}/>}
+                    onPress={() => props.navigation.navigate("UploadExcel")}
+                    // left={<ScanIcon name={"file-upload"} color={theme.White} size={20}/>}
                 >
                     <H7 style={{color: theme.White}}>Upload Excel</H7>
                 </Button>

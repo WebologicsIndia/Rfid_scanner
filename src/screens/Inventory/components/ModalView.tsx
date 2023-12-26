@@ -9,7 +9,6 @@ const ModalView = (props:any) => {
         <Modal
             visible={props.modalVisible}
             transparent
-
         >
             <Pressable
                 style={styles.centeredView}

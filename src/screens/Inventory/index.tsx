@@ -2,6 +2,7 @@ import React from "react";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import ScanTagsScreen from "./components/ScanTags";
 import InvetoryButtonModal from "./components/InvetoryButtonModel";
+import UploadExcelScreen from "./components/UploadExcel";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,7 +17,7 @@ const InventoryScreens = () => {
         >
             <Stack.Screen name="Add Inventories" component={InvetoryButtonModal} />
             <Stack.Screen name="ScanTags" component={ScanTagsScreen} />
-            {/*<Stack.Screen name="UploadExcel" component={UploadExcel} />*/}
+            <Stack.Screen name="UploadExcel" component={UploadExcelScreen} />
         </Stack.Navigator>
     );
 };

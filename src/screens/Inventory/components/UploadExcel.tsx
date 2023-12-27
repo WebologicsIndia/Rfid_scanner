@@ -31,7 +31,7 @@ const UploadExcelScreen = (props: any) => {
     const [selectedFile, setSelectedFile] = useState< any>(null);
 
     const templateDownload = async () => {
-        const templateUrl = "https://docs.google.com/spreadsheets/d/1ABSP1TTmaZTsl8VysbiteYY5n4xXhmtR/edit?usp=drive_link&ouid=117403022071346511077&rtpof=true&sd=true";
+        const templateUrl = "https://github.com/satyamyadav20/template/blob/main/rfid_upload_template.xlsx?raw=true";
         try {
             const {config, fs} = RNFetchBlob;
             const RootDir = fs.dirs.DownloadDir;
@@ -98,6 +98,12 @@ const UploadExcelScreen = (props: any) => {
                         });
                     }
 
+                }).catch(() => {
+                    setLoading(false);
+                }).finally(() => {
+                    setLoading(false);
+                    setModalVisible(true);
+                    setSelectedFile(null);
                 });
         } else {
             setModalData({message: "No File Selected"});

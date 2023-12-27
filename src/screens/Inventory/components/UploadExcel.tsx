@@ -31,8 +31,6 @@ const UploadExcelScreen = (props: any) => {
     const [selectedFile, setSelectedFile] = useState< any>(null);
 
     const templateDownload = async () => {
-        console.log("hello");
-        //TODO to be completed later
         const templateUrl = "https://docs.google.com/spreadsheets/d/1ABSP1TTmaZTsl8VysbiteYY5n4xXhmtR/edit?usp=drive_link&ouid=117403022071346511077&rtpof=true&sd=true";
         try {
             const {config, fs} = RNFetchBlob;

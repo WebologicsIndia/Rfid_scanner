@@ -22,6 +22,7 @@ const TrackingDrawer = (props: any) => {
         fetchWithToken(`${batchUrl}?page=1&results=10`, "get").then((res) => {
             if (res.status === 200) {
                 res.json().then((data) => {
+                    console.log(data);
                     setInventoryData(data.results);
                     setTotal(data.total);
                 });
@@ -33,26 +34,26 @@ const TrackingDrawer = (props: any) => {
         });
     };
 
-    const updateBatchStatus = (batchId: any, status: string) => {
-        setLoading(true);
-        const body = {
-            batchId: batchId,
-            status: status === "Picked Up" ? "In Laundry" : status === "In Laundry" ? "Cleaned" : "Delivered"
-        };
-        fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body)).then((res) => {
-            if (res.status === 200) {
-                res.json().then((data) => {
-                    console.log(data.message);
-                });
-            }
-        }).catch(() => {
-            setLoading(false);
-
-        }).finally(() => {
-            setLoading(false);
-            setUpdate(!update);
-        });
-    };
+    // const updateBatchStatus = (batchId: any, status: string) => {
+    //     setLoading(true);
+    //     const body = {
+    //         batchId: batchId,
+    //         status: status === "Picked Up" ? "In Laundry" : status === "In Laundry" ? "Cleaned" : "Delivered"
+    //     };
+    //     fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body)).then((res) => {
+    //         if (res.status === 200) {
+    //             res.json().then((data) => {
+    //                 console.log(data.message);
+    //             });
+    //         }
+    //     }).catch(() => {
+    //         setLoading(false);
+    //
+    //     }).finally(() => {
+    //         setLoading(false);
+    //         setUpdate(!update);
+    //     });
+    // };
 
     React.useEffect(() => {
         getInventories();
@@ -105,7 +106,7 @@ const TrackingDrawer = (props: any) => {
                                                 alignItems: "center"
                                             }}>
                                             <View style={padding.pb3}>
-                                                <H7 style={{color: theme.PrimaryDark}}>Name</H7>
+                                                <H7 style={{color: theme.PrimaryDark}}>Batch Name</H7>
                                                 <H7 style={{
                                                     color: theme.PrimaryLight,
                                                     textTransform: "capitalize"
@@ -120,11 +121,11 @@ const TrackingDrawer = (props: any) => {
                                                 <H7 style={{color: theme.PrimaryDark}}>Created</H7>
                                                 <H7
                                                     style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH:MM A")}</H7>
-                                                <H7 style={{color: theme.PrimaryDark}}>Current Status</H7>
+                                                <H7 style={{color: theme.PrimaryDark}}>Client</H7>
                                                 <H7 style={{
                                                     color: theme.PrimaryLight,
                                                     textTransform: "capitalize"
-                                                }}>{item.status}</H7>
+                                                }}>{item.assignedTo}</H7>
                                             </View>
                                         </View>
                                     }>
@@ -158,11 +159,12 @@ const TrackingDrawer = (props: any) => {
                                         :<></>
                                     }
                                     <Button
-                                        onPress={() => {
-                                            updateBatchStatus(item._id, item.status);
-                                        }} >
+                                        // onPress={() => {
+                                        //     updateBatchStatus(item._id, item.status);
+                                        // }}
+                                    >
                                         <H7 style={[{textTransform: "uppercase", color: theme.White, textAlign: "center"}]}>{
-                                            item.status === "Picked Up" ? "In Laundry" : item.status === "In Laundry" ? "Cleaned" : "Delivered"
+                                            item.status
                                         }</H7>
 
                                     </Button>

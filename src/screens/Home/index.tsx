@@ -106,11 +106,11 @@ const Home = (props:any) => {
                     setLatitude(position.coords.latitude);
                     setLongitude(position.coords.longitude);
                 },
-
                 (error:any) => {
                     console.error(error);
                 },
-                {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
+
+                {enableHighAccuracy: true, timeout: 3600000, maximumAge: 3600000}
             );
             setLocationIconColor("#009900");
 
@@ -118,6 +118,7 @@ const Home = (props:any) => {
             setLocationIconColor(theme.PrimaryDark);
         }
     };
+    // console.log(latitude);
 
     useEffect(() => {
         RFIDModule.init(

@@ -1,11 +1,11 @@
-import React, {useState} from "react";
+import React from "react";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import {NavigationContainer} from "@react-navigation/native";
 import HomeScreen from "./Home";
 import TrackingDrawer from "./Menu";
-import InventoryButtonModel from "./Inventory";
 import CustomDrawerContent from "../common/CustomDrawerContent/CustomDrawerContent";
 import InventoryScreens from "./Inventory";
+import ClientScreens from "./Clients";
 
 
 const Drawer = createDrawerNavigator();
@@ -15,9 +15,9 @@ const Screens = () => {
         <NavigationContainer>
             <Drawer.Navigator
                 screenOptions={{
-                    headerShown: false,
+                    headerShown: false
                 }}
-                drawerContent={(props) => <CustomDrawerContent {...props}/>}
+                drawerContent={(props) => <CustomDrawerContent {...props} />}
             >
                 <Drawer.Screen
                     name="Tag Scanner"
@@ -30,6 +30,10 @@ const Screens = () => {
                 <Drawer.Screen
                     name="inventory"
                     component={InventoryScreens}
+                />
+                <Drawer.Screen
+                    name="clients"
+                    component={ClientScreens}
                 />
 
             </Drawer.Navigator>

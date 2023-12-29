@@ -22,7 +22,6 @@ const TrackingDrawer = (props: any) => {
         fetchWithToken(`${batchUrl}?page=1&results=10`, "get").then((res) => {
             if (res.status === 200) {
                 res.json().then((data) => {
-                    console.log(data);
                     setInventoryData(data.results);
                     setTotal(data.total);
                 });

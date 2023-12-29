@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "396171535629",
+    "project_id": "laundry-49479",
+    "storage_bucket": "laundry-49479.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:396171535629:android:5b63cf4c274ca2f025fc44",
+        "android_client_info": {
+          "package_name": "com.rfid_scanner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRZcKZGhJ5l42Asg2JxJe9busbYH7DnCo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

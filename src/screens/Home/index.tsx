@@ -118,7 +118,6 @@ const Home = (props:any) => {
             setLocationIconColor(theme.PrimaryDark);
         }
     };
-    // console.log(latitude);
 
     useEffect(() => {
         RFIDModule.init(

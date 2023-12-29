@@ -81,7 +81,7 @@ const ClientDetails = (props: any) => {
                                     <View style={{flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
                                         <View style={{flexDirection: "row", alignItems: "center", gap: 5}}>
                                             <MaterialIcon color={"#ff3366"} name="person" size={20} />
-                                            <H5 style={{color: theme.PrimaryDark, fontWeight: "500"}}>
+                                            <H5 style={{color: theme.PrimaryDark, fontWeight: "500", textTransform: "capitalize"}}>
                                                 {item.name}
                                             </H5>
                                         </View>
@@ -139,7 +139,7 @@ const ClientDetails = (props: any) => {
 };
 const styles = StyleSheet.create({
     container: {
-        ...padding.py5,
+        ...padding.py3,
         flex: 1
     },
     headerText: {

@@ -21,8 +21,6 @@ import {setClient} from "../../../store/reducers/clientSlice";
 
 const AddNewClient = (props: any) => {
     const items: any = props?.route?.params?.item;
-    console.log("itemsssss", items);
-
     const [insets] = useState(Insets.getInsets());
     const initialClientDetails = items
         ? {
@@ -31,7 +29,7 @@ const AddNewClient = (props: any) => {
             address: items.address || "",
             contactPerson: items.userId.name || "",
             contactNo: String(items.userId.phone) || "",
-            assignedBatch: String(items.assignedBatchs) || "0"
+            assignedBatch: String(0) || ""
         }
         : {
             name: "",
@@ -45,6 +43,7 @@ const AddNewClient = (props: any) => {
     const [clientDetails, setClientDetails] = useState(initialClientDetails);
     const [isEditable, setIsEditable] = useState(!items);
     const [loading, setLoading] = useState(false);
+    const [isActive, setIsActive] = useState(false);
 
     useEffect(() => {
         setClientDetails(initialClientDetails);
@@ -52,21 +51,24 @@ const AddNewClient = (props: any) => {
     const handleCancelBtn = () => {
         if (items) {
             setIsEditable(false);
+            props.navigation.goBack();
         } else {
             props.navigation.goBack();
         }
     };
     const AddUpdateClient = () => {
-        const reqBody = JSON.stringify({
+        const reqBody: any = {
             name: clientDetails.name,
             email: clientDetails.email,
             address: clientDetails.address,
             phone: clientDetails.contactNo,
             representative: clientDetails.contactPerson
-        });
+        };
+        if (items) {
+            reqBody.isActive = true;
+        }
         setLoading(true);
-        fetchWithToken(clientUrl, "POST", {}, reqBody).then((resp) => {
-            console.log("status", resp.status);
+        fetchWithToken(clientUrl, !items ? "POST" : "PUT", {}, JSON.stringify(reqBody)).then((resp) => {
             if (resp.status === 200) {
                 resp.json().then((data) => {
                     console.log(data.message);
@@ -134,7 +136,7 @@ const AddNewClient = (props: any) => {
                 floatingPlaceholder={true}
                 onChangeText={(val) => setClientDetails({...clientDetails, name: val})}
                 value={clientDetails.name}
-                editable={!items}
+                editable={isEditable}
             />
             <Input
                 placeholder={"Email"}
@@ -147,7 +149,7 @@ const AddNewClient = (props: any) => {
                 floatingPlaceholder={true}
                 onChangeText={(val) => setClientDetails({...clientDetails, email: val})}
                 value={clientDetails.email}
-                editable={isEditable}
+                editable={!items}
             />
             <Input
                 placeholder={"Address"}
@@ -213,14 +215,19 @@ const AddNewClient = (props: any) => {
                         floatingPlaceholder={true}
                         onChangeText={(val) => setClientDetails({...clientDetails, assignedBatch: val})}
                         value={clientDetails.assignedBatch}
-                        editable={isEditable}
+                        editable={!items}
                     />
             }
             {
                 items &&
           <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
               <H7 style={{color: theme.PrimaryDark}}>IsActive</H7>
-              <Switch activeTrackColors={theme.PrimaryDark} thumbStyle={{backgroundColor: theme.TextLight}} />
+              <Switch
+                  activeTrackColors={theme.PrimaryDark}
+                  thumbStyle={{backgroundColor: theme.TextLight}}
+                  value={isActive}
+                  onChange={() => setIsActive(!isActive)}
+              />
           </View>
             }
             {

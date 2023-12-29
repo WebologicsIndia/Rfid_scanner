@@ -14,7 +14,7 @@ const Screens = (props: any) => {
                     gestureEnabled: false
                 }}>
                 {
-                    props.token !== null ?
+                    props.token === null ?
                         (
                             <>
                                 <Stack.Screen name={"login"} component={Login} />

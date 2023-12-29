@@ -1,8 +1,8 @@
 import React, {useState} from "react";
-import {Modal, Pressable, StyleSheet, View, ActivityIndicator} from "react-native";
+import {Modal, Pressable, StyleSheet, View, ActivityIndicator, FlatList} from "react-native";
 import {theme} from "../../../config/theme";
-import {borderRadius, H7, height, Input, margin, padding, width} from "@WebologicsIndia/react-native-components";
-import {batchUrl} from "../../../config/api";
+import {Block, borderRadius, H7, height, Input, margin, padding, width} from "@WebologicsIndia/react-native-components";
+import {batchUrl, clientUrl} from "../../../config/api";
 import {fetchWithToken} from "../../../config/helper";
 import ModalView from "../../Inventory/components/ModalView";
 import ModalBatchView from "./ModalBatchView";
@@ -24,12 +24,38 @@ const BatchModal = (props:{
     const [loading, setLoading] = useState(false);
     const[modalVisible, setModalVisible] = useState(false);
     const[modalData,  setModalData] = useState();
+    const[clientData, setClientData] = useState([]);
+    const[selectedClient, setSelectedClient] = useState<any>(null);
 
     const handleInputChange = (name: string, value:string) => {
+        if(name === "assignedTo"){
+            setLoading(true);
+            fetchWithToken(`${clientUrl}?name=${value}`, "GET", "").then((resp) => {
+                if(resp.status === 200) {
+                    resp.json().then((data) => {
+                        console.log(data.results);
+                        setClientData(data.results);
+                    });
+                }
+            });
+
+        } else {
+            setValues((prevValues) => ({
+                ...prevValues,
+                [name]: value,
+            }));
+        }
+        setLoading(false);
+    };
+    const handleNameSelect = (client: any) => {
+
         setValues((prevValues) => ({
             ...prevValues,
-            [name]: value,
+            ["assignedTo"]: client.name,
         }));
+        console.log(values);
+        setSelectedClient(client);
+        setClientData([]);
     };
     const batchApi = () => {
         setLoading(true);
@@ -38,7 +64,7 @@ const BatchModal = (props:{
             longitude: props.longitude,
             name: values.name,
             tags: Array.from(props.filteredData),
-            assignedTo: values.assignedTo
+            assignedTo: selectedClient._id
         };
         console.log(body);
         fetchWithToken(batchUrl, "POST", "", JSON.stringify(body))
@@ -63,6 +89,7 @@ const BatchModal = (props:{
                 setLoading(false);
                 props.setRfIdData(new Set());
                 props.setModalVisible(false);
+                setSelectedClient(null);
             });
     };
 
@@ -94,8 +121,28 @@ const BatchModal = (props:{
                                 // value= {values.assignedTo}
                                 placeholderTextColor={theme.PrimaryLight}
                                 onFocus={handleFocus}
+                                value={selectedClient ? selectedClient.name : ""}
                                 onChangeText={(value) => handleInputChange("assignedTo", value)}
                             />
+                            {clientData.length ?
+                                <View>
+                                    <FlatList
+                                        data={clientData}
+                                        renderItem={({item}: any) => {
+                                            return<Block
+                                                fluid
+
+                                            >
+                                                <Pressable onPress={() => handleNameSelect(item)}>
+                                                    <H7 style={{color: theme.Primary}}>{item.name}</H7>
+                                                </Pressable>
+                                            </Block>;
+
+                                        }}
+                                    />
+                                </View>
+                                : <></>
+                            }
                             <Input
                                 inputStyle={{borderBottomWidth: 1, borderBottomColor: isFocused ? theme.Accent : theme.PrimaryDark}}
                                 textStyle={[{color: theme.PrimaryDark}, styles.input]}

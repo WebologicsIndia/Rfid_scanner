@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {StyleSheet, View} from "react-native";
 import {
     borderRadius,
@@ -8,7 +8,7 @@ import {
     Input,
     Insets,
     margin,
-    padding
+    padding, Switch
 } from "@WebologicsIndia/react-native-components";
 import {theme} from "../../../config/theme";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -16,19 +16,42 @@ import {theme} from "../../../config/theme";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 
 const AddNewClient = (props: any) => {
-    const items = props?.route?.params?.item;
-    console.log("items", items);
+    const items: any = props?.route?.params?.item;
     const [insets] = useState(Insets.getInsets());
-    const [clientDetails, setClientDetails] = useState({
-        name: "",
-        email: "",
-        address: "",
-        contactPerson: "",
-        contactNo: "",
-        password: "",
-        assignedBatch: ""
-    });
+    const initialClientDetails = items
+        ? {
+            name: items.name || "",
+            email: items.email || "",
+            address: items.address || "",
+            contactPerson: items.contactPerson || "",
+            contactNo: String(items.contactNo) || "",
+            assignedBatch: String(items.assignedBatchs) || ""
+        }
+        : {
+            name: "",
+            email: "",
+            address: "",
+            contactPerson: "",
+            contactNo: "",
+            password: "",
+            assignedBatch: ""
+        };
+    const [clientDetails, setClientDetails] = useState(initialClientDetails);
+    const [isEditable, setIsEditable] = useState(!items);
 
+    useEffect(() => {
+        setClientDetails(initialClientDetails);
+    }, [items]);
+    const handleCancelBtn = () => {
+        if (items) {
+            setIsEditable(false);
+        } else {
+            props.navigation.goBack();
+        }
+    };
+    const AddUpdateClient = () => {
+        console.log(clientDetails);
+    };
     return (
         <Container
             bottom={insets.bottom}
@@ -41,6 +64,7 @@ const AddNewClient = (props: any) => {
             style={styles.container}
             backIcon={<MaterialIcon name={"arrow-back"} size={20} color={theme.TextLight} />}
             navigation={props.navigation}
+            keyboardAvoiding={true}
         >
             {
                 items &&
@@ -48,7 +72,7 @@ const AddNewClient = (props: any) => {
               <Button
                   borderRadius={borderRadius.br2}
                   padding={padding.p3}
-                  onPress={() => props.navigation.navigate("addNewClient")}
+                  onPress={() => setIsEditable(true)}
               >
                   <H7 style={{color: theme.TextLight}}>Edit</H7>
               </Button>
@@ -56,74 +80,76 @@ const AddNewClient = (props: any) => {
             }
 
             <Input
-                placeholder={"name"}
-                placeholderTextColor={theme.PrimaryDark}
-                // inputStyle={{...margin.mb2}}
+                placeholder={"Name"}
+                placeholderTextColor={theme.TextLight}
                 borderRadius={borderRadius.br2}
-                textStyle={[padding.px2, {color: theme.TextLight}]}
+                textStyle={[padding.px2, {color: theme.PrimaryDark}]}
                 bgColor={theme.White}
                 borderColor={theme.PrimaryDark}
                 floatingPlaceholder={true}
                 onChangeText={(val) => setClientDetails({...clientDetails, name: val})}
                 value={clientDetails.name}
+                editable={!items}
             />
             <Input
-                placeholder={"email"}
-                placeholderTextColor={theme.PrimaryDark}
+                placeholder={"Email"}
+                placeholderTextColor={theme.TextLight}
                 inputStyle={{...margin.my3}}
                 borderRadius={borderRadius.br2}
-                textStyle={[padding.px2, {color: theme.TextLight}]}
+                textStyle={[padding.px2, {color: theme.PrimaryDark}]}
                 bgColor={theme.White}
                 borderColor={theme.PrimaryDark}
                 floatingPlaceholder={true}
                 onChangeText={(val) => setClientDetails({...clientDetails, email: val})}
                 value={clientDetails.email}
+                editable={isEditable}
             />
             <Input
                 placeholder={"Address"}
-                placeholderTextColor={theme.PrimaryDark}
-                // inputStyle={{...margin.mb2}}
+                placeholderTextColor={theme.TextLight}
                 borderRadius={borderRadius.br2}
-                textStyle={[padding.px2, {color: theme.TextLight}]}
+                textStyle={[padding.px2, {color: theme.PrimaryDark}]}
                 bgColor={theme.White}
                 borderColor={theme.PrimaryDark}
                 floatingPlaceholder={true}
                 onChangeText={(val) => setClientDetails({...clientDetails, address: val})}
                 value={clientDetails.address}
+                editable={isEditable}
             />
             <Input
                 placeholder={"Contact Person"}
-                placeholderTextColor={theme.PrimaryDark}
+                placeholderTextColor={theme.TextLight}
                 inputStyle={{...margin.my3}}
                 borderRadius={borderRadius.br2}
-                textStyle={[padding.px2, {color: theme.TextLight}]}
+                textStyle={[padding.px2, {color: theme.PrimaryDark}]}
                 bgColor={theme.White}
                 borderColor={theme.PrimaryDark}
                 floatingPlaceholder={true}
                 onChangeText={(val) => setClientDetails({...clientDetails, contactPerson: val})}
                 value={clientDetails.contactPerson}
+                editable={isEditable}
             />
             <Input
                 placeholder={"Contact No."}
-                placeholderTextColor={theme.PrimaryDark}
-                // inputStyle={{...margin.mb2}}
+                placeholderTextColor={theme.TextLight}
                 borderRadius={borderRadius.br2}
-                textStyle={[padding.px2, {color: theme.TextLight}]}
+                textStyle={[padding.px2, {color: theme.PrimaryDark}]}
                 bgColor={theme.White}
                 borderColor={theme.PrimaryDark}
                 floatingPlaceholder={true}
                 keyboardType={"numeric"}
                 onChangeText={(val) => setClientDetails({...clientDetails, contactNo: val})}
                 value={clientDetails.contactNo}
+                editable={isEditable}
             />
             {
                 !items ?
                     <Input
                         placeholder={"Password"}
-                        placeholderTextColor={theme.PrimaryDark}
+                        placeholderTextColor={theme.TextLight}
                         inputStyle={{...margin.my3}}
                         borderRadius={borderRadius.br2}
-                        textStyle={[padding.px2, {color: theme.TextLight}]}
+                        textStyle={[padding.px2, {color: theme.PrimaryDark}]}
                         bgColor={theme.White}
                         borderColor={theme.PrimaryDark}
                         floatingPlaceholder={true}
@@ -132,39 +158,49 @@ const AddNewClient = (props: any) => {
                     />
                     :
                     <Input
-                        placeholder={"Assigned Batch"}
-                        placeholderTextColor={theme.PrimaryDark}
+                        placeholder={"Assigned Batches"}
+                        placeholderTextColor={theme.TextLight}
                         inputStyle={{...margin.my3}}
                         borderRadius={borderRadius.br2}
-                        textStyle={[padding.px2, {color: theme.TextLight}]}
+                        textStyle={[padding.px2, {color: theme.PrimaryDark}]}
                         bgColor={theme.White}
                         borderColor={theme.PrimaryDark}
                         floatingPlaceholder={true}
                         onChangeText={(val) => setClientDetails({...clientDetails, assignedBatch: val})}
                         value={clientDetails.assignedBatch}
+                        editable={isEditable}
                     />
             }
-
-            <View style={{flexDirection: "row", alignItems: "center", gap: 10, ...margin.mt4}}>
-                <View style={{flex: 1}}>
-                    <Button
-                        borderRadius={borderRadius.br2}
-                        padding={padding.p3}
-                        onPress={() => props.navigation.navigate("addNewClient")}
-                    >
-                        <H7 style={{color: theme.TextLight}}>Save</H7>
-                    </Button>
-                </View>
-                <View style={{flex: 1}}>
-                    <Button
-                        borderRadius={borderRadius.br2}
-                        padding={padding.p3}
-                        onPress={() => props.navigation.navigate("addNewClient")}
-                    >
-                        <H7 style={{color: theme.TextLight}}>Cancel</H7>
-                    </Button>
-                </View>
-            </View>
+            {
+                items &&
+          <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
+              <H7 style={{color: theme.PrimaryDark}}>IsActive</H7>
+              <Switch activeTrackColors={theme.PrimaryDark} thumbStyle={{backgroundColor: theme.TextLight}} />
+          </View>
+            }
+            {
+                isEditable &&
+          <View style={{flexDirection: "row", alignItems: "center", gap: 10, ...margin.mt4}}>
+              <View style={{flex: 1}}>
+                  <Button
+                      borderRadius={borderRadius.br2}
+                      padding={padding.p3}
+                      onPress={() => AddUpdateClient()}
+                  >
+                      <H7 style={{color: theme.TextLight}}>Save</H7>
+                  </Button>
+              </View>
+              <View style={{flex: 1}}>
+                  <Button
+                      borderRadius={borderRadius.br2}
+                      padding={padding.p3}
+                      onPress={handleCancelBtn}
+                  >
+                      <H7 style={{color: theme.TextLight}}>Cancel</H7>
+                  </Button>
+              </View>
+          </View>
+            }
         </Container>
     );
 };

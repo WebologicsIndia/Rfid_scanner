@@ -52,6 +52,8 @@ const ClientDetails = (props: any) => {
                 clientDetails.length ?
                     <FlatList
                         data={clientDetails}
+                        keyExtractor={(item, index) => index.toString()}
+                        showsVerticalScrollIndicator={false}
                         renderItem={({item, index}: any) => {
                             return (
                                 <Pressable

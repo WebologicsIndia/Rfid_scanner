@@ -14,18 +14,24 @@ import {theme} from "../../../config/theme";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import {fetchWithToken} from "../../../config/helper";
+import {clientUrl} from "../../../config/api";
+import {connect} from "react-redux";
+import {setClient} from "../../../store/reducers/clientSlice";
 
 const AddNewClient = (props: any) => {
     const items: any = props?.route?.params?.item;
+    console.log("itemsssss", items);
+
     const [insets] = useState(Insets.getInsets());
     const initialClientDetails = items
         ? {
             name: items.name || "",
             email: items.email || "",
             address: items.address || "",
-            contactPerson: items.contactPerson || "",
-            contactNo: String(items.contactNo) || "",
-            assignedBatch: String(items.assignedBatchs) || ""
+            contactPerson: items.userId.name || "",
+            contactNo: String(items.userId.phone) || "",
+            assignedBatch: String(items.assignedBatchs) || "0"
         }
         : {
             name: "",
@@ -38,6 +44,7 @@ const AddNewClient = (props: any) => {
         };
     const [clientDetails, setClientDetails] = useState(initialClientDetails);
     const [isEditable, setIsEditable] = useState(!items);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setClientDetails(initialClientDetails);
@@ -50,7 +57,45 @@ const AddNewClient = (props: any) => {
         }
     };
     const AddUpdateClient = () => {
-        console.log(clientDetails);
+        const reqBody = JSON.stringify({
+            name: clientDetails.name,
+            email: clientDetails.email,
+            address: clientDetails.address,
+            phone: clientDetails.contactNo,
+            representative: clientDetails.contactPerson
+        });
+        setLoading(true);
+        fetchWithToken(clientUrl, "POST", {}, reqBody).then((resp) => {
+            console.log("status", resp.status);
+            if (resp.status === 200) {
+                resp.json().then((data) => {
+                    console.log(data.message);
+                });
+                fetchWithToken(clientUrl, "GET").then((resp) => {
+                    if (resp.status === 200) {
+                        resp.json().then((data) => {
+                            props.setClient({
+                                data: data.results,
+                                total: data.total
+                            });
+                            setTimeout(() => {
+                                props.navigation.goBack();
+                            }, 2000);
+
+                        });
+                    } else {
+                        setLoading(false);
+                    }
+                });
+            } else {
+                resp.json().then((data) => {
+                    console.log(data.message);
+                });
+                setLoading(false);
+            }
+        }).catch(() => {
+            setLoading(false);
+        });
     };
     return (
         <Container
@@ -183,6 +228,7 @@ const AddNewClient = (props: any) => {
           <View style={{flexDirection: "row", alignItems: "center", gap: 10, ...margin.mt4}}>
               <View style={{flex: 1}}>
                   <Button
+                      loading={loading}
                       borderRadius={borderRadius.br2}
                       padding={padding.p3}
                       onPress={() => AddUpdateClient()}
@@ -213,4 +259,4 @@ const styles = StyleSheet.create({
         fontWeight: "600"
     }
 });
-export default AddNewClient;
+export default connect(null, {setClient})(AddNewClient);

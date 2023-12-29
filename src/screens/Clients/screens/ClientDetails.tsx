@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {FlatList, Pressable, StyleSheet, View} from "react-native";
 import {
     borderRadius,
@@ -15,19 +15,27 @@ import HamburgerSVG from "../../../assets/hamburger.svg";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import {fetchWithToken} from "../../../config/helper";
+import {clientUrl} from "../../../config/api";
+import {connect} from "react-redux";
+import {setClient} from "../../../store/reducers/clientSlice";
 
 const ClientDetails = (props: any) => {
     const [insets] = useState(Insets.getInsets());
-    const clientDetails: any = [
-        {
-            name: "Ankush Narwal",
-            email: "ankush@gamil.com",
-            address: "vvip address ghaziabad",
-            contactPerson: "Satyam Yadav",
-            contactNo: 9876543210,
-            assignedBatchs: 5
-        }
-    ];
+    useEffect(() => {
+        fetchWithToken(clientUrl, "GET").then((resp) => {
+            if (resp.status === 200) {
+                resp.json().then((data) => {
+                    props.setClient({
+                        data: data.results,
+                        total: data.total,
+                        page: 2
+                    });
+                });
+            }
+        });
+    }, []);
+
     return (
         <Container
             bottom={insets.bottom}
@@ -39,7 +47,7 @@ const ClientDetails = (props: any) => {
             style={styles.container}
             addIcon={<Pressable onPress={() => props.navigation.openDrawer()}><HamburgerSVG /></Pressable>}
         >
-            <View style={{flexDirection: "row", justifyContent: "flex-end", ...padding.pb5}}>
+            <View style={{flexDirection: "row", justifyContent: "flex-end", ...padding.pb3}}>
                 <Button
                     borderRadius={borderRadius.br2}
                     padding={padding.p3}
@@ -49,9 +57,9 @@ const ClientDetails = (props: any) => {
                 </Button>
             </View>
             {
-                clientDetails.length ?
+                props.clientDetails.data.length ?
                     <FlatList
-                        data={clientDetails}
+                        data={props.clientDetails.data}
                         keyExtractor={(item, index) => index.toString()}
                         showsVerticalScrollIndicator={false}
                         renderItem={({item, index}: any) => {
@@ -92,7 +100,7 @@ const ClientDetails = (props: any) => {
                                                     name="contacts"
                                                     size={16}
                                                 />
-                                                <H7 style={{color: theme.PrimaryDark}}>{item.contactPerson}</H7>
+                                                <H7 style={{color: theme.PrimaryDark, textTransform: "capitalize"}}>{item.userId.name}</H7>
                                             </View>
                                             <View style={{flexDirection: "row", alignItems: "center", gap: 5}}>
                                                 <MaterialIcon
@@ -100,7 +108,7 @@ const ClientDetails = (props: any) => {
                                                     name="phone-android"
                                                     size={16}
                                                 />
-                                                <H7 style={{color: theme.PrimaryDark}}>{item.contactNo}</H7>
+                                                <H7 style={{color: theme.PrimaryDark}}>{item.userId.phone}</H7>
                                             </View>
                                             <View style={{flexDirection: "row", alignItems: "center", gap: 5, ...padding.py2}}>
                                                 <MaterialIcon
@@ -114,7 +122,7 @@ const ClientDetails = (props: any) => {
                                         <View>
                                             <View style={{flexDirection: "row", alignItems: "center", ...padding.py2}}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Assigned Batches: </H7>
-                                                <H7 style={{color: "#ff3366"}}>{item.assignedBatchs}</H7>
+                                                <H7 style={{color: "#ff3366"}}>{item.assignedBatchs ? item.assignedBatchs : 0}</H7>
                                             </View>
                                         </View>
                                     </View>
@@ -138,4 +146,9 @@ const styles = StyleSheet.create({
         fontWeight: "600"
     }
 });
-export default ClientDetails;
+const mapStateToProps = (state: any) => {
+    return {
+        clientDetails: state.client
+    };
+};
+export default connect(mapStateToProps, {setClient})(ClientDetails);

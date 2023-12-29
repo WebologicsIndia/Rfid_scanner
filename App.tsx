@@ -1,15 +1,17 @@
-
 import React from "react";
 import Screens from "./src/screens";
-import {AppProvider} from "@WebologicsIndia/react-native-components";
-
+import {Provider} from "react-redux";
+import {PersistGate} from "redux-persist/integration/react";
+import {store, persistor} from "./src/store";
 
 
 const App = () => {
     return (
-        // <AppProvider>
-        <Screens />
-        // </AppProvider>
+        <Provider store={store}>
+            <PersistGate persistor={persistor}>
+                <Screens />
+            </PersistGate>
+        </Provider>
     );
 };
 export default App;

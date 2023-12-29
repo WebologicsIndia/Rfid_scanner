@@ -30,10 +30,10 @@ const BatchModal = (props:{
     const handleInputChange = (name: string, value:string) => {
         if(name === "assignedTo"){
             setLoading(true);
+            setSelectedClient(value);
             fetchWithToken(`${clientUrl}?name=${value}`, "GET", "").then((resp) => {
                 if(resp.status === 200) {
                     resp.json().then((data) => {
-                        console.log(data.results);
                         setClientData(data.results);
                     });
                 }
@@ -118,7 +118,6 @@ const BatchModal = (props:{
 
                                 bgColor={theme.White}
                                 placeholder={"Assigned To"}
-                                // value= {values.assignedTo}
                                 placeholderTextColor={theme.PrimaryLight}
                                 onFocus={handleFocus}
                                 value={selectedClient ? selectedClient.name : ""}

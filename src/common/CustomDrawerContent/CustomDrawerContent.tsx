@@ -36,7 +36,6 @@ const CustomDrawerItem = (props: { focused: any, label: any, icon: any, onPress:
 
 
 const CustomDrawerContent = (props: any) => {
-
     return (
         <>
             <DrawerContentScrollView {...props}>
@@ -57,18 +56,17 @@ const CustomDrawerContent = (props: any) => {
                 </LinearGradient>
                 {props.state.routes.map((route: any, index: any) => {
                     return(
-                        <>
-                            <CustomDrawerItem
-                                key={index}
-                                label={route.name}
-                                icon={() => <DrawerIcon />}
-                                focused={route.name === props.state.routes[props.state.index].name}
-                                onPress={() => {
-                                    props.navigation.navigate(route.name);
-                                }}
-                            />
+                        <CustomDrawerItem
+                            key={index}
+                            label={route.name}
+                            icon={() => <DrawerIcon />}
+                            focused={route.name === props.state.routes[props.state.index].name}
+                            onPress={() => {
+                                props.navigation.navigate(route.name);
+                            }}
+                        />
 
-                        </>
+
                     );
                 })}
 

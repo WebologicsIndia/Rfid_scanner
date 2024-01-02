@@ -84,14 +84,12 @@ const Login = (props: any) => {
             });
     };
     const sendResetEmail = async () => {
-        console.log("hello");
-        console.log(user.email);
         await auth().sendPasswordResetEmail(user.email);
     };
 
     return (
         <Container
-            bottom={0}
+            bottom={insets.bottom}
             backgroundColor={theme.White}
             keyboardAvoiding
             style={styles.container}

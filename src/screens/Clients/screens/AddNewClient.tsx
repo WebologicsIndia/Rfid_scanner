@@ -243,6 +243,7 @@ const AddNewClient = (props: any) => {
                     activeTrackColors={theme.PrimaryDark}
                     thumbStyle={{backgroundColor: theme.TextLight}}
                     value={isActive}
+                    disabled={(items && !isEditable) ? true : false}
                     onChange={() => setIsActive(!isActive)}
                 />
             </View>

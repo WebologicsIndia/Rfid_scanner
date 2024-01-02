@@ -14,6 +14,10 @@ import {
 
 const ForgotPassword = () => {
     const [insets] = useState(Insets.getInsets());
+    const [clientDetails, setClientDetails] = useState({
+        setPassword: "",
+        confirmPassword: ""
+    });
     return (
         <Container
             bottom={insets.bottom}
@@ -37,6 +41,7 @@ const ForgotPassword = () => {
                     textStyle={[padding.px2, {color: theme.PrimaryDark}]}
                     bgColor={theme.White}
                     borderColor={theme.TextLight}
+                    onChangeText={(val) => setClientDetails({...clientDetails, setPassword: val})}
                 />
                 <Input
                     placeholder={"Confirm Password"}
@@ -47,6 +52,7 @@ const ForgotPassword = () => {
                     bgColor={theme.White}
                     borderColor={theme.TextLight}
                     secureTextEntry={true}
+                    onChangeText={(val) => setClientDetails({...clientDetails, confirmPassword: val})}
                 />
 
                 <Button

@@ -9,3 +9,19 @@ export const clientState: {
     pageSize: 20,
     total: 0
 };
+
+export const userState = {
+    tokens: null,
+    user: {},
+};
+
+const tokenData = {
+    accessToken: "",
+    expiry: 0,
+    refreshToken: "",
+    refreshExpiry: 0,
+    createdAt: "",
+    reCreatedAt: ""
+};
+
+export type tokenType = typeof tokenData;

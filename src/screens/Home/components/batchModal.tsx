@@ -53,7 +53,6 @@ const BatchModal = (props:{
             ...prevValues,
             ["assignedTo"]: client.name,
         }));
-        console.log(values);
         setSelectedClient(client);
         setClientData([]);
     };

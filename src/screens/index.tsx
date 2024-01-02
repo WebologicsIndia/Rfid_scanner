@@ -3,9 +3,12 @@ import {NavigationContainer} from "@react-navigation/native";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import DrawerNavigation from "./Navigation";
 import Login from "./Authentication/Login";
+import {connect} from "react-redux";
+import {login} from "../store/reducers/userSlice";
 
 const Stack = createNativeStackNavigator();
 const Screens = (props: any) => {
+
     return (
         <NavigationContainer>
             <Stack.Navigator
@@ -33,5 +36,9 @@ const Screens = (props: any) => {
 
     );
 };
+const mapStateToProps = (state: { user: { tokens: any; user: any; }; }) => ({
+    token: state.user.tokens,
+    user: state.user.user
+});
 
-export default Screens;
+export default connect(mapStateToProps, login)(Screens);

@@ -18,18 +18,21 @@ import {fetchWithToken} from "../../../config/helper";
 import {clientUrl} from "../../../config/api";
 import {connect} from "react-redux";
 import {setClient} from "../../../store/reducers/clientSlice";
+import auth from "@react-native-firebase/auth";
+import {ClientType} from "../types";
 
 const AddNewClient = (props: any) => {
     const items: any = props?.route?.params?.item;
     const [insets] = useState(Insets.getInsets());
-    const initialClientDetails = items
+    const initialClientDetails: ClientType = items
         ? {
             name: items.name || "",
             email: items.email || "",
             address: items.address || "",
             contactPerson: items.userId.name || "",
             contactNo: String(items.userId.phone) || "",
-            assignedBatch: String(0) || ""
+            assignedBatch: String(0) || "",
+
         }
         : {
             name: "",
@@ -43,7 +46,7 @@ const AddNewClient = (props: any) => {
     const [clientDetails, setClientDetails] = useState(initialClientDetails);
     const [isEditable, setIsEditable] = useState(!items);
     const [loading, setLoading] = useState(false);
-    const [isActive, setIsActive] = useState(false);
+    const [isActive, setIsActive] = useState(items ? items.isActive : true);
 
     useEffect(() => {
         setClientDetails(initialClientDetails);
@@ -56,17 +59,32 @@ const AddNewClient = (props: any) => {
             props.navigation.goBack();
         }
     };
-    const AddUpdateClient = () => {
+    const AddUpdateClient = async() => {
+        if(!items) {
+            if (clientDetails.password != null) {
+                await auth().createUserWithEmailAndPassword(clientDetails.email, clientDetails.password)
+                    .catch((error) => {
+                        setLoading(false);
+                        if (error.code === "auth/email-already-in-use") {
+                            console.log("Email already in use");
+                        } else if (error.code === "auth/invalid-email") {
+                            console.log("Invalid email");
+                        } else if (error.code === "auth/weak-password") {
+                            console.log("Weak password");
+                        } else {
+                            console.log(`An error occurred during signup (${error.code})`);
+                        }
+                    });
+            }
+        }
         const reqBody: any = {
             name: clientDetails.name,
             email: clientDetails.email,
             address: clientDetails.address,
             phone: clientDetails.contactNo,
-            representative: clientDetails.contactPerson
+            representative: clientDetails.contactPerson,
+            isActive: isActive
         };
-        if (items) {
-            reqBody.isActive = true;
-        }
         setLoading(true);
         fetchWithToken(clientUrl, !items ? "POST" : "PUT", {}, JSON.stringify(reqBody)).then((resp) => {
             if (resp.status === 200) {
@@ -201,7 +219,8 @@ const AddNewClient = (props: any) => {
                         borderColor={theme.PrimaryDark}
                         floatingPlaceholder={true}
                         onChangeText={(val) => setClientDetails({...clientDetails, password: val})}
-                        value={clientDetails.password}
+
+                        secureTextEntry={true}
                     />
                     :
                     <Input
@@ -218,18 +237,15 @@ const AddNewClient = (props: any) => {
                         editable={!items}
                     />
             }
-            {
-                items &&
-          <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
-              <H7 style={{color: theme.PrimaryDark}}>IsActive</H7>
-              <Switch
-                  activeTrackColors={theme.PrimaryDark}
-                  thumbStyle={{backgroundColor: theme.TextLight}}
-                  value={isActive}
-                  onChange={() => setIsActive(!isActive)}
-              />
-          </View>
-            }
+            <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
+                <H7 style={{color: theme.PrimaryDark}}>Active</H7>
+                <Switch
+                    activeTrackColors={theme.PrimaryDark}
+                    thumbStyle={{backgroundColor: theme.TextLight}}
+                    value={isActive}
+                    onChange={() => setIsActive(!isActive)}
+                />
+            </View>
             {
                 isEditable &&
           <View style={{flexDirection: "row", alignItems: "center", gap: 10, ...margin.mt4}}>

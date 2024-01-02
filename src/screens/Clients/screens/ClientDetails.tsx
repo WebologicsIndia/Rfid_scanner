@@ -8,7 +8,7 @@ import {
     H7,
     Insets,
     margin,
-    padding
+    padding, Switch
 } from "@WebologicsIndia/react-native-components";
 import {theme} from "../../../config/theme";
 import HamburgerSVG from "../../../assets/hamburger.svg";
@@ -29,7 +29,7 @@ const ClientDetails = (props: any) => {
                     props.setClient({
                         data: data.results,
                         total: data.total,
-                        page: 2
+                        page: 1
                     });
                 });
             }
@@ -38,7 +38,7 @@ const ClientDetails = (props: any) => {
 
     return (
         <Container
-            bottom={insets.bottom * 1}
+            bottom={insets.bottom*1}
             backgroundColor={theme.White}
             header
             headerText={"Clients"}
@@ -119,10 +119,20 @@ const ClientDetails = (props: any) => {
                                                 <H7 style={{color: theme.PrimaryDark}}>{item.email}</H7>
                                             </View>
                                         </View>
+                                        <View style={styles.verticalLine}></View>
                                         <View>
                                             <View style={{flexDirection: "row", alignItems: "center", ...padding.py2}}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Assigned Batches: </H7>
                                                 <H7 style={{color: "#ff3366"}}>{item.assignedBatchs ? item.assignedBatchs : 0}</H7>
+                                            </View>
+                                            <View style={{flexDirection: "row", alignItems: "center", ...padding.py2}}>
+                                                <H7 style={{color: theme.PrimaryDark}}>Active: </H7>
+                                                <Switch
+                                                    activeTrackColors={theme.PrimaryDark}
+                                                    thumbStyle={{backgroundColor: theme.TextLight}}
+                                                    value={item.isActive}
+                                                    disabled={true}
+                                                />
                                             </View>
                                         </View>
                                     </View>
@@ -144,6 +154,13 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontWeight: "600"
+    },
+    verticalLine: {
+        height: "70%",
+        ...margin.mx1,
+        alignSelf: "center",
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: theme.Accent
     }
 });
 const mapStateToProps = (state: any) => {

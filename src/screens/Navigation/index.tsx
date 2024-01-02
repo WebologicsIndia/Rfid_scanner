@@ -5,6 +5,8 @@ import TrackingDrawer from "../Menu";
 import InventoryScreens from "../Inventory";
 import ClientScreens from "../Clients";
 import {createDrawerNavigator} from "@react-navigation/drawer";
+import {borderRadius, Button, H5, padding} from "@WebologicsIndia/react-native-components";
+import {theme} from "../../config/theme";
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigation = () => {
@@ -25,15 +27,16 @@ const DrawerNavigation = () => {
                     component={TrackingDrawer}
                 />
                 <Drawer.Screen
-                    name="inventory"
+                    name="Inventory"
                     component={InventoryScreens}
                 />
                 <Drawer.Screen
-                    name="clients"
+                    name="Clients"
                     component={ClientScreens}
                 />
 
             </Drawer.Navigator>
+
         </>
     );
 };

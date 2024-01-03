@@ -10,25 +10,25 @@ import {
     padding,
     Insets
 } from "@WebologicsIndia/react-native-components";
-import HamburgerSVG from "../../assets/hamburger.svg";
-import CurrentLocationSVG from "../../assets/current-location.svg";
-import PlaySVG from "../../assets/playSVG.svg";
-import ReloadSVG from "../../assets/reloadSVG.svg";
-import PauseSVG from "../../assets/pauseSVG.svg";
+import HamburgerSVG from "../../../assets/hamburger.svg";
+import CurrentLocationSVG from "../../../assets/current-location.svg";
+import PlaySVG from "../../../assets/playSVG.svg";
+import ReloadSVG from "../../../assets/reloadSVG.svg";
+import PauseSVG from "../../../assets/pauseSVG.svg";
 import {Image, Pressable, StyleSheet, View, NativeModules, ScrollView} from "react-native";
-import {theme} from "../../config/theme";
-import FilterModal from "../../common/FilterModal";
-import DownSvg from "../../assets/downArrow.svg";
+import {theme} from "../../../config/theme";
+import FilterModal from "../../../common/FilterModal";
+import DownSvg from "../../../assets/downArrow.svg";
 import Geolocation from "react-native-geolocation-service";
-import Logo from "../../assets/dr_company_logo.jpg";
-import BatchModal from "./components/batchModal";
-import {fetchWithToken} from "../../config/helper";
-import {batchUrl, inventoryUrl} from "../../config/api";
+import Logo from "../../../assets/dr_company_logo.jpg";
+import BatchModal from "../../Home/components/batchModal";
+import {fetchWithToken} from "../../../config/helper";
+import {batchUrl} from "../../../config/api";
 
 const {RFIDModule} = NativeModules;
 
 const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
-const Home = (props: any) => {
+const ClientHomeScreen = (props: any) => {
     const [insets] = useState(Insets.getInsets());
     const [rfIdData, setRfIdData] = useState<Set<any>>(new Set());
     const [rfIdOpen, setRfIdOpen] = useState(false);
@@ -287,7 +287,7 @@ const Home = (props: any) => {
         </>
     );
 };
-export default Home;
+export default ClientHomeScreen;
 
 const styles = StyleSheet.create({
     container: {

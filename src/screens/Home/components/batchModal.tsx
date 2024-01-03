@@ -1,38 +1,48 @@
 import React, {useState} from "react";
 import {Modal, Pressable, StyleSheet, View, ActivityIndicator, FlatList} from "react-native";
 import {theme} from "../../../config/theme";
-import {Block, borderRadius, H7, height, Input, margin, padding, width} from "@WebologicsIndia/react-native-components";
+import {
+    Block,
+    borderRadius,
+    H7,
+    height,
+    Input,
+    margin,
+    padding,
+    width
+} from "@WebologicsIndia/react-native-components";
 import {batchUrl, clientUrl} from "../../../config/api";
 import {fetchWithToken} from "../../../config/helper";
 import ModalView from "../../Inventory/components/ModalView";
 import ModalBatchView from "./ModalBatchView";
-const BatchModal = (props:{
 
-    modalVisible:boolean,
-    setModalVisible:React.Dispatch<React.SetStateAction<boolean>>
-    setRfIdData: any,
-    latitude:number,
-    longitude:number,
-    filteredData:any
+const BatchModal = (props: {
+
+  modalVisible: boolean,
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>
+  setRfIdData: any,
+  latitude: number,
+  longitude: number,
+  filteredData: any
 }) => {
     const [isFocused, setIsFocused] = useState(false);
     const handleFocus = () => setIsFocused(true);
-    const[values, setValues] = useState<{ [key: string]: string }>({
+    const [values, setValues] = useState<{ [key: string]: string }>({
         name: "",
         assignedTo: ""
     });
     const [loading, setLoading] = useState(false);
-    const[modalVisible, setModalVisible] = useState(false);
-    const[modalData,  setModalData] = useState();
-    const[clientData, setClientData] = useState([]);
-    const[selectedClient, setSelectedClient] = useState<any>(null);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalData, setModalData] = useState();
+    const [clientData, setClientData] = useState([]);
+    const [selectedClient, setSelectedClient] = useState<any>(null);
 
-    const handleInputChange = (name: string, value:string) => {
-        if(name === "assignedTo"){
+    const handleInputChange = (name: string, value: string) => {
+        if (name === "assignedTo") {
             setLoading(true);
             setSelectedClient(value);
             fetchWithToken(`${clientUrl}?name=${value}`, "GET", "").then((resp) => {
-                if(resp.status === 200) {
+                if (resp.status === 200) {
                     resp.json().then((data) => {
                         setClientData(data.results);
                     });
@@ -42,7 +52,7 @@ const BatchModal = (props:{
         } else {
             setValues((prevValues) => ({
                 ...prevValues,
-                [name]: value,
+                [name]: value
             }));
         }
         setLoading(false);
@@ -51,7 +61,7 @@ const BatchModal = (props:{
 
         setValues((prevValues) => ({
             ...prevValues,
-            ["assignedTo"]: client.name,
+            ["assignedTo"]: client.name
         }));
         setSelectedClient(client);
         setClientData([]);
@@ -65,10 +75,9 @@ const BatchModal = (props:{
             tags: Array.from(props.filteredData),
             assignedTo: selectedClient._id
         };
-        console.log(body);
         fetchWithToken(batchUrl, "POST", "", JSON.stringify(body))
             .then((resp) => {
-                if (resp.status === 200){
+                if (resp.status === 200) {
                     setValues({
                         name: "",
                         assignedTo: ""
@@ -76,7 +85,7 @@ const BatchModal = (props:{
                     props.setModalVisible(false);
                 } else {
                     resp.json().then((data) => {
-                        if(data.newTags) {
+                        if (data.newTags) {
                             setModalData(data.newTags);
                             setModalVisible(true);
                         }
@@ -92,8 +101,8 @@ const BatchModal = (props:{
             });
     };
 
-    if(loading){
-        return <ActivityIndicator size={"large"}/>;
+    if (loading) {
+        return <ActivityIndicator size={"large"} />;
     }
     return (
         <>
@@ -103,16 +112,19 @@ const BatchModal = (props:{
             >
                 <Pressable
                     style={styles.centeredView}
-                // onPress={() => {
-                //     props.setModalVisible(false);
-                //     setIsFocused(false);
-                // }}
+                    // onPress={() => {
+                    //     props.setModalVisible(false);
+                    //     setIsFocused(false);
+                    // }}
                 >
                     <View style={styles.modalView}>
                         <H7 style={{color: theme.PrimaryDark, fontWeight: "500"}}>New Batch</H7>
                         <View style={{flex: 1}}>
                             <Input
-                                inputStyle={[{borderBottomWidth: 1, borderBottomColor: isFocused ? theme.Accent : theme.PrimaryDark}, margin.mb4]}
+                                inputStyle={[{
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: isFocused ? theme.Accent : theme.PrimaryDark
+                                }, margin.mb4]}
                                 textStyle={[{color: theme.PrimaryDark}, styles.input]}
 
                                 bgColor={theme.White}
@@ -127,7 +139,7 @@ const BatchModal = (props:{
                                     <FlatList
                                         data={clientData}
                                         renderItem={({item}: any) => {
-                                            return<Block
+                                            return <Block
                                                 fluid
 
                                             >
@@ -167,7 +179,7 @@ const BatchModal = (props:{
                 </Pressable>
 
             </Modal>
-            <ModalBatchView data={modalData} modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+            <ModalBatchView data={modalData} modalVisible={modalVisible} setModalVisible={setModalVisible} />
         </>
     );
 };

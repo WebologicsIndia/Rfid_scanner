@@ -9,10 +9,20 @@ export const clientState: {
     pageSize: 20,
     total: 0
 };
-
+export const batchState: {
+  data: any[],
+  page: number,
+  pageSize: number,
+  total: number
+} = {
+    data: [],
+    page: 1,
+    pageSize: 20,
+    total: 0
+};
 export const userState = {
     tokens: null,
-    user: {},
+    user: {}
 };
 
 const tokenData = {

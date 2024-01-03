@@ -7,6 +7,8 @@ import ClientScreens from "../Clients";
 import {createDrawerNavigator} from "@react-navigation/drawer";
 import {connect} from "react-redux";
 import {login} from "../../store/reducers/userSlice";
+import ClientHomeScreen from "../clientScreens/HomeScreen/HomeScreen";
+import ClientTrackingDrawer from "../clientScreens/Menu/Index";
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigation = (props: any) => {
@@ -22,17 +24,13 @@ const DrawerNavigation = (props: any) => {
                     props?.user?.isClient ?
                         <>
                             <Drawer.Screen
-                                name="Tag Scanner"
-                                component={HomeScreen}
+                                name=" Tag Scanner"
+                                component={ClientHomeScreen}
                             />
                             <Drawer.Screen
                                 name="Batches"
-                                component={TrackingDrawer}
+                                component={ClientTrackingDrawer}
                             />
-                            {/*<Drawer.Screen*/}
-                            {/*    name="Inventory"*/}
-                            {/*    component={InventoryScreens}*/}
-                            {/*/>*/}
                         </>
                         :
 

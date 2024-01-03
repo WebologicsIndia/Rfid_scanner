@@ -1,13 +1,13 @@
 import React, {useState} from "react";
 import {borderRadius, Button, Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
-import {theme} from "../../config/theme";
+import {theme} from "../../../config/theme";
 import {ActivityIndicator, Pressable, ScrollView, StyleSheet, View} from "react-native";
-import HamburgerSVG from "../../assets/hamburger.svg";
-import {batchUrl} from "../../config/api";
+import HamburgerSVG from "../../../assets/hamburger.svg";
+import {batchUrl} from "../../../config/api";
 import dayjs from "dayjs";
-import Accordian from "../../common/accordian";
-import {fetchWithToken} from "../../config/helper";
-import {setBatch} from "../../store/reducers/batchSlice";
+import Accordian from "../../../common/accordian";
+import {fetchWithToken} from "../../../config/helper";
+import {setBatch} from "../../../store/reducers/batchSlice";
 import {connect} from "react-redux";
 
 const TrackingDrawer = (props: any) => {
@@ -57,13 +57,13 @@ const TrackingDrawer = (props: any) => {
     //     });
     // };
 
-    // React.useEffect(() => {
-    //     getInventories();
-    // }, [update]);
-
     React.useEffect(() => {
         getInventories();
-    }, []);
+    }, [update]);
+
+    // React.useEffect(() => {
+    //     getInventories();
+    // }, []);
 
 
     if (loading) {

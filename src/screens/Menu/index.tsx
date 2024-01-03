@@ -19,7 +19,7 @@ const TrackingDrawer = (props: any) => {
 
     const getInventories = () => {
         setLoading(true);
-        fetchWithToken(`${batchUrl}?page=1&results=10`, "get").then((res) => {
+        fetchWithToken(`${batchUrl}?page=1&results=10`, "GET").then((res) => {
             if (res.status === 200) {
                 res.json().then((data) => {
                     setInventoryData(data.results);
@@ -57,7 +57,6 @@ const TrackingDrawer = (props: any) => {
     React.useEffect(() => {
         getInventories();
     }, [update]);
-
 
 
     if (loading) {
@@ -128,7 +127,7 @@ const TrackingDrawer = (props: any) => {
                                             </View>
                                         </View>
                                     }>
-                                    { item.tags.length ?
+                                    {item.tags.length ?
                                         Object.entries(
                                             item.tags.reduce((acc: { [x: string]: any; }, tag: { itemType: string | number; }) => {
                                                 acc[tag.itemType] = (acc[tag.itemType] || 0) + 1;
@@ -136,7 +135,7 @@ const TrackingDrawer = (props: any) => {
                                             }, {})
                                         ).map(([itemType, count], index) => {
 
-                                            return(
+                                            return (
                                                 <View
                                                     key={index}
                                                     style={{
@@ -155,7 +154,7 @@ const TrackingDrawer = (props: any) => {
                                                 </View>
                                             );
                                         })
-                                        :<></>
+                                        : <></>
                                     }
                                     <Button
                                         // onPress={() => {

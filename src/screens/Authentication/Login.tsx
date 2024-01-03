@@ -26,11 +26,11 @@ const Login = (props: any) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    useEffect (() => {
+    useEffect(() => {
         setError("");
     }, [user]);
 
-    const handleLoginDb=(token: any) => {
+    const handleLoginDb = (token: any) => {
         setLoading(true);
         fetch(loginUrl, {
 
@@ -44,16 +44,19 @@ const Login = (props: any) => {
                 email: user.email
             })
         }).then((resp) => {
-            if(resp.status === 200) {
+            if (resp.status === 200) {
                 resp.json().then((data) => {
-                    props.firstLogin(data);
+                    props.firstLogin({
+                        tokens: data.token,
+                        user: data.user
+                    });
                 });
             } else {
                 resp.json().then((data) => {
                     setError(data.message);
                 });
             }
-        }). finally(() => {
+        }).finally(() => {
             setLoading(false);
         });
     };
@@ -74,7 +77,7 @@ const Login = (props: any) => {
                 console.log(error);
                 if (
                     error.code === "auth/user-not-found" ||
-                    error.code === "auth/wrong-password"
+          error.code === "auth/wrong-password"
                 ) {
                     setError("Invalid email or password");
                 } else {
@@ -84,14 +87,12 @@ const Login = (props: any) => {
             });
     };
     const sendResetEmail = async () => {
-        console.log("hello");
-        console.log(user.email);
         await auth().sendPasswordResetEmail(user.email);
     };
 
     return (
         <Container
-            bottom={0}
+            bottom={insets.bottom}
             backgroundColor={theme.White}
             keyboardAvoiding
             style={styles.container}
@@ -168,8 +169,8 @@ const styles = StyleSheet.create({
         color: theme.PrimaryDark
     },
     error: {
-        color: theme.Accent,
-        // ...margin.mt2
+        color: theme.Accent
+    // ...margin.mt2
     }
 });
 export default connect(null, {firstLogin})(Login);

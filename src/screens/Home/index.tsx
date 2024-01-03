@@ -22,8 +22,6 @@ import DownSvg from "../../assets/downArrow.svg";
 import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
 import BatchModal from "./components/batchModal";
-import {fetchWithToken} from "../../config/helper";
-import {batchUrl, inventoryUrl} from "../../config/api";
 
 const {RFIDModule} = NativeModules;
 
@@ -181,18 +179,6 @@ const Home = (props: any) => {
         };
     }, [active]);
 
-    const getInventoryItem = () => {
-        fetchWithToken(batchUrl, "GET").then((resp) => {
-            if (resp.status === 200) {
-                resp.json().then((data) => {
-                    console.log(data);
-                });
-            }
-        });
-    };
-    useEffect(() => {
-        getInventoryItem();
-    }, []);
     return (
         <>
             <Container
@@ -248,17 +234,16 @@ const Home = (props: any) => {
                         </View>
                     </View>
                     {rfIdData.size > 0 &&
-              <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
-                  <H8 style={{color: theme.PrimaryDark}}>Tags</H8>
-                  {Array.from(rfIdData).map((data: any, index: number) => {
-                      console.log("data", data);
-                      return (
-                          <View key={index} style={[padding.py5]}>
-                              <H9 style={{color: theme.PrimaryDark}}>{data}</H9>
-                          </View>
-                      );
-                  })}
-              </ScrollView>
+                    <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
+                        <H8 style={{color: theme.PrimaryDark}}>Tags</H8>
+                        {Array.from(rfIdData).map((data: any, index: number) => {
+                            return (
+                                <View key={index} style={[padding.py5]}>
+                                    <H9 style={{color: theme.PrimaryDark}}>{data}</H9>
+                                </View>
+                            );
+                        })}
+                    </ScrollView>
                     }
                 </View>
                 <View style={styles.footer}>

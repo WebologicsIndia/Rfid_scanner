@@ -5,11 +5,11 @@ import TrackingDrawer from "../Menu";
 import InventoryScreens from "../Inventory";
 import ClientScreens from "../Clients";
 import {createDrawerNavigator} from "@react-navigation/drawer";
-import {borderRadius, Button, H5, padding} from "@WebologicsIndia/react-native-components";
-import {theme} from "../../config/theme";
+import {connect} from "react-redux";
+import {login} from "../../store/reducers/userSlice";
 
 const Drawer = createDrawerNavigator();
-const DrawerNavigation = () => {
+const DrawerNavigation = (props: any) => {
     return (
         <>
             <Drawer.Navigator
@@ -18,27 +18,52 @@ const DrawerNavigation = () => {
                 }}
                 drawerContent={(props) => <CustomDrawerContent {...props} />}
             >
-                <Drawer.Screen
-                    name="Tag Scanner"
-                    component={HomeScreen}
-                />
-                <Drawer.Screen
-                    name="Batches"
-                    component={TrackingDrawer}
-                />
-                <Drawer.Screen
-                    name="Inventory"
-                    component={InventoryScreens}
-                />
-                <Drawer.Screen
-                    name="Clients"
-                    component={ClientScreens}
-                />
+                {
+                    props?.user?.isClient ?
+                        <>
+                            <Drawer.Screen
+                                name="Tag Scanner"
+                                component={HomeScreen}
+                            />
+                            <Drawer.Screen
+                                name="Batches"
+                                component={TrackingDrawer}
+                            />
+                            {/*<Drawer.Screen*/}
+                            {/*    name="Inventory"*/}
+                            {/*    component={InventoryScreens}*/}
+                            {/*/>*/}
+                        </>
+                        :
+
+                        <>
+                            <Drawer.Screen
+                                name="Tag Scanner"
+                                component={HomeScreen}
+                            />
+                            <Drawer.Screen
+                                name="Batches"
+                                component={TrackingDrawer}
+                            />
+                            <Drawer.Screen
+                                name="Inventory"
+                                component={InventoryScreens}
+                            />
+                            <Drawer.Screen
+                                name="Clients"
+                                component={ClientScreens}
+                            />
+                        </>
+
+                }
 
             </Drawer.Navigator>
 
         </>
     );
 };
+const mapStateToProps = (state: { user: { user: any; }; }) => ({
+    user: state.user.user
+});
 
-export default DrawerNavigation;
+export default connect(mapStateToProps, login)(DrawerNavigation);

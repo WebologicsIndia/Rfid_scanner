@@ -7,14 +7,14 @@ import {
     H9,
     margin,
     padding,
-    Insets
+    Insets, Button
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../../assets/current-location.svg";
 import PlaySVG from "../../../assets/playSVG.svg";
 import ReloadSVG from "../../../assets/reloadSVG.svg";
 import PauseSVG from "../../../assets/pauseSVG.svg";
-import {Image, Pressable, StyleSheet, View, NativeModules} from "react-native";
+import {Image, Pressable, StyleSheet, View, NativeModules, ScrollView} from "react-native";
 import {theme} from "../../../config/theme";
 import FilterModal from "../../../common/FilterModal";
 import DownSvg from "../../../assets/downArrow.svg";
@@ -26,7 +26,6 @@ import {batchUrl} from "../../../config/api";
 
 const {RFIDModule} = NativeModules;
 
-// const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
 const ClientHomeScreen = (props: any) => {
     const [modalData, setModalData] = useState([]);
     const [insets] = useState(Insets.getInsets());
@@ -41,7 +40,9 @@ const ClientHomeScreen = (props: any) => {
     const [selectedFilter, setSelectedFilter] = useState<string>("Select Batch Name");
     const [initialized, setInitialized] = useState(false);
     const [active, setActive] = useState(false);
-    const [batchesData, setBatchesData] = useState([]);
+    const [batchesData, setBatchesData] = useState<any>([]);
+    const [tagsData, setTagsData] = useState<{ [key: string]: number }>({});
+    const [foundData, setFoundData] = useState<any>({});
 
     useEffect(() => {
         fetchWithToken(`${batchUrl}?status:"Ready"`, "GET").then((resp) => {
@@ -54,6 +55,7 @@ const ClientHomeScreen = (props: any) => {
             }
         });
     }, []);
+
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
             Geolocation.getCurrentPosition(
@@ -133,7 +135,26 @@ const ClientHomeScreen = (props: any) => {
                 clearInterval(x);
         };
     }, [active]);
+    const findItemByTagId = (tagId: string) => {
+        return batchesData.find((item: any) =>
+            item.tags.some((tag: any) => tag.tagId === tagId)
+        );
+    };
+    useEffect(() => {
+        const newTagsData: { [key: string]: number } = {};
+        rfIdData.forEach((tagId) => {
+            const foundItem = findItemByTagId(tagId);
+            setFoundData(foundItem);
+            if (foundItem) {
+                foundItem.tags.forEach((tag: any) => {
+                    const itemType = tag.itemType;
+                    newTagsData[itemType] = (newTagsData[itemType] || 0) + 1;
+                });
+            }
+        });
 
+        setTagsData(newTagsData);
+    }, [rfIdData, batchesData]);
     return (
         <>
             <Container
@@ -164,7 +185,9 @@ const ClientHomeScreen = (props: any) => {
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
                             {!active ? (
-                                <Pressable onPress={handleIconClick}>
+                                <Pressable
+                                    onPress={handleIconClick}
+                                    disabled={selectedFilter === "Select Batch Name" && selectedFilter !== foundData.name}>
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
                             ) : (
@@ -177,6 +200,43 @@ const ClientHomeScreen = (props: any) => {
                             </Pressable>
                         </View>
                     </View>
+                    <ScrollView contentContainerStyle={[styles.scrollContent]}>
+                        {Object.entries(tagsData).map(([itemType, count], index) => {
+                            return (
+                                <View key={index}
+                                    style={{
+                                        flexDirection: "column", ...padding.px5, ...padding.py5, ...borderRadius.br2,
+                                        borderColor: theme.PrimaryDark,
+                                        borderWidth: StyleSheet.hairlineWidth
+                                    }}>
+                                    <View style={{flexDirection: "row", alignItems: "center", ...margin.mb1}}>
+                                        <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
+                                            {itemType}
+                                        </H7>
+                                        <H7 style={{color: theme.PrimaryLight, flex: 1}}>{count}</H7>
+                                    </View>
+                                    <View style={{flexDirection: "row", alignItems: "center", ...margin.mb1}}>
+                                        <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
+                                            {"Missing Items"}
+                                        </H7>
+                                        <H7 style={{color: theme.PrimaryDark, flex: 1}}>{"0"}</H7>
+                                    </View>
+                                    <View style={{flexDirection: "row", alignItems: "center", ...margin.mb1}}>
+                                        <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
+                                            {"UnCategorised Tags"}
+                                        </H7>
+                                        <H7 style={{color: theme.PrimaryDark, flex: 1}}>{"0"}</H7>
+                                    </View>
+                                    <View style={[margin.mt4]}>
+                                        <Button padding={padding.py3} borderRadius={borderRadius.br3}>
+                                            <H7 style={{color: theme.TextLight}}>Received</H7>
+                                        </Button>
+                                    </View>
+                                </View>
+                            );
+                        })}
+
+                    </ScrollView>
                     {/*      {rfIdData.size > 0 &&*/}
                     {/*<ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>*/}
                     {/*    <H8 style={{color: theme.PrimaryDark}}>Tags</H8>*/}
@@ -315,9 +375,9 @@ const styles = StyleSheet.create({
     svgGap: {
         gap: 10
     },
-    scrollView: {
-        height: 450
-    },
+    // scrollView: {
+    // // height: 450
+    // },
     scrollContent: {
         flexGrow: 1,
         paddingVertical: 10

@@ -203,7 +203,6 @@ const ClientHomeScreen = (props: any) => {
 
                     <ScrollView contentContainerStyle={[styles.scrollContent]}>
                         {Object.entries(tagsData).map(([itemType, count], index) => {
-                            console.log("itemsss", itemType);
                             return (
                                 <View key={index}
                                     style={{

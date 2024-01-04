@@ -198,7 +198,6 @@ const Home = (props: any) => {
         const newTagsData: { [key: string]: number } = {};
         rfIdData.forEach((tagId) => {
             const foundItem = findItemByTagId(tagId);
-            console.log("foundItems", foundItem);
             setFoundData(foundItem);
             if (foundItem) {
                 foundItem.tags.forEach((tag: any) => {
@@ -210,7 +209,6 @@ const Home = (props: any) => {
 
         setTagsData(newTagsData);
     }, [rfIdData, batchesData]);
-    console.log("tagData", tagsData);
     return (
         <>
             <Container
@@ -280,7 +278,6 @@ const Home = (props: any) => {
                     {/*}*/}
                     <ScrollView contentContainerStyle={[styles.scrollContent]}>
                         {Object.entries(tagsData).map(([itemType, count], index) => {
-                            console.log("itemmmmsss", itemType);
                             return (
                                 <View key={index}
                                     style={{

@@ -8,7 +8,7 @@ import {
     Input,
     margin,
     padding,
-    Insets, Button
+    Insets, Button, H5
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../assets/current-location.svg";
@@ -23,9 +23,11 @@ import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
 import BatchModal from "./components/batchModal";
 import {fetchWithToken} from "../../config/helper";
-import {batchUrl} from "../../config/api";
+import {batchUrl, inventoryUrl} from "../../config/api";
 
 const {RFIDModule} = NativeModules;
+
+const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
 
 const Home = (props: any) => {
     const [insets] = useState(Insets.getInsets());
@@ -37,18 +39,15 @@ const Home = (props: any) => {
     // const [icon, setIcon] = useState("PlaySVG");
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
-    const [selectedFilter, setSelectedFilter] = useState<string>("Select Batch Name");
+    const [selectedFilter, setSelectedFilter] = useState<string>("Contains");
     const [initialized, setInitialized] = useState(false);
     const [active, setActive] = useState(false);
-    const [modalData, setModalData] = useState([]);
-    const [batchesData, setBatchesData] = useState<any>([]);
-    const [tagsData, setTagsData] = useState<{ [key: string]: number }>({});
-    const [foundData, setFoundData] = useState<any>({});
+    // const [modalData, setModalData] = useState([]);
+    const [tagsData, setTagsData] = useState<Set<any>>(new Set());
+    const [unCategorizedTags, setUnCategorizedTags] = useState<Set<any>>(new Set());
     const [filteredData, setFilteredData] = useState<string[]>([]);
-    const [item, setItems] = useState({
-        tag: "sdfsdf",
-        name: "towel"
-    });
+
+
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
             Geolocation.getCurrentPosition(
@@ -106,6 +105,7 @@ const Home = (props: any) => {
     };
     const handleRefreshSvg = () => {
         setRfIdData(new Set());
+        setTagsData(new Set());
     };
 
     useEffect(() => {
@@ -115,6 +115,7 @@ const Home = (props: any) => {
                 RFIDModule.readTag(
                     (tag: any) => {
                         // console.log("tag", tag);
+
                         setRfIdData(new Set([...rfIdData, tag]));
                     },
                     (error: any) => {
@@ -128,24 +129,14 @@ const Home = (props: any) => {
                 clearInterval(x);
         };
     }, [active]);
-    useEffect(() => {
-        fetchWithToken(`${batchUrl}?status:"Ready"`, "GET").then((resp) => {
-            if (resp.status === 200) {
-                resp.json().then((data) => {
-                    const batchesName = data.results.map((item: any) => item.name);
-                    setModalData(batchesName);
-                    setBatchesData(data.results);
-                });
-            }
-        });
-    }, []);
+
     const handleInputChange = (name: string, value: string) => {
         if (name === "filterMask") {
-            const filtered = filterData(value, item, selectedFilter);
+            const filtered = filterData(value, selectedFilter);
             setFilteredData(filtered);
         }
     };
-    const filterData = (value: string, item: { name: string; tag: string }, selectedFilter: any) => {
+    const filterData = (value: string, selectedFilter: any) => {
         switch (selectedFilter) {
             case "Contains":
                 return generateMockData(value, 5, true);
@@ -189,26 +180,22 @@ const Home = (props: any) => {
         }
         return result;
     };
-    const findItemByTagId = (tagId: string) => {
-        return batchesData.find((item: any) =>
-            item.tags.some((tag: any) => tag.tagId === tagId)
-        );
-    };
-    useEffect(() => {
-        const newTagsData: { [key: string]: number } = {};
-        rfIdData.forEach((tagId) => {
-            const foundItem = findItemByTagId(tagId);
-            setFoundData(foundItem);
-            if (foundItem) {
-                foundItem.tags.forEach((tag: any) => {
-                    const itemType = tag.itemType;
-                    newTagsData[itemType] = (newTagsData[itemType] || 0) + 1;
-                });
-            }
-        });
 
-        setTagsData(newTagsData);
-    }, [rfIdData, batchesData]);
+    useEffect(() => {
+        Array.from(rfIdData).map((tagId) => {
+            fetchWithToken(`${inventoryUrl}?tag=${tagId}`, "GET", "")
+                .then((resp) => {
+                    if(resp.status === 200) {
+                        resp.json().then((data) => {
+                            setTagsData((prevState) => new Set([...prevState, data.itemType]));
+                        });
+                    } else {
+                        setUnCategorizedTags((prevState) => new Set([...prevState, tagId]));
+                    }
+                });
+        });
+    }, [rfIdData]);
+
     return (
         <>
             <Container
@@ -239,8 +226,7 @@ const Home = (props: any) => {
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
                             {!active ? (
-                                <Pressable onPress={handleIconClick}
-                                    disabled={selectedFilter === "Select Batch Name" && selectedFilter !== foundData.name}>
+                                <Pressable onPress={handleIconClick}>
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
                             ) : (
@@ -264,45 +250,36 @@ const Home = (props: any) => {
                             />
                         </View>
                     </View>
-                    {/*{rfIdData.size > 0 &&*/}
-                    {/*<ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>*/}
-                    {/*    <H8 style={{color: theme.PrimaryDark}}>Tags</H8>*/}
-                    {/*    {Array.from(rfIdData).map((data: any, index: number) => {*/}
-                    {/*        return (*/}
-                    {/*            <View key={index} style={[padding.py5]}>*/}
-                    {/*                <H9 style={{color: theme.PrimaryDark}}>{data}</H9>*/}
-                    {/*            </View>*/}
-                    {/*        );*/}
-                    {/*    })}*/}
-                    {/*</ScrollView>*/}
-                    {/*}*/}
-                    <ScrollView contentContainerStyle={[styles.scrollContent]}>
-                        {Object.entries(tagsData).map(([itemType, count], index) => {
-                            return (
-                                <View key={index}
-                                    style={{
-                                        flexDirection: "column", ...padding.px5, ...padding.py5, ...borderRadius.br2, ...margin.mb2,
-                                        borderColor: theme.PrimaryDark,
-                                        borderWidth: StyleSheet.hairlineWidth
-                                    }}>
-                                    <View style={{flexDirection: "row", alignItems: "center", ...margin.mb1}}>
-                                        <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
-                                            {itemType}
-                                        </H7>
-                                        <H7 style={{color: theme.PrimaryLight, flex: 1}}>{count}</H7>
-                                    </View>
-                                    <View style={{flexDirection: "row", alignItems: "center", ...margin.mb1}}>
-                                        <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
-                                            {"UnCategorised Tags"}
-                                        </H7>
-                                        <H7 style={{color: theme.PrimaryDark, flex: 1}}>{"0"}</H7>
-                                    </View>
+                    <View style={styles.card}>
+                        <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>Batch Summary</H7>
+                        {
+                            Array.from(tagsData).length ?
+                                Object.entries(
+                                    Array.from(new Set(tagsData)).reduce((acc: any, tag: any) => {
+                                        acc[tag] = (acc[tag] || 0) +1;
+                                        return acc;
+                                    }, {})
+                                ).map(([itemType, count], index) => {
+                                    return (
+                                        <View key = {index} style={{flexDirection: "row", alignItems: "center", ...margin.my2}}>
+                                            <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
+                                                {itemType}
+                                            </H7>
+                                            <H7 style={{color: theme.PrimaryLight, flex: 1}}>{parseInt(count as string)}</H7>
+                                        </View>
+                                    );
+                                }) : <></>
+                        }
+                        <View style={{flexDirection: "row", alignItems: "center", gap: 8}}>
+                            <H7 style={{color: theme.PrimaryDark, textTransform: "capitalize"}}>
+                                {"UnCategorised Tags:"}
+                            </H7>
+                            {Array.from(unCategorizedTags).map((tag, index) => (
+                                <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
+                            ))}
+                        </View>
+                    </View>
 
-                                </View>
-                            );
-                        })}
-
-                    </ScrollView>
                 </View>
                 <View style={styles.footer}>
                     <View style={[styles.rowAlignCenter, styles.svgGap]}>
@@ -404,5 +381,10 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingVertical: 10
+    },
+    card: {
+        flexDirection: "column", ...padding.px5, ...padding.pt1, ...padding.pb3, ...borderRadius.br2, ...margin.my5,
+        borderColor: theme.PrimaryDark,
+        borderWidth: StyleSheet.hairlineWidth
     }
 });

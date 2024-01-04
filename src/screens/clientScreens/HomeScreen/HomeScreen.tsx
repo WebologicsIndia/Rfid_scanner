@@ -7,7 +7,7 @@ import {
     H9,
     margin,
     padding,
-    Insets, Button
+    Insets, Button, Input
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../../assets/current-location.svg";
@@ -200,8 +200,10 @@ const ClientHomeScreen = (props: any) => {
                             </Pressable>
                         </View>
                     </View>
+
                     <ScrollView contentContainerStyle={[styles.scrollContent]}>
                         {Object.entries(tagsData).map(([itemType, count], index) => {
+                            console.log("itemsss", itemType);
                             return (
                                 <View key={index}
                                     style={{
@@ -235,7 +237,6 @@ const ClientHomeScreen = (props: any) => {
                                 </View>
                             );
                         })}
-
                     </ScrollView>
                     {/*      {rfIdData.size > 0 &&*/}
                     {/*<ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>*/}

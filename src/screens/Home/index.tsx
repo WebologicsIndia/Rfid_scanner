@@ -44,7 +44,11 @@ const Home = (props: any) => {
     const [batchesData, setBatchesData] = useState<any>([]);
     const [tagsData, setTagsData] = useState<{ [key: string]: number }>({});
     const [foundData, setFoundData] = useState<any>({});
-
+    const [filteredData, setFilteredData] = useState<string[]>([]);
+    const [item, setItems] = useState({
+        tag: "sdfsdf",
+        name: "towel"
+    });
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
             Geolocation.getCurrentPosition(
@@ -135,6 +139,56 @@ const Home = (props: any) => {
             }
         });
     }, []);
+    const handleInputChange = (name: string, value: string) => {
+        if (name === "filterMask") {
+            const filtered = filterData(value, item, selectedFilter);
+            setFilteredData(filtered);
+        }
+    };
+    const filterData = (value: string, item: { name: string; tag: string }, selectedFilter: any) => {
+        switch (selectedFilter) {
+            case "Contains":
+                return generateMockData(value, 5, true);
+            case "Does Not Contain":
+                return generateMockData(value, 5, false);
+            case "Equals":
+                return generateMockData(value, 1, true);
+            case "Not Equal":
+                return generateMockData(value, 5, true);
+            case "Starts With":
+                return generateMockData(value, 5, true, true);
+            case "Ends With":
+                return generateMockData(value, 5, true, false);
+            default:
+                return [];
+        }
+    };
+    const generateMockData = (value: string, count: number, includeValue: boolean, startsWith = false) => {
+        const data = [];
+        for (let i = 0; i < count; i++) {
+            let entry = "";
+            if (startsWith) {
+                entry = generateRandomString(5);
+            } else {
+                entry = generateRandomString(5) + value;
+            }
+            if (includeValue) {
+                data.push(entry);
+            } else {
+                data.push(generateRandomString(5));
+            }
+        }
+        return data;
+    };
+    const generateRandomString = (length: any) => {
+        let result = "";
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    };
     const findItemByTagId = (tagId: string) => {
         return batchesData.find((item: any) =>
             item.tags.some((tag: any) => tag.tagId === tagId)
@@ -144,6 +198,7 @@ const Home = (props: any) => {
         const newTagsData: { [key: string]: number } = {};
         rfIdData.forEach((tagId) => {
             const foundItem = findItemByTagId(tagId);
+            console.log("foundItems", foundItem);
             setFoundData(foundItem);
             if (foundItem) {
                 foundItem.tags.forEach((tag: any) => {
@@ -155,6 +210,7 @@ const Home = (props: any) => {
 
         setTagsData(newTagsData);
     }, [rfIdData, batchesData]);
+    console.log("tagData", tagsData);
     return (
         <>
             <Container
@@ -199,6 +255,17 @@ const Home = (props: any) => {
                             </Pressable>
                         </View>
                     </View>
+                    <View style={[styles.filterMaskView, styles.rowAlignCenter]}>
+                        <H8 style={styles.textHeading}>Filter Mask:</H8>
+                        <View style={{flex: 1}}>
+                            <Input
+                                inputStyle={{borderBottomWidth: 1}}
+                                textStyle={[{color: theme.PrimaryDark}, styles.input]}
+                                bgColor={theme.White}
+                                onChangeText={(value) => handleInputChange("filterMask", value)}
+                            />
+                        </View>
+                    </View>
                     {/*{rfIdData.size > 0 &&*/}
                     {/*<ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>*/}
                     {/*    <H8 style={{color: theme.PrimaryDark}}>Tags</H8>*/}
@@ -213,6 +280,7 @@ const Home = (props: any) => {
                     {/*}*/}
                     <ScrollView contentContainerStyle={[styles.scrollContent]}>
                         {Object.entries(tagsData).map(([itemType, count], index) => {
+                            console.log("itemmmmsss", itemType);
                             return (
                                 <View key={index}
                                     style={{

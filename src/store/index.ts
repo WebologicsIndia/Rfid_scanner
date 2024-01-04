@@ -12,7 +12,7 @@ import {configureStore} from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import rootReducer from "./reducers/rootReducer";
 
-import {clientState, userState} from "./initialState";
+import {batchState, clientState, userState} from "./initialState";
 
 const persistConfig = {
     key: "root",
@@ -43,6 +43,7 @@ const createStore = (preloadedState: object) => {
 };
 export const store = createStore({
     client: clientState,
-    user: userState
+    user: userState,
+    batch: batchState
 });
 export const persistor = persistStore(store);

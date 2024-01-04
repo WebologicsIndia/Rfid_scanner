@@ -5,29 +5,29 @@ import {
     H7,
     H8,
     H9,
-    Input,
     margin,
     padding,
-    Insets, Button
+    Insets, Button, Input
 } from "@WebologicsIndia/react-native-components";
-import HamburgerSVG from "../../assets/hamburger.svg";
-import CurrentLocationSVG from "../../assets/current-location.svg";
-import PlaySVG from "../../assets/playSVG.svg";
-import ReloadSVG from "../../assets/reloadSVG.svg";
-import PauseSVG from "../../assets/pauseSVG.svg";
+import HamburgerSVG from "../../../assets/hamburger.svg";
+import CurrentLocationSVG from "../../../assets/current-location.svg";
+import PlaySVG from "../../../assets/playSVG.svg";
+import ReloadSVG from "../../../assets/reloadSVG.svg";
+import PauseSVG from "../../../assets/pauseSVG.svg";
 import {Image, Pressable, StyleSheet, View, NativeModules, ScrollView} from "react-native";
-import {theme} from "../../config/theme";
-import FilterModal from "../../common/FilterModal";
-import DownSvg from "../../assets/downArrow.svg";
+import {theme} from "../../../config/theme";
+import FilterModal from "../../../common/FilterModal";
+import DownSvg from "../../../assets/downArrow.svg";
 import Geolocation from "react-native-geolocation-service";
-import Logo from "../../assets/dr_company_logo.jpg";
-import BatchModal from "./components/batchModal";
-import {fetchWithToken} from "../../config/helper";
-import {batchUrl} from "../../config/api";
+import Logo from "../../../assets/dr_company_logo.jpg";
+import BatchModal from "../../Home/components/batchModal";
+import {fetchWithToken} from "../../../config/helper";
+import {batchUrl} from "../../../config/api";
 
 const {RFIDModule} = NativeModules;
 
-const Home = (props: any) => {
+const ClientHomeScreen = (props: any) => {
+    const [modalData, setModalData] = useState([]);
     const [insets] = useState(Insets.getInsets());
     const [rfIdData, setRfIdData] = useState<Set<any>>(new Set());
     const [rfIdOpen, setRfIdOpen] = useState(false);
@@ -40,15 +40,22 @@ const Home = (props: any) => {
     const [selectedFilter, setSelectedFilter] = useState<string>("Select Batch Name");
     const [initialized, setInitialized] = useState(false);
     const [active, setActive] = useState(false);
-    const [modalData, setModalData] = useState([]);
     const [batchesData, setBatchesData] = useState<any>([]);
     const [tagsData, setTagsData] = useState<{ [key: string]: number }>({});
     const [foundData, setFoundData] = useState<any>({});
-    const [filteredData, setFilteredData] = useState<string[]>([]);
-    const [item, setItems] = useState({
-        tag: "sdfsdf",
-        name: "towel"
-    });
+
+    useEffect(() => {
+        fetchWithToken(`${batchUrl}?status:"Ready"`, "GET").then((resp) => {
+            if (resp.status === 200) {
+                resp.json().then((data) => {
+                    const batchesName = data.results.map((item: any) => item.name);
+                    setModalData(batchesName);
+                    setBatchesData(data.results);
+                });
+            }
+        });
+    }, []);
+
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
             Geolocation.getCurrentPosition(
@@ -128,67 +135,6 @@ const Home = (props: any) => {
                 clearInterval(x);
         };
     }, [active]);
-    useEffect(() => {
-        fetchWithToken(`${batchUrl}?status:"Ready"`, "GET").then((resp) => {
-            if (resp.status === 200) {
-                resp.json().then((data) => {
-                    const batchesName = data.results.map((item: any) => item.name);
-                    setModalData(batchesName);
-                    setBatchesData(data.results);
-                });
-            }
-        });
-    }, []);
-    const handleInputChange = (name: string, value: string) => {
-        if (name === "filterMask") {
-            const filtered = filterData(value, item, selectedFilter);
-            setFilteredData(filtered);
-        }
-    };
-    const filterData = (value: string, item: { name: string; tag: string }, selectedFilter: any) => {
-        switch (selectedFilter) {
-            case "Contains":
-                return generateMockData(value, 5, true);
-            case "Does Not Contain":
-                return generateMockData(value, 5, false);
-            case "Equals":
-                return generateMockData(value, 1, true);
-            case "Not Equal":
-                return generateMockData(value, 5, true);
-            case "Starts With":
-                return generateMockData(value, 5, true, true);
-            case "Ends With":
-                return generateMockData(value, 5, true, false);
-            default:
-                return [];
-        }
-    };
-    const generateMockData = (value: string, count: number, includeValue: boolean, startsWith = false) => {
-        const data = [];
-        for (let i = 0; i < count; i++) {
-            let entry = "";
-            if (startsWith) {
-                entry = generateRandomString(5);
-            } else {
-                entry = generateRandomString(5) + value;
-            }
-            if (includeValue) {
-                data.push(entry);
-            } else {
-                data.push(generateRandomString(5));
-            }
-        }
-        return data;
-    };
-    const generateRandomString = (length: any) => {
-        let result = "";
-        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        const charactersLength = characters.length;
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return result;
-    };
     const findItemByTagId = (tagId: string) => {
         return batchesData.find((item: any) =>
             item.tags.some((tag: any) => tag.tagId === tagId)
@@ -239,7 +185,8 @@ const Home = (props: any) => {
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
                             {!active ? (
-                                <Pressable onPress={handleIconClick}
+                                <Pressable
+                                    onPress={handleIconClick}
                                     disabled={selectedFilter === "Select Batch Name" && selectedFilter !== foundData.name}>
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
@@ -253,35 +200,13 @@ const Home = (props: any) => {
                             </Pressable>
                         </View>
                     </View>
-                    <View style={[styles.filterMaskView, styles.rowAlignCenter]}>
-                        <H8 style={styles.textHeading}>Filter Mask:</H8>
-                        <View style={{flex: 1}}>
-                            <Input
-                                inputStyle={{borderBottomWidth: 1}}
-                                textStyle={[{color: theme.PrimaryDark}, styles.input]}
-                                bgColor={theme.White}
-                                onChangeText={(value) => handleInputChange("filterMask", value)}
-                            />
-                        </View>
-                    </View>
-                    {/*{rfIdData.size > 0 &&*/}
-                    {/*<ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>*/}
-                    {/*    <H8 style={{color: theme.PrimaryDark}}>Tags</H8>*/}
-                    {/*    {Array.from(rfIdData).map((data: any, index: number) => {*/}
-                    {/*        return (*/}
-                    {/*            <View key={index} style={[padding.py5]}>*/}
-                    {/*                <H9 style={{color: theme.PrimaryDark}}>{data}</H9>*/}
-                    {/*            </View>*/}
-                    {/*        );*/}
-                    {/*    })}*/}
-                    {/*</ScrollView>*/}
-                    {/*}*/}
+
                     <ScrollView contentContainerStyle={[styles.scrollContent]}>
                         {Object.entries(tagsData).map(([itemType, count], index) => {
                             return (
                                 <View key={index}
                                     style={{
-                                        flexDirection: "column", ...padding.px5, ...padding.py5, ...borderRadius.br2, ...margin.mb2,
+                                        flexDirection: "column", ...padding.px5, ...padding.py5, ...borderRadius.br2,
                                         borderColor: theme.PrimaryDark,
                                         borderWidth: StyleSheet.hairlineWidth
                                     }}>
@@ -293,16 +218,68 @@ const Home = (props: any) => {
                                     </View>
                                     <View style={{flexDirection: "row", alignItems: "center", ...margin.mb1}}>
                                         <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
+                                            {"Missing Items"}
+                                        </H7>
+                                        <H7 style={{color: theme.PrimaryDark, flex: 1}}>{"0"}</H7>
+                                    </View>
+                                    <View style={{flexDirection: "row", alignItems: "center", ...margin.mb1}}>
+                                        <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
                                             {"UnCategorised Tags"}
                                         </H7>
                                         <H7 style={{color: theme.PrimaryDark, flex: 1}}>{"0"}</H7>
                                     </View>
-
+                                    <View style={[margin.mt4]}>
+                                        <Button padding={padding.py3} borderRadius={borderRadius.br3}>
+                                            <H7 style={{color: theme.TextLight}}>Received</H7>
+                                        </Button>
+                                    </View>
                                 </View>
                             );
                         })}
-
                     </ScrollView>
+                    {/*      {rfIdData.size > 0 &&*/}
+                    {/*<ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>*/}
+                    {/*    <H8 style={{color: theme.PrimaryDark}}>Tags</H8>*/}
+                    {/*    {Array.from(rfIdData).map((data: any, index: number) => {*/}
+                    {/*        return (*/}
+                    {/*            <View key={index} style={[padding.py5]}>*/}
+                    {/*                <H9 style={{color: theme.PrimaryDark}}>{data}</H9>*/}
+                    {/*            </View>*/}
+                    {/*        );*/}
+                    {/*    })}*/}
+
+                    {/*</ScrollView>*/}
+                    {/*      }*/}
+                    {/*{*/}
+                    {/*    batchesData.tags.length ?*/}
+                    {/*        Object.entries(*/}
+                    {/*            batchesData.tags.reduce((acc: { [x: string]: any; }, tag: { itemType: string | number; }) => {*/}
+                    {/*                acc[tag.itemType] = (acc[tag.itemType] || 0) + 1;*/}
+                    {/*                return acc;*/}
+                    {/*            }, {})*/}
+                    {/*        ).map(([itemType, count], index) => {*/}
+                    {/*            console.log("itemType", itemType);*/}
+                    {/*            return (*/}
+                    {/*                <View*/}
+                    {/*                    key={index}*/}
+                    {/*                    style={{*/}
+                    {/*                        flexDirection: "row",*/}
+                    {/*                        justifyContent: "flex-start",*/}
+                    {/*                        alignItems: "center",*/}
+                    {/*                        ...padding.px5*/}
+                    {/*                    }}*/}
+                    {/*                >*/}
+                    {/*                    <H7 style={{color: theme.PrimaryDark, flex: 1}}>{itemType}</H7>*/}
+                    {/*                    <H7 style={{*/}
+                    {/*                        color: theme.PrimaryLight,*/}
+                    {/*                        flex: 1,*/}
+                    {/*                        textTransform: "capitalize"*/}
+                    {/*                    }}>{parseInt(count as string)}</H7>*/}
+                    {/*                </View>*/}
+                    {/*            );*/}
+                    {/*        })*/}
+                    {/*        : <></>*/}
+                    {/*}*/}
                 </View>
                 <View style={styles.footer}>
                     <View style={[styles.rowAlignCenter, styles.svgGap]}>
@@ -330,7 +307,7 @@ const Home = (props: any) => {
         </>
     );
 };
-export default Home;
+export default ClientHomeScreen;
 
 const styles = StyleSheet.create({
     container: {
@@ -398,9 +375,9 @@ const styles = StyleSheet.create({
     svgGap: {
         gap: 10
     },
-    scrollView: {
-        height: 450
-    },
+    // scrollView: {
+    // // height: 450
+    // },
     scrollContent: {
         flexGrow: 1,
         paddingVertical: 10

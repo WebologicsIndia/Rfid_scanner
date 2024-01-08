@@ -80,6 +80,29 @@ const TrackingDrawer = (props: any) => {
         newExpanded[index] = !newExpanded[index];
         setExpanded(newExpanded);
     };
+    const deleteBatch = (id: string, status: string) => {
+        const reqBody = JSON.stringify({
+            status: status,
+            batchId: id
+        });
+        setLoading(true);
+        fetchWithToken(batchUrl, "DELETE", {}, reqBody).then((resp) => {
+            if (resp.status === 200) {
+                resp.json().then((data) => {
+                    console.log(data.message);
+                });
+                getInventories();
+                setLoading(false);
+            } else {
+                resp.json().then((data) => {
+                    console.log(data.message);
+                });
+                setLoading(false);
+            }
+        }).catch(() => {
+            setLoading(false);
+        });
+    };
     return (
         <Container
             style={styles.container}
@@ -148,32 +171,68 @@ const TrackingDrawer = (props: any) => {
                                                         flexDirection: "row",
                                                         justifyContent: "flex-start",
                                                         alignItems: "center",
-                                                        ...padding.px5
+                                                        ...padding.px5,
+                                                        ...padding.py2
                                                     }}
                                                 >
-                                                    <H7 style={{color: theme.PrimaryDark, flex: 1}}>{itemType}</H7>
                                                     <H7 style={{
-                                                        color: theme.PrimaryLight,
+                                                        color: theme.PrimaryDark,
                                                         flex: 1,
                                                         textTransform: "capitalize"
+                                                    }}>{itemType}</H7>
+                                                    <H7 style={{
+                                                        color: theme.PrimaryLight,
+                                                        flex: 1
                                                     }}>{parseInt(count as string)}</H7>
                                                 </View>
                                             );
                                         })
                                         : <></>
                                     }
-                                    <Button
-                                        // onPress={() => {
-                                        //     updateBatchStatus(item._id, item.status);
-                                        // }}
-                                    >
-                                        <H7
-                                            style={[{textTransform: "uppercase", color: theme.White, textAlign: "center"}]}>{
-                                                item.status
-                                            }</H7>
+                                    <View style={{flexDirection: "row", gap: 10}}>
+                                        <View style={{flex: 1}}>
+                                            <Button
+                                                borderRadius={borderRadius.br2}
+                                                padding={padding.p1}
+                                                // onPress={() => {
+                                                //     updateBatchStatus(item._id, item.status);
+                                                // }}
+                                            >
+                                                <H7
+                                                    style={[{
+                                                        textTransform: "uppercase",
+                                                        color: theme.White,
+                                                        textAlign: "center"
+                                                    }]}>{
+                                                        item.status
+                                                    }</H7>
 
-                                    </Button>
+                                            </Button>
+                                        </View>
+                                        {
 
+                                            item.status === "Ready" &&
+                          <View style={{flex: 1}}>
+                              <Button
+                                  loading={loading}
+                                  borderRadius={borderRadius.br2}
+                                  padding={padding.p1}
+                                  onPress={() => deleteBatch(item._id, item.status)}
+                              >
+                                  <H7
+                                      style={[{
+                                          textTransform: "uppercase",
+                                          color: theme.White,
+                                          textAlign: "center"
+                                      }]}>
+                                      Delete
+                                  </H7>
+
+                              </Button>
+                          </View>
+                                        }
+
+                                    </View>
                                 </Accordian>
                             );
                         }) :
@@ -183,7 +242,8 @@ const TrackingDrawer = (props: any) => {
             </ScrollView>
         </Container>
     );
-};
+}
+;
 const styles = StyleSheet.create({
     container: {
         flex: 1

@@ -24,6 +24,7 @@ const TrackingDrawer = (props: any) => {
         fetchWithToken(`${batchUrl}?page=1&results=10`, "GET").then((res) => {
             if (res.status === 200) {
                 res.json().then((data) => {
+                    console.log("data: ", data.results);
                     setInventoryData(data.results);
                     setTotal(data.total);
 
@@ -96,6 +97,7 @@ const TrackingDrawer = (props: any) => {
                 {
                     inventoryData.length ?
                         inventoryData.map((item: any, index) => {
+                            console.log("item: ", item);
                             return (
                                 <Accordian
                                     expanded={expanded[index]}
@@ -129,7 +131,7 @@ const TrackingDrawer = (props: any) => {
                                                 <H7 style={{
                                                     color: theme.PrimaryLight,
                                                     textTransform: "capitalize"
-                                                }}>{item.assignedTo}</H7>
+                                                }}>{item.assignedTo.name}</H7>
                                             </View>
                                         </View>
                                     }>

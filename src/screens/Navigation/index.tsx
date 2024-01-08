@@ -9,6 +9,7 @@ import {connect} from "react-redux";
 import {login} from "../../store/reducers/userSlice";
 import ClientHomeScreen from "../clientScreens/HomeScreen/HomeScreen";
 import ClientTrackingDrawer from "../clientScreens/Menu/Index";
+import HotelInventory from "../clientScreens/HotelInventory";
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigation = (props: any) => {
@@ -30,6 +31,10 @@ const DrawerNavigation = (props: any) => {
                             <Drawer.Screen
                                 name="Batches"
                                 component={ClientTrackingDrawer}
+                            />
+                            <Drawer.Screen
+                                name="Hotel Inventory"
+                                component={HotelInventory}
                             />
                         </>
                         :

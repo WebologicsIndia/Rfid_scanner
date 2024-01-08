@@ -38,7 +38,7 @@ const ClientDetails = (props: any) => {
 
     return (
         <Container
-            bottom={insets.bottom*1}
+            bottom={insets.bottom * 1}
             backgroundColor={theme.White}
             header
             headerText={"Clients"}
@@ -67,40 +67,43 @@ const ClientDetails = (props: any) => {
                                 <Pressable
                                     onPress={() => props.navigation.navigate("addNewClient", {item})}
                                     key={index}
-                                    style={[
-                                        borderRadius.br2,
-                                        padding.p3,
-                                        margin.mb4,
-                                        {
-                                            borderWidth: StyleSheet.hairlineWidth,
-                                            backgroundColor: "#ff3366" + "1A",
-                                            borderColor: "#ff3366"
-                                        }
-                                    ]}
+
                                 >
                                     <View style={{flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
                                         <View style={{flexDirection: "row", alignItems: "center", gap: 5}}>
                                             <MaterialIcon color={"#ff3366"} name="person" size={20} />
-                                            <H5 style={{color: theme.PrimaryDark, fontWeight: "500", textTransform: "capitalize"}}>
+                                            <H5 style={{
+                                                color: theme.PrimaryDark,
+                                                fontWeight: "500",
+                                                textTransform: "capitalize"
+                                            }}>
                                                 {item.name}
                                             </H5>
                                         </View>
                                         <View style={{flexDirection: "row", alignItems: "center", gap: 5, ...padding.pt2}}>
                                             <MaterialIcon color={"#ff3366"} name="push-pin" size={16} />
-                                            <H7 style={{color: theme.PrimaryDark, textTransform: "capitalize", fontWeight: "500"}}>
+                                            <H7 style={{
+                                                color: theme.PrimaryDark,
+                                                textTransform: "capitalize",
+                                                fontWeight: "500"
+                                            }}>
                                                 {item.address}
                                             </H7>
                                         </View>
                                     </View>
                                     <View style={{flexDirection: "row", justifyContent: "space-between"}}>
                                         <View>
-                                            <View style={{flexDirection: "row", alignItems: "center", gap: 5, ...padding.py2}}>
+                                            <View
+                                                style={{flexDirection: "row", alignItems: "center", gap: 5, ...padding.py2}}>
                                                 <MaterialIcon
                                                     color={"#ff3366"}
                                                     name="contacts"
                                                     size={16}
                                                 />
-                                                <H7 style={{color: theme.PrimaryDark, textTransform: "capitalize"}}>{item.userId.name}</H7>
+                                                <H7 style={{
+                                                    color: theme.PrimaryDark,
+                                                    textTransform: "capitalize"
+                                                }}>{item.userId.name}</H7>
                                             </View>
                                             <View style={{flexDirection: "row", alignItems: "center", gap: 5}}>
                                                 <MaterialIcon
@@ -110,7 +113,8 @@ const ClientDetails = (props: any) => {
                                                 />
                                                 <H7 style={{color: theme.PrimaryDark}}>{item.userId.phone}</H7>
                                             </View>
-                                            <View style={{flexDirection: "row", alignItems: "center", gap: 5, ...padding.py2}}>
+                                            <View
+                                                style={{flexDirection: "row", alignItems: "center", gap: 5, ...padding.py2}}>
                                                 <MaterialIcon
                                                     color={"#ff3366"}
                                                     name="alternate-email"
@@ -123,7 +127,8 @@ const ClientDetails = (props: any) => {
                                         <View>
                                             <View style={{flexDirection: "row", alignItems: "center", ...padding.py2}}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Assigned Batches: </H7>
-                                                <H7 style={{color: "#ff3366"}}>{item.assignedBatchs ? item.assignedBatchs : 0}</H7>
+                                                <H7
+                                                    style={{color: "#ff3366"}}>{item.assignedBatchs ? item.assignedBatchs : 0}</H7>
                                             </View>
                                             <View style={{flexDirection: "row", alignItems: "center", ...padding.py2}}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Active: </H7>

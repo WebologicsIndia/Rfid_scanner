@@ -48,7 +48,8 @@ const Login = (props: any) => {
                 resp.json().then((data) => {
                     props.firstLogin({
                         tokens: data.token,
-                        user: data.user
+                        user: data.user,
+                        client: data.client
                     });
                 });
             } else {

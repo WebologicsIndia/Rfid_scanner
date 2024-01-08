@@ -22,7 +22,8 @@ export const batchState: {
 };
 export const userState = {
     tokens: null,
-    user: {}
+    user: {},
+    client: {}
 };
 
 const tokenData = {

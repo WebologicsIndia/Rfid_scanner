@@ -8,9 +8,10 @@ const userSlice = createSlice({
         firstLogin: (state, action) => {
             state.tokens = action.payload.tokens;
             state.user = action.payload.user;
+            state.client = action.payload.client;
         },
         login: (state, action) => {
-            if(state.tokens !== null) {
+            if (state.tokens !== null) {
                 state.tokens = action.payload;
             }
         },

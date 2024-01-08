@@ -98,6 +98,7 @@ const BatchModal = (props: {
                 props.setRfIdData(new Set());
                 props.setModalVisible(false);
                 setSelectedClient(null);
+
             });
     };
 

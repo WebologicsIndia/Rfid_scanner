@@ -26,7 +26,6 @@ const TrackingDrawer = (props: any) => {
                 res.json().then((data) => {
                     setInventoryData(data.results);
                     setTotal(data.total);
-
                 });
             }
         }).catch(() => {
@@ -36,34 +35,9 @@ const TrackingDrawer = (props: any) => {
         });
     };
 
-    // const updateBatchStatus = (batchId: any, status: string) => {
-    //     setLoading(true);
-    //     const body = {
-    //         batchId: batchId,
-    //         status: status === "Picked Up" ? "In Laundry" : status === "In Laundry" ? "Cleaned" : "Delivered"
-    //     };
-    //     fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body)).then((res) => {
-    //         if (res.status === 200) {
-    //             res.json().then((data) => {
-    //                 console.log(data.message);
-    //             });
-    //         }
-    //     }).catch(() => {
-    //         setLoading(false);
-    //
-    //     }).finally(() => {
-    //         setLoading(false);
-    //         setUpdate(!update);
-    //     });
-    // };
-
-    // React.useEffect(() => {
-    //     getInventories();
-    // }, [update]);
-
     React.useEffect(() => {
         getInventories();
-    }, []);
+    }, [update]);
 
 
     if (loading) {
@@ -92,7 +66,9 @@ const TrackingDrawer = (props: any) => {
             bottom={insets.bottom * 1.5}
         >
             <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {total}</H7>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false}
+                style={{...padding.px0}}
+            >
                 {
                     inventoryData.length ?
                         inventoryData.map((item: any, index) => {
@@ -106,10 +82,11 @@ const TrackingDrawer = (props: any) => {
                                         <View key={item._id}
                                             style={{
                                                 flexDirection: "row",
-                                                justifyContent: "space-between",
-                                                alignItems: "center"
+                                                justifyContent: "flex-end",
+                                                alignItems: "flex-start",
+                                                gap: 16
                                             }}>
-                                            <View style={padding.pb3}>
+                                            <View style={padding.p2}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Batch Name</H7>
                                                 <H7 style={{
                                                     color: theme.PrimaryLight,
@@ -121,7 +98,7 @@ const TrackingDrawer = (props: any) => {
                                                     textTransform: "capitalize"
                                                 }}>{item.quantity}</H7>
                                             </View>
-                                            <View style={margin.ms5}>
+                                            <View style={padding.py2}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Created</H7>
                                                 <H7
                                                     style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH:MM A")}</H7>
@@ -129,7 +106,7 @@ const TrackingDrawer = (props: any) => {
                                                 <H7 style={{
                                                     color: theme.PrimaryLight,
                                                     textTransform: "capitalize"
-                                                }}>{item.assignedTo}</H7>
+                                                }}>{item.assignedTo.name}</H7>
                                             </View>
                                         </View>
                                     }>
@@ -140,7 +117,6 @@ const TrackingDrawer = (props: any) => {
                                                 return acc;
                                             }, {})
                                         ).map(([itemType, count], index) => {
-
                                             return (
                                                 <View
                                                     key={index}

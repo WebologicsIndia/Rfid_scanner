@@ -29,13 +29,7 @@ const FilterModal = (props: {
                         props.modelData.map((item: any) => {
                             return (
                                 <Pressable onPress={() => handleModelItem(item)} key={item}>
-                                    {
-
-                                        typeof item === "string" ?
-                                            <H7 style={{color: theme.PrimaryDark, ...margin.my2}}>{item}</H7>
-                                            :
-                                            <H7 style={{color: theme.PrimaryDark, ...margin.my2}}>{item.freq}</H7>
-                                    }
+                                    <H7 style={{color: theme.PrimaryDark, ...margin.my2}}>{item.name}</H7>
                                 </Pressable>
                             );
                         })

@@ -9,8 +9,10 @@ import Accordian from "../../../common/accordian";
 import {fetchWithToken} from "../../../config/helper";
 import {setBatch} from "../../../store/reducers/batchSlice";
 import {connect} from "react-redux";
+import {login} from "../../../store/reducers/userSlice";
 
 const TrackingDrawer = (props: any) => {
+
     const [insets] = useState(Insets.getInsets());
     const [loading, setLoading] = useState(false);
     const [inventoryData, setInventoryData] = useState([]);
@@ -26,44 +28,21 @@ const TrackingDrawer = (props: any) => {
                 res.json().then((data) => {
                     setInventoryData(data.results);
                     setTotal(data.total);
-
                 });
             }
         }).catch(() => {
             setLoading(false);
         }).finally(() => {
             setLoading(false);
+
         });
     };
-
-    // const updateBatchStatus = (batchId: any, status: string) => {
-    //     setLoading(true);
-    //     const body = {
-    //         batchId: batchId,
-    //         status: status === "Picked Up" ? "In Laundry" : status === "In Laundry" ? "Cleaned" : "Delivered"
-    //     };
-    //     fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body)).then((res) => {
-    //         if (res.status === 200) {
-    //             res.json().then((data) => {
-    //                 console.log(data.message);
-    //             });
-    //         }
-    //     }).catch(() => {
-    //         setLoading(false);
-    //
-    //     }).finally(() => {
-    //         setLoading(false);
-    //         setUpdate(!update);
-    //     });
-    // };
 
     React.useEffect(() => {
         getInventories();
     }, [update]);
 
-    // React.useEffect(() => {
-    //     getInventories();
-    // }, []);
+
 
 
     if (loading) {
@@ -109,7 +88,7 @@ const TrackingDrawer = (props: any) => {
                                                 justifyContent: "space-between",
                                                 alignItems: "center"
                                             }}>
-                                            <View style={padding.pb3}>
+                                            <View style={padding.p2}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Batch Name</H7>
                                                 <H7 style={{
                                                     color: theme.PrimaryLight,
@@ -121,7 +100,7 @@ const TrackingDrawer = (props: any) => {
                                                     textTransform: "capitalize"
                                                 }}>{item.quantity}</H7>
                                             </View>
-                                            <View style={margin.ms5}>
+                                            <View style={padding.py2}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Created</H7>
                                                 <H7
                                                     style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH:MM A")}</H7>
@@ -129,7 +108,7 @@ const TrackingDrawer = (props: any) => {
                                                 <H7 style={{
                                                     color: theme.PrimaryLight,
                                                     textTransform: "capitalize"
-                                                }}>{item.assignedTo}</H7>
+                                                }}>{item.assignedTo.name}</H7>
                                             </View>
                                         </View>
                                     }>
@@ -195,7 +174,8 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = (state: any) => {
     return {
-        batchDetails: state.batch
+        batchDetails: state.batch,
+        user: state.user
     };
 };
-export default connect(mapStateToProps, {setBatch})(TrackingDrawer);
+export default connect(mapStateToProps, {setBatch, login})(TrackingDrawer);

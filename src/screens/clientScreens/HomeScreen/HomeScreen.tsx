@@ -22,39 +22,55 @@ import Geolocation from "react-native-geolocation-service";
 import Logo from "../../../assets/dr_company_logo.jpg";
 import BatchModal from "../../Home/components/batchModal";
 import {fetchWithToken} from "../../../config/helper";
-import {batchUrl} from "../../../config/api";
+import {batchUrl, clientUrl, inventoryUrl} from "../../../config/api";
+import {login} from "../../../store/reducers/userSlice";
+import {connect} from "react-redux";
+import {setClient} from "../../../store/reducers/clientSlice";
+
 
 const {RFIDModule} = NativeModules;
 
 const ClientHomeScreen = (props: any) => {
-    const [modalData, setModalData] = useState([]);
     const [insets] = useState(Insets.getInsets());
     const [rfIdData, setRfIdData] = useState<Set<any>>(new Set());
-    const [rfIdOpen, setRfIdOpen] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const [inventoryModal, setInventoryModal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
     // const [icon, setIcon] = useState("PlaySVG");
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
-    const [selectedFilter, setSelectedFilter] = useState<string>("Select Batch Name");
+    const [selectedFilter, setSelectedFilter] = useState<any>(null);
     const [initialized, setInitialized] = useState(false);
     const [active, setActive] = useState(false);
     const [batchesData, setBatchesData] = useState<any>([]);
-    const [tagsData, setTagsData] = useState<{ [key: string]: number }>({});
-    const [foundData, setFoundData] = useState<any>({});
+    const [tagsData, setTagsData] = useState<Set<any>>(new Set());
+    const [unCategorizedTags, setUnCategorizedTags] = useState<Set<any>>(new Set());
+    const [loading, setLoading] = useState<boolean>(false);
+
 
     useEffect(() => {
-        fetchWithToken(`${batchUrl}?status:"Ready"`, "GET").then((resp) => {
+        fetchWithToken(`${batchUrl}?status=Ready`, "GET").then((resp) => {
             if (resp.status === 200) {
                 resp.json().then((data) => {
-                    const batchesName = data.results.map((item: any) => item.name);
-                    setModalData(batchesName);
                     setBatchesData(data.results);
                 });
             }
         });
     }, []);
+
+    useEffect(() => {
+        Array.from(rfIdData).map((tagId) => {
+            fetchWithToken(`${inventoryUrl}?tag=${tagId}`, "GET", "")
+                .then((resp) => {
+                    if(resp.status === 200) {
+                        resp.json().then((data) => {
+                            setTagsData((prevState) => new Set([...prevState, data.itemType]));
+                        });
+                    } else {
+                        setUnCategorizedTags((prevState) => new Set([...prevState, tagId]));
+                    }
+                });
+        });
+    }, [rfIdData]);
 
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
@@ -104,7 +120,7 @@ const ClientHomeScreen = (props: any) => {
                     console.log(error);
                 }
             );
-            setInventoryModal(true);
+
         }
     };
 
@@ -135,26 +151,29 @@ const ClientHomeScreen = (props: any) => {
                 clearInterval(x);
         };
     }, [active]);
-    const findItemByTagId = (tagId: string) => {
-        return batchesData.find((item: any) =>
-            item.tags.some((tag: any) => tag.tagId === tagId)
-        );
-    };
-    useEffect(() => {
-        const newTagsData: { [key: string]: number } = {};
-        rfIdData.forEach((tagId) => {
-            const foundItem = findItemByTagId(tagId);
-            setFoundData(foundItem);
-            if (foundItem) {
-                foundItem.tags.forEach((tag: any) => {
-                    const itemType = tag.itemType;
-                    newTagsData[itemType] = (newTagsData[itemType] || 0) + 1;
-                });
-            }
-        });
 
-        setTagsData(newTagsData);
-    }, [rfIdData, batchesData]);
+    const receiveBatch = () => {
+        setLoading(true);
+        const body = {
+            status: "Delivered",
+            batchId: selectedFilter._id.toString()
+        };
+        fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body))
+            .then((resp) => {
+                if(resp.status === 200) {
+                    resp.json().then((data) => {
+                        console.log(data.message);
+                    });
+                }
+            }).catch((e) => {
+                console.log("error");
+            }).finally(() => {
+                setTagsData(new Set());
+                setLoading(false);
+                setSelectedFilter(null);
+            });
+    };
+
     return (
         <>
             <Container
@@ -178,16 +197,17 @@ const ClientHomeScreen = (props: any) => {
                         </Pressable>
                     </View>
                     <View style={[styles.filterModeView, styles.rowAlignCenter]}>
-                        <H8 style={styles.textHeading}>Filter Mode:</H8>
+                        <H8 style={styles.textHeading}>Select Batch:</H8>
                         <Pressable onPress={showModal} style={[styles.modalOpen, styles.rowAlignCenter]}>
-                            <H7 style={{color: theme.PrimaryLight, fontWeight: "500"}}>{selectedFilter}</H7>
+                            <H7 style={{color: theme.PrimaryLight, fontWeight: "500"}}>{selectedFilter ? selectedFilter.name : "Select Batch"}</H7>
                             <DownSvg color={theme.Primary} />
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
                             {!active ? (
                                 <Pressable
                                     onPress={handleIconClick}
-                                    disabled={selectedFilter === "Select Batch Name" && selectedFilter !== foundData.name}>
+                                    disabled={selectedFilter ? false : true}
+                                >
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
                             ) : (
@@ -200,86 +220,48 @@ const ClientHomeScreen = (props: any) => {
                             </Pressable>
                         </View>
                     </View>
-
-                    <ScrollView contentContainerStyle={[styles.scrollContent]}>
-                        {Object.entries(tagsData).map(([itemType, count], index) => {
-                            return (
-                                <View key={index}
-                                    style={{
-                                        flexDirection: "column", ...padding.px5, ...padding.py5, ...borderRadius.br2,
-                                        borderColor: theme.PrimaryDark,
-                                        borderWidth: StyleSheet.hairlineWidth
-                                    }}>
-                                    <View style={{flexDirection: "row", alignItems: "center", ...margin.mb1}}>
-                                        <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
-                                            {itemType}
-                                        </H7>
-                                        <H7 style={{color: theme.PrimaryLight, flex: 1}}>{count}</H7>
-                                    </View>
-                                    <View style={{flexDirection: "row", alignItems: "center", ...margin.mb1}}>
-                                        <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
-                                            {"Missing Items"}
-                                        </H7>
-                                        <H7 style={{color: theme.PrimaryDark, flex: 1}}>{"0"}</H7>
-                                    </View>
-                                    <View style={{flexDirection: "row", alignItems: "center", ...margin.mb1}}>
-                                        <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
-                                            {"UnCategorised Tags"}
-                                        </H7>
-                                        <H7 style={{color: theme.PrimaryDark, flex: 1}}>{"0"}</H7>
-                                    </View>
-                                    <View style={[margin.mt4]}>
-                                        <Button padding={padding.py3} borderRadius={borderRadius.br3}>
-                                            <H7 style={{color: theme.TextLight}}>Received</H7>
-                                        </Button>
-                                    </View>
+                    {
+                        tagsData.size ?
+                            <View style={styles.card}>
+                                <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>Batch Summary</H7>
+                                {
+                                    Array.from(tagsData).length ?
+                                        Object.entries(
+                                            Array.from(tagsData).reduce((acc: any, tag: any) => {
+                                                acc[tag] = (acc[tag] || 0) +1;
+                                                return acc;
+                                            }, {})
+                                        ).map(([itemType, count], index) => {
+                                            return (
+                                                <View key = {index} style={{flexDirection: "row", alignItems: "center", ...margin.my2}}>
+                                                    <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
+                                                        {itemType}
+                                                    </H7>
+                                                    <H7 style={{color: theme.PrimaryLight, flex: 1}}>{parseInt(count as string)}</H7>
+                                                </View>
+                                            );
+                                        }) : <></>
+                                }
+                                <View style={{flexDirection: "row", alignItems: "center", gap: 8}}>
+                                    <H7 style={{color: theme.PrimaryDark, textTransform: "capitalize"}}>
+                                        {"UnCategorised Tags:"}
+                                    </H7>
+                                    {Array.from(unCategorizedTags).map((tag, index) => (
+                                        <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
+                                    ))}
                                 </View>
-                            );
-                        })}
-                    </ScrollView>
-                    {/*      {rfIdData.size > 0 &&*/}
-                    {/*<ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>*/}
-                    {/*    <H8 style={{color: theme.PrimaryDark}}>Tags</H8>*/}
-                    {/*    {Array.from(rfIdData).map((data: any, index: number) => {*/}
-                    {/*        return (*/}
-                    {/*            <View key={index} style={[padding.py5]}>*/}
-                    {/*                <H9 style={{color: theme.PrimaryDark}}>{data}</H9>*/}
-                    {/*            </View>*/}
-                    {/*        );*/}
-                    {/*    })}*/}
-
-                    {/*</ScrollView>*/}
-                    {/*      }*/}
-                    {/*{*/}
-                    {/*    batchesData.tags.length ?*/}
-                    {/*        Object.entries(*/}
-                    {/*            batchesData.tags.reduce((acc: { [x: string]: any; }, tag: { itemType: string | number; }) => {*/}
-                    {/*                acc[tag.itemType] = (acc[tag.itemType] || 0) + 1;*/}
-                    {/*                return acc;*/}
-                    {/*            }, {})*/}
-                    {/*        ).map(([itemType, count], index) => {*/}
-                    {/*            console.log("itemType", itemType);*/}
-                    {/*            return (*/}
-                    {/*                <View*/}
-                    {/*                    key={index}*/}
-                    {/*                    style={{*/}
-                    {/*                        flexDirection: "row",*/}
-                    {/*                        justifyContent: "flex-start",*/}
-                    {/*                        alignItems: "center",*/}
-                    {/*                        ...padding.px5*/}
-                    {/*                    }}*/}
-                    {/*                >*/}
-                    {/*                    <H7 style={{color: theme.PrimaryDark, flex: 1}}>{itemType}</H7>*/}
-                    {/*                    <H7 style={{*/}
-                    {/*                        color: theme.PrimaryLight,*/}
-                    {/*                        flex: 1,*/}
-                    {/*                        textTransform: "capitalize"*/}
-                    {/*                    }}>{parseInt(count as string)}</H7>*/}
-                    {/*                </View>*/}
-                    {/*            );*/}
-                    {/*        })*/}
-                    {/*        : <></>*/}
-                    {/*}*/}
+                                <View style={[margin.mt4]}>
+                                    <Button
+                                        padding={padding.py3}
+                                        borderRadius={borderRadius.br3}
+                                        onPress={receiveBatch}
+                                        loading={loading}
+                                    >
+                                        <H7 style={{color: theme.TextLight}}>Receive Batch</H7>
+                                    </Button>
+                                </View>
+                            </View> : <></>
+                    }
                 </View>
                 <View style={styles.footer}>
                     <View style={[styles.rowAlignCenter, styles.svgGap]}>
@@ -293,21 +275,16 @@ const ClientHomeScreen = (props: any) => {
 
             </Container>
             <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter}
-                modelData={modalData} />
-            <FilterModal modalVisible={rfIdOpen} setModalVisible={setRfIdOpen} setValue={setRfIdData}
-                modelData={Array.from(rfIdData)} />
-            <BatchModal
-                modalVisible={inventoryModal}
-                setModalVisible={setInventoryModal}
-                latitude={latitude}
-                longitude={longitude}
-                filteredData={rfIdData}
-                setRfIdData={setRfIdData}
-            />
+                modelData={batchesData} />
         </>
     );
 };
-export default ClientHomeScreen;
+const mapStateToProps = (state:any) => ({
+    user: state.user.user._id,
+
+});
+
+export default connect(mapStateToProps, {login})(ClientHomeScreen);
 
 const styles = StyleSheet.create({
     container: {
@@ -381,5 +358,11 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingVertical: 10
+    },
+    card: {
+        flexDirection: "column", ...padding.px5, ...padding.pt1, ...padding.pb3, ...borderRadius.br2,
+        ...margin.mt5,
+        borderColor: theme.PrimaryDark,
+        borderWidth: StyleSheet.hairlineWidth
     }
 });

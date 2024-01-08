@@ -7,7 +7,7 @@ import {
     H9,
     margin,
     padding,
-    Insets, Button, Input
+    Insets, Button
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../../assets/current-location.svg";
@@ -23,6 +23,7 @@ import Logo from "../../../assets/dr_company_logo.jpg";
 import BatchModal from "../../Home/components/batchModal";
 import {fetchWithToken} from "../../../config/helper";
 import {batchUrl} from "../../../config/api";
+import {connect} from "react-redux";
 
 const {RFIDModule} = NativeModules;
 
@@ -163,7 +164,7 @@ const ClientHomeScreen = (props: any) => {
                 backgroundColor={theme.White}
                 header
                 addIcon={<Pressable onPress={() => props.navigation.openDrawer()}><HamburgerSVG /></Pressable>}
-                headerText={"Tag Scanner"}
+                headerText={props.userDetails.name}
                 headerTextStyle={styles.headerText}
                 headerColor={theme.Primary}
                 bottom={insets.bottom * 1.6}
@@ -307,7 +308,12 @@ const ClientHomeScreen = (props: any) => {
         </>
     );
 };
-export default ClientHomeScreen;
+const mapStateToProps = (state: any) => {
+    return {
+        userDetails: state.user.client
+    };
+};
+export default connect(mapStateToProps)(ClientHomeScreen);
 
 const styles = StyleSheet.create({
     container: {
@@ -322,7 +328,8 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontWeight: "600",
-        ...margin.ms4
+        ...margin.ms4,
+        textTransform: "capitalize"
     },
     bodyLogoView: {
         justifyContent: "space-between"

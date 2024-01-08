@@ -10,7 +10,8 @@ import {login} from "../../store/reducers/userSlice";
 import ClientHomeScreen from "../clientScreens/HomeScreen/HomeScreen";
 import ClientTrackingDrawer from "../clientScreens/Menu/Index";
 import HotelInventory from "../clientScreens/HotelInventory";
-import UserDetails from "../clientScreens/UserDetails/UserDetails";
+import UserDetails from "../userDetails/UserDetails";
+import userClientDetails from "../clientScreens/userClientDetails/userClientDetails";
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigation = (props: any) => {
@@ -25,21 +26,21 @@ const DrawerNavigation = (props: any) => {
                 {
                     props?.user?.isClient ?
                         <>
-                            {/*<Drawer.Screen*/}
-                            {/*    name=" Tag Scanner"*/}
-                            {/*    component={ClientHomeScreen}*/}
-                            {/*/>*/}
+                            <Drawer.Screen
+                                name="Tag Scanner"
+                                component={ClientHomeScreen}
+                            />
                             <Drawer.Screen
                                 name="Batches"
                                 component={ClientTrackingDrawer}
                             />
-                            {/*<Drawer.Screen*/}
-                            {/*    name="Hotel Inventory"*/}
-                            {/*    component={HotelInventory}*/}
-                            {/*/>*/}
+                            <Drawer.Screen
+                                name="Hotel Inventory"
+                                component={HotelInventory}
+                            />
                             <Drawer.Screen
                                 name="User Details"
-                                component={UserDetails}
+                                component={userClientDetails}
                             />
                         </>
                         :
@@ -60,6 +61,10 @@ const DrawerNavigation = (props: any) => {
                             <Drawer.Screen
                                 name="Clients"
                                 component={ClientScreens}
+                            />
+                            <Drawer.Screen
+                                name="User Details"
+                                component={UserDetails}
                             />
                         </>
 

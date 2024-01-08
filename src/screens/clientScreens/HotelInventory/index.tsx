@@ -161,9 +161,9 @@ const styles = StyleSheet.create({
         shadowColor: theme.PrimaryDark,
         shadowOffset: {
             width: 0,
-            height: 1
+            height: 2
         },
-        shadowOpacity: 0.8,
+        shadowOpacity: 0.25,
         shadowRadius: 3
     }
 });

@@ -9,6 +9,7 @@ import Accordian from "../../../common/accordian";
 import {fetchWithToken} from "../../../config/helper";
 import {setBatch} from "../../../store/reducers/batchSlice";
 import {connect} from "react-redux";
+import {setInventories} from "../../../store/reducers/inventorySlice";
 
 const TrackingDrawer = (props: any) => {
     const [insets] = useState(Insets.getInsets());
@@ -28,6 +29,9 @@ const TrackingDrawer = (props: any) => {
                         data: data.results,
                         page: 1,
                         total: data.total
+                    });
+                    props.setInventories({
+                        data: data.results
                     });
                     setInventoryData(data.results);
                     setTotal(data.total);
@@ -108,6 +112,7 @@ const TrackingDrawer = (props: any) => {
             setLoading(false);
         });
     };
+    console.log("inventoryDetails", props.inventoryDetails);
     return (
         <Container
             style={styles.container}
@@ -260,7 +265,7 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = (state: any) => {
     return {
-        batchDetails: state.batch
+        inventoryDetails: state.inventory
     };
 };
-export default connect(mapStateToProps, {setBatch})(TrackingDrawer);
+export default connect(mapStateToProps, {setBatch, setInventories})(TrackingDrawer);

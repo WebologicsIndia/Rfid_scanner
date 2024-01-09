@@ -20,6 +20,13 @@ export const batchState: {
     pageSize: 20,
     total: 0
 };
+export const inventoryState: {
+  data: any[],
+
+} = {
+    data: [],
+
+};
 export const userState = {
     tokens: null,
     user: {},

@@ -38,7 +38,7 @@ const ClientDetails = (props: any) => {
 
     return (
         <Container
-            bottom={insets.bottom*1}
+            bottom={insets.bottom*1.5}
             backgroundColor={theme.White}
             header
             headerText={"Clients"}

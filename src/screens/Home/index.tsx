@@ -250,36 +250,38 @@ const Home = (props: any) => {
                             />
                         </View>
                     </View>
-                    <View style={styles.card}>
-                        <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>Batch Summary</H7>
-                        {
-                            Array.from(tagsData).length ?
-                                Object.entries(
-                                    Array.from(new Set(tagsData)).reduce((acc: any, tag: any) => {
-                                        acc[tag] = (acc[tag] || 0) +1;
-                                        return acc;
-                                    }, {})
-                                ).map(([itemType, count], index) => {
-                                    return (
-                                        <View key = {index} style={{flexDirection: "row", alignItems: "center", ...margin.my2}}>
-                                            <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
-                                                {itemType}
-                                            </H7>
-                                            <H7 style={{color: theme.PrimaryLight, flex: 1}}>{parseInt(count as string)}</H7>
-                                        </View>
-                                    );
-                                }) : <></>
-                        }
-                        <View style={{flexDirection: "row", alignItems: "center", gap: 8}}>
-                            <H7 style={{color: theme.PrimaryDark, textTransform: "capitalize"}}>
-                                {"UnCategorised Tags:"}
-                            </H7>
-                            {Array.from(unCategorizedTags).map((tag, index) => (
-                                <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
-                            ))}
-                        </View>
-                    </View>
-
+                    {
+                        rfIdData.size ?
+                            <View style={styles.card}>
+                                <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>Batch Summary</H7>
+                                {
+                                    Array.from(tagsData).length ?
+                                        Object.entries(
+                                            Array.from(new Set(tagsData)).reduce((acc: any, tag: any) => {
+                                                acc[tag] = (acc[tag] || 0) +1;
+                                                return acc;
+                                            }, {})
+                                        ).map(([itemType, count], index) => {
+                                            return (
+                                                <View key = {index} style={{flexDirection: "row", alignItems: "center", ...margin.my2}}>
+                                                    <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
+                                                        {itemType}
+                                                    </H7>
+                                                    <H7 style={{color: theme.PrimaryLight, flex: 1}}>{parseInt(count as string)}</H7>
+                                                </View>
+                                            );
+                                        }) : <></>
+                                }
+                                <View style={{flexDirection: "row", alignItems: "center", gap: 8}}>
+                                    <H7 style={{color: theme.PrimaryDark, textTransform: "capitalize"}}>
+                                        {"UnCategorised Tags:"}
+                                    </H7>
+                                    {Array.from(unCategorizedTags).map((tag, index) => (
+                                        <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
+                                    ))}
+                                </View>
+                            </View> : <></>
+                    }
                 </View>
                 <View style={styles.footer}>
                     <View style={[styles.rowAlignCenter, styles.svgGap]}>

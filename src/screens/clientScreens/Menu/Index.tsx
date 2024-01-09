@@ -24,6 +24,11 @@ const TrackingDrawer = (props: any) => {
         fetchWithToken(`${batchUrl}?page=1&results=10`, "GET").then((res) => {
             if (res.status === 200) {
                 res.json().then((data) => {
+                    props.setBatch({
+                        data: data.results,
+                        page: 1,
+                        total: data.total
+                    });
                     setInventoryData(data.results);
                     setTotal(data.total);
 

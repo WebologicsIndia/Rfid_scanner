@@ -26,6 +26,7 @@ const ClientDetails = (props: any) => {
         fetchWithToken(clientUrl, "GET").then((resp) => {
             if (resp.status === 200) {
                 resp.json().then((data) => {
+                    console.log("data: ", data.results );
                     props.setClient({
                         data: data.results,
                         total: data.total,

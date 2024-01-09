@@ -17,6 +17,8 @@ import {connect} from "react-redux";
 import Icon from "react-native-vector-icons/Ionicons";
 
 const UserClientDetails = (props: any) => {
+    console.log(props.userDetails);
+
     const [insets] = useState(Insets.getInsets());
     return (
         <Container
@@ -59,11 +61,11 @@ const UserClientDetails = (props: any) => {
                 bgColor={theme.White}
                 borderColor={theme.TextLight}
                 editable={false}
-                value={props?.userDetails?.name.toUpperCase()}
+                value={props?.userDetails?.client.name.toUpperCase()}
                 floatingPlaceholder={true}
             />
             <Input
-                placeholder={"user Name"}
+                placeholder={"Representative"}
                 placeholderTextColor={theme.TextLight}
                 inputStyle={{...margin.mb2}}
                 borderRadius={borderRadius.br2}
@@ -71,7 +73,7 @@ const UserClientDetails = (props: any) => {
                 bgColor={theme.White}
                 borderColor={theme.TextLight}
                 editable={false}
-                value={props?.userDetails?.userId?.name.toUpperCase()}
+                value={props?.userDetails?.user.name.toUpperCase()}
                 floatingPlaceholder={true}
             />
             <Input
@@ -83,7 +85,7 @@ const UserClientDetails = (props: any) => {
                 bgColor={theme.White}
                 borderColor={theme.TextLight}
                 editable={false}
-                value={props?.userDetails?.userId?.phone.toUpperCase()}
+                value={props?.userDetails?.user?.phone.toUpperCase()}
                 floatingPlaceholder={true}
             />
             <Input
@@ -95,7 +97,7 @@ const UserClientDetails = (props: any) => {
                 bgColor={theme.White}
                 borderColor={theme.TextLight}
                 editable={false}
-                value={props?.userDetails?.email.toUpperCase()}
+                value={props?.userDetails?.client.email.toUpperCase()}
                 floatingPlaceholder={true}
             />
             <Input
@@ -107,7 +109,7 @@ const UserClientDetails = (props: any) => {
                 bgColor={theme.White}
                 borderColor={theme.TextLight}
                 editable={false}
-                value={props?.userDetails?.address.toUpperCase()}
+                value={props?.userDetails?.client.address.toUpperCase()}
                 floatingPlaceholder={true}
             />
             <Input
@@ -119,7 +121,7 @@ const UserClientDetails = (props: any) => {
                 bgColor={theme.White}
                 borderColor={theme.TextLight}
                 editable={false}
-                value={props?.userDetails?.isActive.toString().toUpperCase()}
+                value={props?.userDetails?.client.isActive.toString().toUpperCase()}
                 floatingPlaceholder={true}
             />
         </Container>
@@ -136,7 +138,7 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = (state: any) => {
     return {
-        userDetails: state.user.client
+        userDetails: state.user
     };
 };
 export default connect(mapStateToProps)(UserClientDetails);

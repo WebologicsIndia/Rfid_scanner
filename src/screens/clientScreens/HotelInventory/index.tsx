@@ -16,8 +16,10 @@ import HamburgerSVG from "../../../assets/hamburger.svg";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import AntIcon from "react-native-vector-icons/AntDesign";
+import {connect} from "react-redux";
 
 const Index = (props: any) => {
+    console.log(props.batchDetails.data);
     const [insets] = useState(Insets.getInsets());
     const [totalItemCount, setTotalItemCount] = useState<number | null>(null);
     const dummyData = [
@@ -167,5 +169,10 @@ const styles = StyleSheet.create({
         shadowRadius: 3
     }
 });
+const mapStateToProps = (state: any) => {
+    return {
+        batchDetails: state.batch
+    };
+};
 
-export default Index;
+export default connect(mapStateToProps)(Index);

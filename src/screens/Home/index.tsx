@@ -8,14 +8,14 @@ import {
     Input,
     margin,
     padding,
-    Insets, Button, H5
+    Insets
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../assets/current-location.svg";
 import PlaySVG from "../../assets/playSVG.svg";
 import ReloadSVG from "../../assets/reloadSVG.svg";
 import PauseSVG from "../../assets/pauseSVG.svg";
-import {Image, Pressable, StyleSheet, View, NativeModules, ScrollView} from "react-native";
+import {Image, Pressable, StyleSheet, View, NativeModules} from "react-native";
 import {theme} from "../../config/theme";
 import FilterModal from "../../common/FilterModal";
 import DownSvg from "../../assets/downArrow.svg";
@@ -185,7 +185,7 @@ const Home = (props: any) => {
         Array.from(rfIdData).map((tagId) => {
             fetchWithToken(`${inventoryUrl}?tag=${tagId}`, "GET", "")
                 .then((resp) => {
-                    if(resp.status === 200) {
+                    if (resp.status === 200) {
                         resp.json().then((data) => {
                             setTagsData((prevState) => new Set([...prevState, data.itemType]));
                         });
@@ -196,6 +196,24 @@ const Home = (props: any) => {
         });
     }, [rfIdData]);
 
+    useEffect(() => {
+        const item = props?.route?.params?.item;
+        if (item) {
+            const itemType = item.tags.map((item: any) => item.itemType);
+            setTagsData((prevTagsData) => new Set([...prevTagsData, itemType]));
+        }
+    }, [props?.route?.params?.item]);
+
+    const editBatch = () => {
+        const body = JSON.stringify({
+            batchId: props.route.params.item._id,
+            status: props.route.params.item.status
+        });
+        console.log("editBatch body", body);
+        fetchWithToken(batchUrl, "PUT", {}, body).then((resp) => {
+            console.log(resp.status);
+        });
+    };
     return (
         <>
             <Container
@@ -251,23 +269,33 @@ const Home = (props: any) => {
                         </View>
                     </View>
                     {
-                        rfIdData.size ?
+                        tagsData?.size ?
                             <View style={styles.card}>
-                                <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>Batch Summary</H7>
+                                <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>Batch
+                  Summary</H7>
                                 {
                                     Array.from(tagsData).length ?
                                         Object.entries(
                                             Array.from(new Set(tagsData)).reduce((acc: any, tag: any) => {
-                                                acc[tag] = (acc[tag] || 0) +1;
+                                                acc[tag] = (acc[tag] || 0) + 1;
                                                 return acc;
                                             }, {})
                                         ).map(([itemType, count], index) => {
+                                            console.log("itemType", itemType);
                                             return (
-                                                <View key = {index} style={{flexDirection: "row", alignItems: "center", ...margin.my2}}>
-                                                    <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
+                                                <View key={index}
+                                                    style={{flexDirection: "row", alignItems: "center", ...margin.my2}}>
+                                                    <H7 style={{
+                                                        color: theme.PrimaryDark,
+                                                        flex: 2,
+                                                        textTransform: "capitalize"
+                                                    }}>
                                                         {itemType}
                                                     </H7>
-                                                    <H7 style={{color: theme.PrimaryLight, flex: 1}}>{parseInt(count as string)}</H7>
+                                                    <H7 style={{
+                                                        color: theme.PrimaryLight,
+                                                        flex: 1
+                                                    }}>{parseInt(count as string)}</H7>
                                                 </View>
                                             );
                                         }) : <></>

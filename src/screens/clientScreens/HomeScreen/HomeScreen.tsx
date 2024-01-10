@@ -7,25 +7,23 @@ import {
     H9,
     margin,
     padding,
-    Insets, Button, Input
+    Insets, Button
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../../assets/current-location.svg";
 import PlaySVG from "../../../assets/playSVG.svg";
 import ReloadSVG from "../../../assets/reloadSVG.svg";
 import PauseSVG from "../../../assets/pauseSVG.svg";
-import {Image, Pressable, StyleSheet, View, NativeModules, ScrollView} from "react-native";
+import {Image, Pressable, StyleSheet, View, NativeModules} from "react-native";
 import {theme} from "../../../config/theme";
 import FilterModal from "../../../common/FilterModal";
 import DownSvg from "../../../assets/downArrow.svg";
 import Geolocation from "react-native-geolocation-service";
 import Logo from "../../../assets/dr_company_logo.jpg";
-import BatchModal from "../../Home/components/batchModal";
 import {fetchWithToken} from "../../../config/helper";
-import {batchUrl, clientUrl, inventoryUrl} from "../../../config/api";
+import {batchUrl, inventoryUrl} from "../../../config/api";
 import {login} from "../../../store/reducers/userSlice";
 import {connect} from "react-redux";
-import {setClient} from "../../../store/reducers/clientSlice";
 
 
 const {RFIDModule} = NativeModules;
@@ -61,7 +59,7 @@ const ClientHomeScreen = (props: any) => {
         Array.from(rfIdData).map((tagId) => {
             fetchWithToken(`${inventoryUrl}?tag=${tagId}`, "GET", "")
                 .then((resp) => {
-                    if(resp.status === 200) {
+                    if (resp.status === 200) {
                         resp.json().then((data) => {
                             setTagsData((prevState) => new Set([...prevState, data.itemType]));
                         });
@@ -160,12 +158,12 @@ const ClientHomeScreen = (props: any) => {
         };
         fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body))
             .then((resp) => {
-                if(resp.status === 200) {
+                if (resp.status === 200) {
                     resp.json().then((data) => {
                         console.log(data.message);
                     });
                 }
-            }).catch((e) => {
+            }).catch(() => {
                 console.log("error");
             }).finally(() => {
                 setTagsData(new Set());
@@ -199,14 +197,17 @@ const ClientHomeScreen = (props: any) => {
                     <View style={[styles.filterModeView, styles.rowAlignCenter]}>
                         <H8 style={styles.textHeading}>Select Batch:</H8>
                         <Pressable onPress={showModal} style={[styles.modalOpen, styles.rowAlignCenter]}>
-                            <H7 style={{color: theme.PrimaryLight, fontWeight: "500"}}>{selectedFilter ? selectedFilter.name : "Select Batch"}</H7>
+                            <H7 style={{
+                                color: theme.PrimaryLight,
+                                fontWeight: "500"
+                            }}>{selectedFilter ? selectedFilter.name : "Select Batch"}</H7>
                             <DownSvg color={theme.Primary} />
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
                             {!active ? (
                                 <Pressable
                                     onPress={handleIconClick}
-                                    disabled={selectedFilter ? false : true}
+                                    disabled={!selectedFilter}
                                 >
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
@@ -221,23 +222,32 @@ const ClientHomeScreen = (props: any) => {
                         </View>
                     </View>
                     {
-                        tagsData.size ?
+                        tagsData?.size ?
                             <View style={styles.card}>
-                                <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>Batch Summary</H7>
+                                <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>Batch
+                  Summary</H7>
                                 {
                                     Array.from(tagsData).length ?
                                         Object.entries(
                                             Array.from(tagsData).reduce((acc: any, tag: any) => {
-                                                acc[tag] = (acc[tag] || 0) +1;
+                                                acc[tag] = (acc[tag] || 0) + 1;
                                                 return acc;
                                             }, {})
                                         ).map(([itemType, count], index) => {
                                             return (
-                                                <View key = {index} style={{flexDirection: "row", alignItems: "center", ...margin.my2}}>
-                                                    <H7 style={{color: theme.PrimaryDark, flex: 2, textTransform: "capitalize"}}>
+                                                <View key={index}
+                                                    style={{flexDirection: "row", alignItems: "center", ...margin.my2}}>
+                                                    <H7 style={{
+                                                        color: theme.PrimaryDark,
+                                                        flex: 2,
+                                                        textTransform: "capitalize"
+                                                    }}>
                                                         {itemType}
                                                     </H7>
-                                                    <H7 style={{color: theme.PrimaryLight, flex: 1}}>{parseInt(count as string)}</H7>
+                                                    <H7 style={{
+                                                        color: theme.PrimaryLight,
+                                                        flex: 1
+                                                    }}>{parseInt(count as string)}</H7>
                                                 </View>
                                             );
                                         }) : <></>
@@ -279,8 +289,8 @@ const ClientHomeScreen = (props: any) => {
         </>
     );
 };
-const mapStateToProps = (state:any) => ({
-    user: state.user.user._id,
+const mapStateToProps = (state: any) => ({
+    user: state.user.user._id
 
 });
 

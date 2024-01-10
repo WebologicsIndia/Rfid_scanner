@@ -24,7 +24,7 @@ const DrawerNavigation = (props: any) => {
                     props?.user?.isClient ?
                         <>
                             <Drawer.Screen
-                                name=" Tag Scanner"
+                                name="Tag Scanner"
                                 component={ClientHomeScreen}
                             />
                             <Drawer.Screen

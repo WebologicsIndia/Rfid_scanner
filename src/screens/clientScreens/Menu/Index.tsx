@@ -9,10 +9,8 @@ import Accordian from "../../../common/accordian";
 import {fetchWithToken} from "../../../config/helper";
 import {setBatch} from "../../../store/reducers/batchSlice";
 import {connect} from "react-redux";
-import {login} from "../../../store/reducers/userSlice";
 
 const TrackingDrawer = (props: any) => {
-
     const [insets] = useState(Insets.getInsets());
     const [loading, setLoading] = useState(false);
     const [inventoryData, setInventoryData] = useState([]);
@@ -34,15 +32,12 @@ const TrackingDrawer = (props: any) => {
             setLoading(false);
         }).finally(() => {
             setLoading(false);
-
         });
     };
 
     React.useEffect(() => {
         getInventories();
     }, [update]);
-
-
 
 
     if (loading) {
@@ -71,7 +66,9 @@ const TrackingDrawer = (props: any) => {
             bottom={insets.bottom * 1.5}
         >
             <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {total}</H7>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false}
+                style={{...padding.px0}}
+            >
                 {
                     inventoryData.length ?
                         inventoryData.map((item: any, index) => {
@@ -85,8 +82,9 @@ const TrackingDrawer = (props: any) => {
                                         <View key={item._id}
                                             style={{
                                                 flexDirection: "row",
-                                                justifyContent: "space-between",
-                                                alignItems: "center"
+                                                justifyContent: "flex-end",
+                                                alignItems: "flex-start",
+                                                gap: 16
                                             }}>
                                             <View style={padding.p2}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Batch Name</H7>
@@ -119,7 +117,6 @@ const TrackingDrawer = (props: any) => {
                                                 return acc;
                                             }, {})
                                         ).map(([itemType, count], index) => {
-
                                             return (
                                                 <View
                                                     key={index}
@@ -141,18 +138,22 @@ const TrackingDrawer = (props: any) => {
                                         })
                                         : <></>
                                     }
-                                    <Button
-                                        // onPress={() => {
-                                        //     updateBatchStatus(item._id, item.status);
-                                        // }}
-                                    >
-                                        <H7
-                                            style={[{textTransform: "uppercase", color: theme.White, textAlign: "center"}]}>{
-                                                item.status
-                                            }</H7>
+                                    <View style={{flex: 1}}>
+                                        <Button
+                                            // onPress={() => {
+                                            //     updateBatchStatus(item._id, item.status);
+                                            // }}
+                                        >
+                                            <H7
+                                                style={[{
+                                                    textTransform: "uppercase",
+                                                    color: theme.White,
+                                                    textAlign: "center"
+                                                }]}>{item.status}
+                                            </H7>
 
-                                    </Button>
-
+                                        </Button>
+                                    </View>
                                 </Accordian>
                             );
                         }) :
@@ -162,7 +163,8 @@ const TrackingDrawer = (props: any) => {
             </ScrollView>
         </Container>
     );
-};
+}
+;
 const styles = StyleSheet.create({
     container: {
         flex: 1
@@ -174,8 +176,7 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = (state: any) => {
     return {
-        batchDetails: state.batch,
-        user: state.user
+        batchDetails: state.batch
     };
 };
-export default connect(mapStateToProps, {setBatch, login})(TrackingDrawer);
+export default connect(mapStateToProps, {setBatch})(TrackingDrawer);

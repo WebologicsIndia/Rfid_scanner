@@ -112,7 +112,7 @@ const TrackingDrawer = (props: any) => {
             setLoading(false);
         });
     };
-    console.log("inventoryDetails", props.inventoryDetails);
+
     return (
         <Container
             style={styles.container}

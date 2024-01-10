@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {FlatList, Pressable, StyleSheet, View} from "react-native";
 import {
     borderRadius,
@@ -16,48 +16,62 @@ import HamburgerSVG from "../../../assets/hamburger.svg";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import AntIcon from "react-native-vector-icons/AntDesign";
-import {connect} from "react-redux";
+import {fetchWithToken} from "../../../config/helper";
+import {batchUrl} from "../../../config/api";
+
+
 
 const Index = (props: any) => {
-    console.log(props.batchDetails.data);
     const [insets] = useState(Insets.getInsets());
-    const [totalItemCount, setTotalItemCount] = useState<number | null>(null);
-    const dummyData = [
-        {
-            id: 1,
-            status: "Received",
-            itemTypes: [
-                {
-                    id: "HandTowel",
-                    name: "Hand Towel",
-                    count: 10
-                },
-                {
-                    id: "BathTowel",
-                    name: "Bath Towel",
-                    count: 15
-                },
-                {
-                    id: "Towel",
-                    name: "Towel",
-                    count: 20
-                },
-                {
-                    id: "soap",
-                    name: "Soap",
-                    count: 30
-                },
-                {
-                    id: "badSheet",
-                    name: "Bad Sheets",
-                    count: 45
-                }
-            ]
+    const [loading, setLoading] = useState(false);
+    const [itemTypeCount, setItemTypeCount] = useState<any>([]);
+    const [inventoryItems, setInventoryItems] =  useState<any>([]);
+
+
+    useEffect(() => {
+        setLoading(true);
+        setItemTypeCount({});
+        setInventoryItems(inventoryItems.length = 0);
+        fetchWithToken(`${batchUrl}?status=Delivered`, "GET", "").then((res) => {
+            if(res.status === 200) {
+                res.json().then((data) => {
+                    let total = 0;
+                    data.results.map((item: any) => {
+                        total = total +  item.quantity;
+                        setInventoryItems((prevState: any) => {
+                            if (Array.isArray(prevState)) {
+                                return [...prevState, ...item.tags.map((tag: any) => tag)];
+                            } else {
+                                return (item.tags.map((tag: any) => tag));
+                            }
+                        });
+                    });
+                });
+            }
+        }).catch((error) => {
+            setLoading(false);
+            console.error(error);
+        }).finally(() => {
+            setLoading(false);
+        });
+    }, []);
+
+    useEffect(() => {
+        if (inventoryItems && inventoryItems.length > 0) {
+            const itemCounts = Object.entries(
+                inventoryItems.reduce((prev: { [x: string]: any; }, curr: { itemType: string | number; }) => {
+                    prev[curr.itemType] = (prev[curr.itemType] || 0) + 1;
+                    return prev;
+                }, {})
+            ).map(([itemType, count]) => ({
+                type: itemType,
+                count: count
+            }));
+            setItemTypeCount(itemCounts);
         }
-    ];
-    const calculateTotalCount = (itemTypes: any) => {
-        return itemTypes.reduce((total: number, itemType: any) => total + itemType.count, 0);
-    };
+
+    }, [inventoryItems]);
+
     return (
         <Container
             bottom={insets.bottom * 1.5}
@@ -72,38 +86,36 @@ const Index = (props: any) => {
             <View style={[styles.commonStyles, styles.commonBackground]}>
                 <H4 style={[styles.commonText, {fontWeight: "600"}]}>Inventory Details</H4>
             </View>
-            <FlatList
-                showsVerticalScrollIndicator={false}
-                data={dummyData}
-                renderItem={({item, index}: any) => {
-                    const totalItemCount = calculateTotalCount(item.itemTypes);
-                    setTotalItemCount(totalItemCount);
-                    return (
-                        <View key={index} style={[styles.itemTypesContainer, styles.commonBackground]}>
-                            {item.status === "Received" && item?.itemTypes?.map((itemType: any) => {
-                                return (
-                                    <View key={itemType.id} style={[styles.itemTypesWrapper, styles.commonStyles, styles.shadow]}>
-                                        <View style={{flexDirection: "row", alignItems: "center", gap: 5}}>
-                                            <AntIcon name={"tags"} size={16} color={"#ff3366"} />
-                                            <H6 style={styles.commonText}>{itemType.name}</H6>
-                                        </View>
-                                        <View style={{alignItems: "center"}}>
-                                            <View style={styles.circleView}>
-                                                <H7 style={{textAlign: "center"}}>{itemType.count}</H7>
-                                            </View>
+            <View style={[styles.itemTypesContainer, styles.commonBackground]}>
+                <FlatList
+                    showsVerticalScrollIndicator={false}
+
+                    data={itemTypeCount}
+                    renderItem={({item, index}: any) => {
+                        return (
+                            <View key={index}>
+                                <View key={item.id} style={[styles.itemTypesWrapper, styles.commonStyles, styles.shadow]}>
+                                    <View style={{flexDirection: "row", alignItems: "center", gap: 5}}>
+                                        <AntIcon name={"tags"} size={16} color={"#ff3366"} />
+                                        <H6 style={styles.commonText}>{item.type}</H6>
+                                    </View>
+                                    <View style={{alignItems: "center"}}>
+                                        <View style={styles.circleView}>
+                                            <H7 style={{textAlign: "center"}}>{item.count}</H7>
                                         </View>
                                     </View>
-                                );
-                            })}
-                        </View>
+                                </View>
+                            </View>
 
-                    );
-                }}
-            />
+                        );
+                    }}
+                />
+            </View>
             <View style={[styles.totalItemsWrapper, styles.commonBackground, styles.commonStyles]}>
                 <H5 style={[styles.commonText, {fontWeight: "500"}]}>{"Total Items : "}</H5>
-                <H5 style={{color: theme.PrimaryDark}}>{totalItemCount}</H5>
+                <H5 style={{color: theme.PrimaryDark}}>{inventoryItems.length}</H5>
             </View>
+
         </Container>
     );
 };
@@ -122,6 +134,7 @@ const styles = StyleSheet.create({
         borderColor: "#ff3366"
     },
     totalItemsWrapper: {
+
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center"
@@ -131,11 +144,12 @@ const styles = StyleSheet.create({
         borderColor: "#ff3366",
         ...borderRadius.circle,
         ...padding.p1,
+        justifyContent: "center",
         backgroundColor: "#ff3366",
         aspectRatio: 1
     },
     itemTypesContainer: {
-        flex: 10,
+        // flex: 10,
         ...borderRadius.br2,
         ...padding.px5,
         ...padding.py3,
@@ -169,10 +183,6 @@ const styles = StyleSheet.create({
         shadowRadius: 3
     }
 });
-const mapStateToProps = (state: any) => {
-    return {
-        batchDetails: state.batch
-    };
-};
 
-export default connect(mapStateToProps)(Index);
+
+export default Index;

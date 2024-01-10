@@ -7,7 +7,6 @@ const inventoryReducer = createSlice({
     reducers: {
         setInventories: (state, action) => {
             action.payload.data.forEach((order: any) => {
-                console.log("orders", order);
                 state.data = order.tags;
             });
         }

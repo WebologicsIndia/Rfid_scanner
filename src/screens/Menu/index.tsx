@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {borderRadius, Button, Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
 import {theme} from "../../config/theme";
-import {ActivityIndicator, Pressable, ScrollView, StyleSheet, View} from "react-native";
+import {ActivityIndicator, Pressable, FlatList, StyleSheet, View} from "react-native";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import {batchUrl} from "../../config/api";
 import dayjs from "dayjs";
@@ -10,6 +10,8 @@ import {fetchWithToken} from "../../config/helper";
 import {setBatch} from "../../store/reducers/batchSlice";
 import {connect} from "react-redux";
 import {PanGestureHandler} from "react-native-gesture-handler";
+
+
 import Animated, {
     useSharedValue,
     useAnimatedStyle, useAnimatedGestureHandler
@@ -46,31 +48,10 @@ const TrackingDrawer = (props: any) => {
         });
     };
 
-    // const updateBatchStatus = (batchId: any, status: string) => {
-    //     setLoading(true);
-    //     const body = {
-    //         batchId: batchId,
-    //         status: status === "Picked Up" ? "In Laundry" : status === "In Laundry" ? "Cleaned" : "Delivered"
-    //     };
-    //     fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body)).then((res) => {
-    //         if (res.status === 200) {
-    //             res.json().then((data) => {
-    //                 console.log(data.message);
-    //             });
-    //         }
-    //     }).catch(() => {
-    //         setLoading(false);
-    //
-    //     }).finally(() => {
-    //         setLoading(false);
-    //         setUpdate(!update);
-    //     });
-    // };
-
     React.useEffect(() => {
         getInventories();
     }, [update]);
-    
+
 
     if (loading) {
         return <View style={{justifyContent: "center", alignItems: "center"}}><ActivityIndicator size={"large"}
@@ -93,21 +74,24 @@ const TrackingDrawer = (props: any) => {
             bottom={insets.bottom * 1.5}
         >
             <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {total}</H7>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{flex: 1}}>
-
-                {
-                    inventoryData.length ?
-                        inventoryData.map((item: any, index) => {
-                            return (
-                                <Items item={item} index={index} key={index} getInventories={getInventories}
-                                    navigation={props.navigation} />
-                            );
-                        }) :
-                        <H7>No Data found</H7>
-                }
-
-            </ScrollView>
+            <FlatList
+                showsVerticalScrollIndicator={false}
+                data={inventoryData}
+                renderItem={({item, index}: any) => (
+                    inventoryData.length ? (
+                        <Items
+                            item={item}
+                            index={index}
+                            key={index}
+                            getInventories={getInventories}
+                            navigation={props.navigation}
+                        />
+                    ):
+                        (<H7>No Data found</H7>)
+                )}
+            />
         </Container>
+
     );
 }
 ;
@@ -167,6 +151,7 @@ const Items = ({item, index, getInventories, navigation}: any) => {
         newExpanded[index] = !newExpanded[index];
         setExpanded(newExpanded);
     };
+
     const deleteBatch = (id: string, status: string) => {
         const reqBody = JSON.stringify({
             status: status,
@@ -191,7 +176,12 @@ const Items = ({item, index, getInventories, navigation}: any) => {
         });
     };
     return (
-        <PanGestureHandler onGestureEvent={panGesture} key={index}>
+        <PanGestureHandler
+            onGestureEvent={panGesture}
+            key={index}
+            failOffsetY={[-5, 5]}
+            activeOffsetX={[-5, 5]}
+        >
             <Animated.View style={animatedStyle}>
                 <Accordian
                     expanded={expanded[index]}
@@ -211,11 +201,11 @@ const Items = ({item, index, getInventories, navigation}: any) => {
                                     color: theme.PrimaryLight,
                                     textTransform: "capitalize"
                                 }}>{item.name}</H7>
-                                <H7 style={{color: theme.PrimaryDark}}>Tags</H7>
+                                <H7 style={{color: theme.PrimaryDark}}>Status</H7>
                                 <H7 style={{
                                     color: theme.PrimaryLight,
                                     textTransform: "capitalize"
-                                }}>{item.quantity}</H7>
+                                }}>{item.status}</H7>
                             </View>
                             <View style={margin.ms5}>
                                 <H7 style={{color: theme.PrimaryDark}}>Created</H7>
@@ -262,28 +252,9 @@ const Items = ({item, index, getInventories, navigation}: any) => {
                         })
                         : <></>
                     }
-                    <View style={{flexDirection: "row", gap: 10}}>
-                        <View style={{flex: 1}}>
-                            <Button
-                                borderRadius={borderRadius.br2}
-                                padding={padding.p1}
-                                // onPress={() => {
-                                //     updateBatchStatus(item._id, item.status);
-                                // }}
-                            >
-                                <H7
-                                    style={[{
-                                        textTransform: "uppercase",
-                                        color: theme.White,
-                                        textAlign: "center"
-                                    }]}>{
-                                        item.status
-                                    }</H7>
-
-                            </Button>
-                        </View>
+                    <View >
                         {
-                            item.status === "Ready" && <View style={{flex: 1}}>
+                            item.status === "Ready" && <View>
                                 <Button
                                     borderRadius={borderRadius.br2}
                                     padding={padding.p1}
@@ -334,6 +305,7 @@ const Items = ({item, index, getInventories, navigation}: any) => {
             </Animated.View>
 
         </PanGestureHandler>
+
     );
 };
 

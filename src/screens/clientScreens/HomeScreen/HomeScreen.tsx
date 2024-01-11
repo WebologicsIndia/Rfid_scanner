@@ -180,7 +180,7 @@ const ClientHomeScreen = (props: any) => {
                 backgroundColor={theme.White}
                 header
                 addIcon={<Pressable onPress={() => props.navigation.openDrawer()}><HamburgerSVG /></Pressable>}
-                headerText={props.userDetails.name}
+                headerText={props?.userDetails?.name ? props.userDetails.name : "Tag Scanner"}
                 headerTextStyle={styles.headerText}
                 headerColor={theme.Primary}
                 bottom={insets.bottom * 1.6}
@@ -289,7 +289,12 @@ const ClientHomeScreen = (props: any) => {
         </>
     );
 };
-export default ClientHomeScreen;
+const mapStateToProps = (state:any) => {
+    return{
+        userDetails: state.user.client
+    };
+};
+export default connect(mapStateToProps)(ClientHomeScreen);
 
 const styles = StyleSheet.create({
     container: {

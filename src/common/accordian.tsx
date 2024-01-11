@@ -61,29 +61,28 @@ const Accordian = (props: any) => {
                 style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                 }}
             >
                 <View
                     style={{
-                        flex: 11,
                         justifyContent: "space-between",
                         alignItems: "center",
                     }}>
                     {props.title}
                 </View>
-                <View
-                    style={{
-                        flex: 1,
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                    }}>
-                    {/*<EntypoIcons*/}
-                    {/*    name={props.expanded ? "chevron-up" : "chevron-down"}*/}
-                    {/*    color={"#999999"}*/}
-                    {/*    size={20}*/}
-                    {/*/>*/}
-                </View>
+                {/*<View*/}
+                {/*    style={{*/}
+                {/*        flex: 1,*/}
+                {/*        justifyContent: "space-between",*/}
+                {/*        alignItems: "center",*/}
+                {/*    }}>*/}
+                {/*<EntypoIcons*/}
+                {/*    name={props.expanded ? "chevron-up" : "chevron-down"}*/}
+                {/*    color={"#999999"}*/}
+                {/*    size={20}*/}
+                {/*/>*/}
+                {/*</View>*/}
             </Pressable>
             {visible ? (
                 <>

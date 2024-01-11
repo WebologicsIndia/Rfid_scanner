@@ -35,7 +35,6 @@ const TrackingDrawer = (props: any) => {
                     });
                     setInventoryData(data.results);
                     setTotal(data.total);
-
                 });
             }
         }).catch(() => {
@@ -45,34 +44,9 @@ const TrackingDrawer = (props: any) => {
         });
     };
 
-    // const updateBatchStatus = (batchId: any, status: string) => {
-    //     setLoading(true);
-    //     const body = {
-    //         batchId: batchId,
-    //         status: status === "Picked Up" ? "In Laundry" : status === "In Laundry" ? "Cleaned" : "Delivered"
-    //     };
-    //     fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body)).then((res) => {
-    //         if (res.status === 200) {
-    //             res.json().then((data) => {
-    //                 console.log(data.message);
-    //             });
-    //         }
-    //     }).catch(() => {
-    //         setLoading(false);
-    //
-    //     }).finally(() => {
-    //         setLoading(false);
-    //         setUpdate(!update);
-    //     });
-    // };
-
     React.useEffect(() => {
         getInventories();
     }, [update]);
-
-    // React.useEffect(() => {
-    //     getInventories();
-    // }, []);
 
 
     if (loading) {
@@ -125,7 +99,9 @@ const TrackingDrawer = (props: any) => {
             bottom={insets.bottom * 1.5}
         >
             <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {total}</H7>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false}
+                style={{...padding.px0}}
+            >
                 {
                     inventoryData.length ?
                         inventoryData.map((item: any, index) => {
@@ -139,10 +115,11 @@ const TrackingDrawer = (props: any) => {
                                         <View key={item._id}
                                             style={{
                                                 flexDirection: "row",
-                                                justifyContent: "space-between",
-                                                alignItems: "center"
+                                                justifyContent: "flex-end",
+                                                alignItems: "flex-start",
+                                                gap: 16
                                             }}>
-                                            <View style={padding.pb3}>
+                                            <View style={padding.p2}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Batch Name</H7>
                                                 <H7 style={{
                                                     color: theme.PrimaryLight,
@@ -154,7 +131,7 @@ const TrackingDrawer = (props: any) => {
                                                     textTransform: "capitalize"
                                                 }}>{item.quantity}</H7>
                                             </View>
-                                            <View style={margin.ms5}>
+                                            <View style={padding.py2}>
                                                 <H7 style={{color: theme.PrimaryDark}}>Created</H7>
                                                 <H7
                                                     style={{color: theme.PrimaryLight}}>{dayjs(item.createdAt).format("DD-MMM-YYYY : HH:MM A")}</H7>
@@ -199,50 +176,18 @@ const TrackingDrawer = (props: any) => {
                                         })
                                         : <></>
                                     }
-                                    <View style={{flexDirection: "row", gap: 10}}>
-                                        <View style={{flex: 1}}>
-                                            <Button
-                                                borderRadius={borderRadius.br2}
-                                                padding={padding.p1}
-                                                // onPress={() => {
-                                                //     updateBatchStatus(item._id, item.status);
-                                                // }}
-                                            >
-                                                <H7
-                                                    style={[{
-                                                        textTransform: "uppercase",
-                                                        color: theme.White,
-                                                        textAlign: "center"
-                                                    }]}>{
-                                                        item.status
-                                                    }</H7>
+                                    <Button
+                                        // onPress={() => {
+                                        //     updateBatchStatus(item._id, item.status);
+                                        // }}
+                                    >
+                                        <H7
+                                            style={[{textTransform: "uppercase", color: theme.White, textAlign: "center"}]}>{
+                                                item.status
+                                            }</H7>
 
-                                            </Button>
-                                        </View>
-                                        {
+                                    </Button>
 
-                                            item.status === "Ready" &&
-                          <View style={{flex: 1}}>
-                              <Button
-                                  loading={loading}
-                                  borderRadius={borderRadius.br2}
-                                  padding={padding.p1}
-                                  onPress={() => deleteBatch(item._id, item.status)}
-                              >
-                                  <H7
-                                      style={[{
-                                          textTransform: "uppercase",
-                                          color: theme.White,
-                                          textAlign: "center"
-                                      }]}>
-                                      Delete
-                                  </H7>
-
-                              </Button>
-                          </View>
-                                        }
-
-                                    </View>
                                 </Accordian>
                             );
                         }) :

@@ -93,6 +93,7 @@ export async function fetchWithToken(url: string, method: string, headers?: any,
     const state: any = store.getState();
     const token = await getValidToken(state.user.tokens);
     store.dispatch(login(token));
+
     let header = {
         "authorization": `Bearer ${token.accessToken}`,
         "content-type": "application/json",

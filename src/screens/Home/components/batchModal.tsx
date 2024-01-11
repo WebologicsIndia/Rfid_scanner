@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Modal, Pressable, StyleSheet, View, ActivityIndicator, FlatList} from "react-native";
 import {theme} from "../../../config/theme";
 import {
@@ -13,7 +13,6 @@ import {
 } from "@WebologicsIndia/react-native-components";
 import {batchUrl, clientUrl} from "../../../config/api";
 import {fetchWithToken} from "../../../config/helper";
-import ModalView from "../../Inventory/components/ModalView";
 import ModalBatchView from "./ModalBatchView";
 
 const BatchModal = (props: {
@@ -23,14 +22,20 @@ const BatchModal = (props: {
   setRfIdData: any,
   latitude: number,
   longitude: number,
-  filteredData: any
+  filteredData: any,
+  item: any
 }) => {
+
     const [isFocused, setIsFocused] = useState(false);
-    const handleFocus = () => setIsFocused(true);
-    const [values, setValues] = useState<{ [key: string]: string }>({
+    const initialDetails: any = props.item ? {
+        name: props.item.name || "",
+        assignedTo: props.item.assignedTo.name || ""
+    } : {
         name: "",
         assignedTo: ""
-    });
+    };
+    const handleFocus = () => setIsFocused(true);
+    const [values, setValues] = useState<{ [key: string]: string }>(initialDetails);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalData, setModalData] = useState();
@@ -102,6 +107,39 @@ const BatchModal = (props: {
             });
     };
 
+    useEffect(() => {
+        setValues(initialDetails);
+    }, [props.item]);
+    const editBatch = () => {
+        const tags = props.item.tags.map((item: any) => item.tagId);
+        const body = JSON.stringify({
+            batchId: props.item._id,
+            tags: [
+                ...Array.from(props.filteredData),
+                ...tags
+            ]
+        });
+        setLoading(true);
+        fetchWithToken(batchUrl, "PUT", {}, body).then((resp) => {
+            if (resp.status === 200) {
+                resp.json().then((data) => {
+                    console.log(data.message);
+                });
+                props.setModalVisible(false);
+            } else {
+                resp.json().then((data) => {
+                    console.log(data.message);
+                });
+                setLoading(false);
+            }
+        }).catch(() => {
+            setLoading(false);
+        }).finally(() => {
+            setLoading(false);
+            props.setRfIdData(new Set());
+            props.setModalVisible(false);
+        });
+    };
     if (loading) {
         return <ActivityIndicator size={"large"} />;
     }
@@ -127,12 +165,13 @@ const BatchModal = (props: {
                                     borderBottomColor: isFocused ? theme.Accent : theme.PrimaryDark
                                 }, margin.mb4]}
                                 textStyle={[{color: theme.PrimaryDark}, styles.input]}
-
+                                // floatingPlaceholder
                                 bgColor={theme.White}
                                 placeholder={"Assigned To"}
                                 placeholderTextColor={theme.PrimaryLight}
                                 onFocus={handleFocus}
-                                value={selectedClient ? selectedClient.name : ""}
+                                editable={!props.item}
+                                value={selectedClient ? selectedClient.name : values.assignedTo}
                                 onChangeText={(value) => handleInputChange("assignedTo", value)}
                             />
                             {clientData.length ?
@@ -155,14 +194,19 @@ const BatchModal = (props: {
                                 : <></>
                             }
                             <Input
-                                inputStyle={{borderBottomWidth: 1, borderBottomColor: isFocused ? theme.Accent : theme.PrimaryDark}}
+                                inputStyle={{
+                                    borderBottomWidth: 1,
+                                    borderBottomColor: isFocused ? theme.Accent : theme.PrimaryDark
+                                }}
                                 textStyle={[{color: theme.PrimaryDark}, styles.input]}
                                 bgColor={theme.White}
                                 placeholder={"Batch Name"}
-                                // value= {values.name}
+                                // floatingPlaceholder
                                 placeholderTextColor={theme.PrimaryLight}
                                 onFocus={handleFocus}
                                 onChangeText={(value) => handleInputChange("name", value)}
+                                editable={!props.item}
+                                value={values.name}
                             />
                         </View>
                         <View style={{flexDirection: "row", gap: 30, marginLeft: "auto"}}>
@@ -172,9 +216,17 @@ const BatchModal = (props: {
                             }}>
                                 <H7 style={{textTransform: "uppercase", color: theme.Accent}}>Cancel</H7>
                             </Pressable>
-                            <Pressable onPress={batchApi}>
-                                <H7 style={{textTransform: "uppercase", color: theme.Accent}}>oK</H7>
-                            </Pressable>
+                            {
+                                props.item ?
+                                    <Pressable onPress={editBatch}>
+                                        <H7 style={{textTransform: "uppercase", color: theme.Accent}}>update</H7>
+                                    </Pressable>
+                                    :
+                                    <Pressable onPress={batchApi}>
+                                        <H7 style={{textTransform: "uppercase", color: theme.Accent}}>oK</H7>
+                                    </Pressable>
+                            }
+
                         </View>
                     </View>
                 </Pressable>

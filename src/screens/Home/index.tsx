@@ -23,7 +23,7 @@ import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
 import BatchModal from "./components/batchModal";
 import {fetchWithToken} from "../../config/helper";
-import {batchUrl, inventoryUrl} from "../../config/api";
+import {inventoryUrl} from "../../config/api";
 
 const {RFIDModule} = NativeModules;
 
@@ -204,16 +204,6 @@ const Home = (props: any) => {
         }
     }, [props?.route?.params?.item]);
 
-    const editBatch = () => {
-        const body = JSON.stringify({
-            batchId: props.route.params.item._id,
-            status: props.route.params.item.status
-        });
-        console.log("editBatch body", body);
-        fetchWithToken(batchUrl, "PUT", {}, body).then((resp) => {
-            console.log(resp.status);
-        });
-    };
     return (
         <>
             <Container
@@ -333,6 +323,7 @@ const Home = (props: any) => {
                 longitude={longitude}
                 filteredData={rfIdData}
                 setRfIdData={setRfIdData}
+                item={props?.route?.params?.item}
             />
         </>
     );

@@ -17,8 +17,6 @@ import {connect} from "react-redux";
 import Icon from "react-native-vector-icons/Ionicons";
 
 const UserClientDetails = (props: any) => {
-    console.log(props.userDetails);
-
     const [insets] = useState(Insets.getInsets());
     return (
         <Container

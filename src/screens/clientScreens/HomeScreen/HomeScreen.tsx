@@ -22,7 +22,6 @@ import Geolocation from "react-native-geolocation-service";
 import Logo from "../../../assets/dr_company_logo.jpg";
 import {fetchWithToken} from "../../../config/helper";
 import {batchUrl, inventoryUrl} from "../../../config/api";
-import {login} from "../../../store/reducers/userSlice";
 import {connect} from "react-redux";
 
 
@@ -289,7 +288,12 @@ const ClientHomeScreen = (props: any) => {
         </>
     );
 };
-export default ClientHomeScreen;
+const mapStateToProps = (state: any) => {
+    return {
+        userDetails: state.user.client
+    };
+};
+export default connect(mapStateToProps)(ClientHomeScreen);
 
 const styles = StyleSheet.create({
     container: {

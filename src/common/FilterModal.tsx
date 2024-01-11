@@ -5,12 +5,11 @@ import {theme} from "../config/theme";
 
 
 const FilterModal = (props: {
-    modalVisible: boolean,
-    setModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
-    setValue: any
-    modelData:any[]
+  modalVisible: boolean,
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
+  setValue: any
+  modelData: any[]
 }) => {
-
     const handleModelItem = (item: string) => {
         props.setValue(item);
         props.setModalVisible(!props.modalVisible);
@@ -28,7 +27,7 @@ const FilterModal = (props: {
                     {
                         props.modelData.map((item: any) => {
                             return (
-                                <Pressable onPress={() => handleModelItem(item)} key={item}>
+                                <Pressable onPress={() => handleModelItem(item)} key={item._id}>
                                     <H7 style={{color: theme.PrimaryDark, ...margin.my2}}>{item.name}</H7>
                                 </Pressable>
                             );

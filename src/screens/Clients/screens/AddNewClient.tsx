@@ -15,7 +15,7 @@ import {theme} from "../../../config/theme";
 // @ts-ignore
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import {fetchWithToken} from "../../../config/helper";
-import {clientUrl} from "../../../config/api";
+import {batchUrl, clientUrl} from "../../../config/api";
 import {connect} from "react-redux";
 import {setClient} from "../../../store/reducers/clientSlice";
 import auth from "@react-native-firebase/auth";
@@ -23,7 +23,9 @@ import {ClientType} from "../types";
 
 const AddNewClient = (props: any) => {
     const items: any = props?.route?.params?.item;
+    console.log("items", items);
     const [insets] = useState(Insets.getInsets());
+    const [total, setTotal] = useState(0);
     const initialClientDetails: ClientType = items
         ? {
             name: items.name || "",
@@ -31,7 +33,7 @@ const AddNewClient = (props: any) => {
             address: items.address || "",
             contactPerson: items.userId.name || "",
             contactNo: String(items.userId.phone) || "",
-            assignedBatch: String(0) || "",
+            assignedBatch: String(total) || ""
 
         }
         : {
@@ -48,9 +50,23 @@ const AddNewClient = (props: any) => {
     const [loading, setLoading] = useState(false);
     const [isActive, setIsActive] = useState(items ? items.isActive : true);
 
+
     useEffect(() => {
         setClientDetails(initialClientDetails);
     }, [items]);
+    useEffect(() => {
+        setLoading(true);
+        fetchWithToken(`${batchUrl}?status=Delivered&&assignedTo=${items._id}`, "GET").then((resp) => {
+            if (resp.status === 200) {
+                resp.json().then((data) => {
+                    setTotal(data.total);
+                });
+                setLoading(false);
+            }
+        }).finally(() => {
+            setLoading(false);
+        });
+    }, []);
     const handleCancelBtn = () => {
         if (items) {
             setIsEditable(false);
@@ -59,8 +75,8 @@ const AddNewClient = (props: any) => {
             props.navigation.goBack();
         }
     };
-    const AddUpdateClient = async() => {
-        if(!items) {
+    const AddUpdateClient = async () => {
+        if (!items) {
             if (clientDetails.password != null) {
                 await auth().createUserWithEmailAndPassword(clientDetails.email, clientDetails.password)
                     .catch((error) => {
@@ -117,6 +133,7 @@ const AddNewClient = (props: any) => {
             setLoading(false);
         });
     };
+
     return (
         <Container
             bottom={insets.bottom}

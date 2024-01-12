@@ -29,8 +29,9 @@ import SelectClient from "./components/selectClient";
 const {RFIDModule} = NativeModules;
 
 const modalData = [
-    {_id: "new", name: "New"},
-    {_id: "pickedUp", name: "Pick Up"}
+    {_id: "new", name: "New Batch"},
+    {_id: "pickedUp", name: "PickUp Batch"},
+    {_id: "inventory", name: "Update Inventory"}
 ];
 
 const Home = (props: any) => {
@@ -103,7 +104,9 @@ const Home = (props: any) => {
                     console.log(error);
                 }
             );
-            setInventoryModal(true);
+            if (selectedFilter?.name === "New Batch") {
+                setInventoryModal(true);
+            }
         }
     };
 
@@ -241,6 +244,30 @@ const Home = (props: any) => {
                 setSelectedFilter(null);
             });
     };
+    const updateInventory = () => {
+        const tagsArray = [...rfIdData];
+        setLoading(true);
+        fetchWithToken(inventoryUrl, "PUT", {}, JSON.stringify({tags: tagsArray})).then((resp) => {
+            if (resp.status === 200) {
+                resp.json().then((data) => {
+                    console.log(data.message);
+                });
+                setTagsData(new Set());
+                setSelectedFilter(null);
+            } else {
+                resp.json().then((data) => {
+                    console.log(data.message);
+                });
+                setLoading(false);
+            }
+        }).catch(() => {
+            setLoading(false);
+        }).finally(() => {
+            setLoading(false);
+            setTagsData(new Set());
+            setSelectedFilter(null);
+        });
+    };
     return (
         <>
             <Container
@@ -264,18 +291,17 @@ const Home = (props: any) => {
                         </Pressable>
                     </View>
                     <View style={[styles.filterModeView, styles.rowAlignCenter]}>
-                        <H8 style={styles.textHeading}>Select Batch Status:</H8>
+                        <H8 style={styles.textHeading}>Select Action:</H8>
                         <Pressable onPress={showModal} style={[styles.modalOpen, styles.rowAlignCenter]}>
-                            <H7 style={{
-                                color: theme.PrimaryLight,
-                                fontWeight: "500"
-                            }}>{selectedFilter ? selectedFilter.name : "Select Status"}</H7>
+                            <H7 style={{color: theme.PrimaryLight, fontWeight: "500"}}>
+                                {selectedFilter ? selectedFilter.name : "Select Action"}
+                            </H7>
                             <DownSvg color={theme.Primary} />
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
                             {!active ? (
                                 <Pressable onPress={handleIconClick}
-                                    disabled={selectedFilter?.name === "New" ? false : !(selectedFilter?.name === "Pick Up" && selectClientName)}>
+                                    disabled={selectedFilter?.name === "New Batch" || selectedFilter?.name === "Update Inventory" ? false : !(selectedFilter?.name === "PickUp Batch" && selectClientName)}>
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
                             ) : (
@@ -300,36 +326,40 @@ const Home = (props: any) => {
                         </View>
                     </View>
                     {
-                        selectedFilter?.name === "Pick Up" &&
-              <>
-                  <SelectClient setClientData={setClientData} selectClient={selectClient}
-                      setSelectClient={setSelectClient} />
+                        selectedFilter?.name === "PickUp Batch" &&
+                    <>
+                        <SelectClient
+                            setClientData={setClientData}
+                            selectClient={selectClient}
+                            setSelectClient={setSelectClient}
+                        />
 
-                  <View style={[margin.mt4, {flexDirection: "row", alignItems: "center"}]}>
-                      <H8 style={[styles.textHeading]}>Select Batch:</H8>
-                      <Pressable
-                          onPress={() => setClientDataModal(true)}
-                          style={[padding.ps4, {
-                              flexDirection: "row",
-                              alignItems: "center",
-                              flex: 1,
-                              justifyContent: "space-between"
-                          }]}>
-                          <H7 style={{color: theme.PrimaryLight}}>
-                              {selectClientName ? selectClientName.name : "Select Batch"}
-                          </H7>
-                          <View>
-                              <DownSvg color={theme.Primary} />
-                          </View>
-                      </Pressable>
-                  </View>
-              </>
+                        <View style={[margin.mt4, {flexDirection: "row", alignItems: "center"}]}>
+                            <H8 style={[styles.textHeading]}>Select Batch:</H8>
+                            <Pressable
+                                onPress={() => setClientDataModal(true)}
+                                style={[padding.ps4, {
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    flex: 1,
+                                    justifyContent: "space-between"
+                                }]}>
+                                <H7 style={{color: theme.PrimaryLight}}>
+                                    {selectClientName ? selectClientName.name : "Select Batch"}
+                                </H7>
+                                <View>
+                                    <DownSvg color={theme.Primary} />
+                                </View>
+                            </Pressable>
+                        </View>
+                    </>
                     }
                     {
                         tagsData?.size ?
                             <View style={styles.card}>
-                                <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>Batch
-                  Summary</H7>
+                                <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>
+                                Batch Summary
+                                </H7>
                                 {
                                     Array.from(tagsData).length ?
                                         Object.entries(
@@ -338,7 +368,6 @@ const Home = (props: any) => {
                                                 return acc;
                                             }, {})
                                         ).map(([itemType, count], index) => {
-                                            console.log("itemType", itemType);
                                             return (
                                                 <View key={index}
                                                     style={{flexDirection: "row", alignItems: "center", ...margin.my2}}>
@@ -365,17 +394,31 @@ const Home = (props: any) => {
                                         <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
                                     ))}
                                 </View>
-                                {selectedFilter?.name === "Pick Up" && <View style={[margin.mt4]}>
-                                    <Button
-                                        padding={padding.py3}
-                                        borderRadius={borderRadius.br3}
-                                        onPress={receiveBatch}
-                                    >
-                                        <H7 style={{color: theme.TextLight}}>PickUp Batch</H7>
-                                    </Button>
-                                </View>
+                                {selectedFilter?.name === "PickUp Batch" &&
+                              <View style={[margin.mt4]}>
+                                  <Button
+                                      loading={loading}
+                                      padding={padding.py3}
+                                      borderRadius={borderRadius.br3}
+                                      onPress={receiveBatch}
+                                  >
+                                      <H7 style={{color: theme.TextLight}}>PickUp Batch</H7>
+                                  </Button>
+                              </View>
                                 }
-
+                                {
+                                    selectedFilter?.name === "Update Inventory" &&
+                              <View style={[margin.mt4]}>
+                                  <Button
+                                      loading={loading}
+                                      padding={padding.py3}
+                                      borderRadius={borderRadius.br3}
+                                      onPress={updateInventory}
+                                  >
+                                      <H7 style={{color: theme.TextLight}}>Update Inventory</H7>
+                                  </Button>
+                              </View>
+                                }
                             </View> : <></>
                     }
                 </View>

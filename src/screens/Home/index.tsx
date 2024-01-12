@@ -8,7 +8,7 @@ import {
     Input,
     margin,
     padding,
-    Insets
+    Insets, Button
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../assets/current-location.svg";
@@ -53,6 +53,7 @@ const Home = (props: any) => {
     const [clientDataModal, setClientDataModal] = useState(false);
     const [selectClientName, selSelectClientName] = useState<any>(null);
     const [clientBatchDetails, setClientBatchDetail] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
 
 
     const handleLocationIconColor = () => {
@@ -219,6 +220,27 @@ const Home = (props: any) => {
             }
         });
     }, []);
+    const receiveBatch = () => {
+        setLoading(true);
+        const body = {
+            status: "PickedUp",
+            batchId: selectClientName._id.toString()
+        };
+        fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body))
+            .then((resp) => {
+                if (resp.status === 200) {
+                    resp.json().then((data) => {
+                        console.log(data.message);
+                    });
+                }
+            }).catch(() => {
+                console.log("error");
+            }).finally(() => {
+                setTagsData(new Set());
+                setLoading(false);
+                setSelectedFilter(null);
+            });
+    };
     return (
         <>
             <Container
@@ -341,6 +363,15 @@ const Home = (props: any) => {
                                     {Array.from(unCategorizedTags).map((tag, index) => (
                                         <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
                                     ))}
+                                </View>
+                                <View style={[margin.mt4]}>
+                                    <Button
+                                        padding={padding.py3}
+                                        borderRadius={borderRadius.br3}
+                                        onPress={receiveBatch}
+                                    >
+                                        <H7 style={{color: theme.TextLight}}>PickUp Batch</H7>
+                                    </Button>
                                 </View>
                             </View> : <></>
                     }

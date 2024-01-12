@@ -23,7 +23,8 @@ const BatchModal = (props: {
   latitude: number,
   longitude: number,
   filteredData: any,
-  item: any
+  item: any,
+  setTagsData: any
 }) => {
 
     const [isFocused, setIsFocused] = useState(false);
@@ -100,7 +101,7 @@ const BatchModal = (props: {
                 setLoading(false);
             }).finally(() => {
                 setLoading(false);
-                props.setRfIdData(new Set());
+                props.setTagsData(new Set());
                 props.setModalVisible(false);
                 setSelectedClient(null);
 

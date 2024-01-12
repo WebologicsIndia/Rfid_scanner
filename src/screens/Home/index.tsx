@@ -29,7 +29,8 @@ import SelectClient from "./components/selectClient";
 const {RFIDModule} = NativeModules;
 
 const modalData = [
-    {_id: "pickedUp", name: "PickedUp"}
+    {_id: "new", name: "New"},
+    {_id: "pickedUp", name: "Pick Up"}
 ];
 
 const Home = (props: any) => {
@@ -54,7 +55,6 @@ const Home = (props: any) => {
     const [selectClientName, selSelectClientName] = useState<any>(null);
     const [clientBatchDetails, setClientBatchDetail] = useState<any>([]);
     const [loading, setLoading] = useState(false);
-
 
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
@@ -264,7 +264,7 @@ const Home = (props: any) => {
                         </Pressable>
                     </View>
                     <View style={[styles.filterModeView, styles.rowAlignCenter]}>
-                        <H8 style={styles.textHeading}>Select Status:</H8>
+                        <H8 style={styles.textHeading}>Select Batch Status:</H8>
                         <Pressable onPress={showModal} style={[styles.modalOpen, styles.rowAlignCenter]}>
                             <H7 style={{
                                 color: theme.PrimaryLight,
@@ -274,7 +274,8 @@ const Home = (props: any) => {
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
                             {!active ? (
-                                <Pressable onPress={handleIconClick} disabled={!selectClientName}>
+                                <Pressable onPress={handleIconClick}
+                                    disabled={selectedFilter?.name === "New" ? false : !(selectedFilter?.name === "Pick Up" && selectClientName)}>
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
                             ) : (
@@ -299,7 +300,7 @@ const Home = (props: any) => {
                         </View>
                     </View>
                     {
-                        selectedFilter &&
+                        selectedFilter?.name === "Pick Up" &&
               <>
                   <SelectClient setClientData={setClientData} selectClient={selectClient}
                       setSelectClient={setSelectClient} />
@@ -364,7 +365,7 @@ const Home = (props: any) => {
                                         <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
                                     ))}
                                 </View>
-                                <View style={[margin.mt4]}>
+                                {selectedFilter?.name === "Pick Up" && <View style={[margin.mt4]}>
                                     <Button
                                         padding={padding.py3}
                                         borderRadius={borderRadius.br3}
@@ -373,6 +374,8 @@ const Home = (props: any) => {
                                         <H7 style={{color: theme.TextLight}}>PickUp Batch</H7>
                                     </Button>
                                 </View>
+                                }
+
                             </View> : <></>
                     }
                 </View>
@@ -402,6 +405,7 @@ const Home = (props: any) => {
                 filteredData={rfIdData}
                 setRfIdData={setRfIdData}
                 item={props?.route?.params?.item}
+                setTagsData={setTagsData}
             />
         </>
     );

@@ -8,7 +8,7 @@ import {
     Input,
     margin,
     padding,
-    Insets
+    Insets, Button
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../assets/current-location.svg";
@@ -23,11 +23,14 @@ import Geolocation from "react-native-geolocation-service";
 import Logo from "../../assets/dr_company_logo.jpg";
 import BatchModal from "./components/batchModal";
 import {fetchWithToken} from "../../config/helper";
-import {inventoryUrl} from "../../config/api";
+import {batchUrl, inventoryUrl} from "../../config/api";
+import SelectClient from "./components/selectClient";
 
 const {RFIDModule} = NativeModules;
 
-const modalData = ["Contains", "Does Not Contain", "Equals", "Not Equal", "Starts With", "Ends With"];
+const modalData = [
+    {_id: "pickedUp", name: "PickedUp"}
+];
 
 const Home = (props: any) => {
     const [insets] = useState(Insets.getInsets());
@@ -36,16 +39,21 @@ const Home = (props: any) => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [inventoryModal, setInventoryModal] = useState<boolean>(false);
     const [locationIconColor, setLocationIconColor] = useState(theme.PrimaryDark);
-    // const [icon, setIcon] = useState("PlaySVG");
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
-    const [selectedFilter, setSelectedFilter] = useState<string>("Contains");
+    const [selectedFilter, setSelectedFilter] = useState<any>(null);
     const [initialized, setInitialized] = useState(false);
     const [active, setActive] = useState(false);
-    // const [modalData, setModalData] = useState([]);
     const [tagsData, setTagsData] = useState<Set<any>>(new Set());
     const [unCategorizedTags, setUnCategorizedTags] = useState<Set<any>>(new Set());
     const [filteredData, setFilteredData] = useState<string[]>([]);
+
+    const [selectClient, setSelectClient] = useState<any>(null);
+    const [clientData, setClientData] = useState<any>([]);
+    const [clientDataModal, setClientDataModal] = useState(false);
+    const [selectClientName, selSelectClientName] = useState<any>(null);
+    const [clientBatchDetails, setClientBatchDetail] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
 
 
     const handleLocationIconColor = () => {
@@ -79,7 +87,6 @@ const Home = (props: any) => {
             }
         );
     }, []);
-
 
     const handleIconClick = () => {
         if (!active) {
@@ -204,6 +211,36 @@ const Home = (props: any) => {
         }
     }, [props?.route?.params?.item]);
 
+    useEffect(() => {
+        fetchWithToken(`${batchUrl}?status=Delivered&&assignedTo=${clientData[0]?._id}`, "GET").then((resp) => {
+            if (resp.status === 200) {
+                resp.json().then((data) => {
+                    setClientBatchDetail(data.results);
+                });
+            }
+        });
+    }, []);
+    const receiveBatch = () => {
+        setLoading(true);
+        const body = {
+            status: "PickedUp",
+            batchId: selectClientName._id.toString()
+        };
+        fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body))
+            .then((resp) => {
+                if (resp.status === 200) {
+                    resp.json().then((data) => {
+                        console.log(data.message);
+                    });
+                }
+            }).catch(() => {
+                console.log("error");
+            }).finally(() => {
+                setTagsData(new Set());
+                setLoading(false);
+                setSelectedFilter(null);
+            });
+    };
     return (
         <>
             <Container
@@ -227,14 +264,17 @@ const Home = (props: any) => {
                         </Pressable>
                     </View>
                     <View style={[styles.filterModeView, styles.rowAlignCenter]}>
-                        <H8 style={styles.textHeading}>Filter Mode:</H8>
+                        <H8 style={styles.textHeading}>Select Status:</H8>
                         <Pressable onPress={showModal} style={[styles.modalOpen, styles.rowAlignCenter]}>
-                            <H7 style={{color: theme.PrimaryLight, fontWeight: "500"}}>{selectedFilter}</H7>
+                            <H7 style={{
+                                color: theme.PrimaryLight,
+                                fontWeight: "500"
+                            }}>{selectedFilter ? selectedFilter.name : "Select Status"}</H7>
                             <DownSvg color={theme.Primary} />
                         </Pressable>
                         <View style={[styles.rowAlignCenter, styles.svgGap]}>
                             {!active ? (
-                                <Pressable onPress={handleIconClick}>
+                                <Pressable onPress={handleIconClick} disabled={!selectClientName}>
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
                             ) : (
@@ -258,6 +298,32 @@ const Home = (props: any) => {
                             />
                         </View>
                     </View>
+                    {
+                        selectedFilter &&
+              <>
+                  <SelectClient setClientData={setClientData} selectClient={selectClient}
+                      setSelectClient={setSelectClient} />
+
+                  <View style={[margin.mt4, {flexDirection: "row", alignItems: "center"}]}>
+                      <H8 style={[styles.textHeading]}>Select Batch:</H8>
+                      <Pressable
+                          onPress={() => setClientDataModal(true)}
+                          style={[padding.ps4, {
+                              flexDirection: "row",
+                              alignItems: "center",
+                              flex: 1,
+                              justifyContent: "space-between"
+                          }]}>
+                          <H7 style={{color: theme.PrimaryLight}}>
+                              {selectClientName ? selectClientName.name : "Select Batch"}
+                          </H7>
+                          <View>
+                              <DownSvg color={theme.Primary} />
+                          </View>
+                      </Pressable>
+                  </View>
+              </>
+                    }
                     {
                         tagsData?.size ?
                             <View style={styles.card}>
@@ -298,6 +364,15 @@ const Home = (props: any) => {
                                         <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
                                     ))}
                                 </View>
+                                <View style={[margin.mt4]}>
+                                    <Button
+                                        padding={padding.py3}
+                                        borderRadius={borderRadius.br3}
+                                        onPress={receiveBatch}
+                                    >
+                                        <H7 style={{color: theme.TextLight}}>PickUp Batch</H7>
+                                    </Button>
+                                </View>
                             </View> : <></>
                     }
                 </View>
@@ -314,6 +389,9 @@ const Home = (props: any) => {
             </Container>
             <FilterModal modalVisible={modalVisible} setModalVisible={setModalVisible} setValue={setSelectedFilter}
                 modelData={modalData} />
+            <FilterModal modalVisible={clientDataModal} setModalVisible={setClientDataModal}
+                setValue={selSelectClientName}
+                modelData={clientBatchDetails} />
             <FilterModal modalVisible={rfIdOpen} setModalVisible={setRfIdOpen} setValue={setRfIdData}
                 modelData={Array.from(rfIdData)} />
             <BatchModal

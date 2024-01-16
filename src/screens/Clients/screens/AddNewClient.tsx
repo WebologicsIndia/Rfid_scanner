@@ -23,7 +23,6 @@ import {ClientType} from "../types";
 
 const AddNewClient = (props: any) => {
     const items: any = props?.route?.params?.item;
-    console.log("items", items);
     const [insets] = useState(Insets.getInsets());
     const [total, setTotal] = useState(0);
     const initialClientDetails: ClientType = items
@@ -52,11 +51,14 @@ const AddNewClient = (props: any) => {
 
 
     useEffect(() => {
-        setClientDetails(initialClientDetails);
-    }, [items]);
+        setClientDetails({
+            ...initialClientDetails,
+            assignedBatch: String(total) || ""
+        });
+    }, [items, total]);
     useEffect(() => {
         setLoading(true);
-        fetchWithToken(`${batchUrl}?status=Delivered&&assignedTo=${items._id}`, "GET").then((resp) => {
+        fetchWithToken(`${batchUrl}?status=Delivered&&assignedTo=${items?._id}`, "GET").then((resp) => {
             if (resp.status === 200) {
                 resp.json().then((data) => {
                     setTotal(data.total);

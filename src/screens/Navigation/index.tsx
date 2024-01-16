@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import CustomDrawerContent from "../../common/CustomDrawerContent/CustomDrawerContent";
 import HomeScreen from "../Home";
 import TrackingDrawer from "../Menu";
@@ -12,9 +12,39 @@ import ClientTrackingDrawer from "../clientScreens/Menu/Index";
 import HotelInventory from "../clientScreens/HotelInventory";
 import UserDetails from "../userDetails/UserDetails";
 import userClientDetails from "../clientScreens/userClientDetails/userClientDetails";
+import {fetchWithToken} from "../../config/helper";
+import {batchUrl, clientUrl} from "../../config/api";
+import {setClient} from "../../store/reducers/clientSlice";
+import {setBatch} from "../../store/reducers/batchSlice";
 
 const Drawer = createDrawerNavigator();
 const DrawerNavigation = (props: any) => {
+    useEffect(() => {
+        fetchWithToken(clientUrl, "GET").then((resp) => {
+            if (resp.status === 200) {
+                resp.json().then((data) => {
+                    props.setClient({
+                        data: data.results,
+                        total: data.total,
+                        page: 1
+                    });
+                });
+            }
+        });
+        fetchWithToken(`${batchUrl}?page=1&results=10`, "GET").then((resp) => {
+            if (resp.status === 200) {
+                resp.json().then((data) => {
+                    props.setBatch({
+                        data: data.results,
+                        page: 1,
+                        total: data.total
+                    });
+                });
+            }
+        });
+
+
+    }, []);
     return (
         <>
             <Drawer.Navigator
@@ -79,4 +109,4 @@ const mapStateToProps = (state: { user: { user: any; }; }) => ({
     user: state.user.user
 });
 
-export default connect(mapStateToProps, login)(DrawerNavigation);
+export default connect(mapStateToProps, {login, setClient, setBatch})(DrawerNavigation);

@@ -9,7 +9,7 @@ const SelectClient = (props: {
   selectedClient: any,
   setSelectedClient: any,
   setClientData: any,
-    clientData: any
+  clientData: any
 }) => {
     const [loading, setLoading] = useState(false);
     const handleInputChange = (value: string) => {
@@ -46,8 +46,8 @@ const SelectClient = (props: {
                         onChangeText={(value) => handleInputChange(value)}
                     />
                     {
-                        props.clientData.length?
-                            <View >
+                        props?.clientData?.length ?
+                            <View>
                                 <FlatList
                                     data={props.clientData}
                                     renderItem={({item}: any) => {
@@ -72,8 +72,8 @@ const SelectClient = (props: {
 };
 const styles = StyleSheet.create({
     rowAlignCenter: {
-        flexDirection: "row",
-        // alignItems: "center"
+        flexDirection: "row"
+    // alignItems: "center"
     },
     filterMaskView: {
         gap: 16

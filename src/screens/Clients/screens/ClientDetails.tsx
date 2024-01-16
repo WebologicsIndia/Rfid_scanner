@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {FlatList, Pressable, StyleSheet, View} from "react-native";
 import {
     borderRadius,
@@ -15,27 +15,10 @@ import HamburgerSVG from "../../../assets/hamburger.svg";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
-import {fetchWithToken} from "../../../config/helper";
-import {clientUrl} from "../../../config/api";
 import {connect} from "react-redux";
-import {setClient} from "../../../store/reducers/clientSlice";
 
 const ClientDetails = (props: any) => {
     const [insets] = useState(Insets.getInsets());
-    useEffect(() => {
-        fetchWithToken(clientUrl, "GET").then((resp) => {
-            if (resp.status === 200) {
-                resp.json().then((data) => {
-                    props.setClient({
-                        data: data.results,
-                        total: data.total,
-                        page: 1
-                    });
-                });
-            }
-        });
-    }, []);
-
     return (
         <Container
             bottom={insets.bottom * 1.5}
@@ -173,4 +156,4 @@ const mapStateToProps = (state: any) => {
         clientDetails: state.client
     };
 };
-export default connect(mapStateToProps, {setClient})(ClientDetails);
+export default connect(mapStateToProps)(ClientDetails);

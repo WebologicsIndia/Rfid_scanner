@@ -25,6 +25,8 @@ import BatchModal from "./components/batchModal";
 import {fetchWithToken} from "../../config/helper";
 import {batchUrl, inventoryUrl} from "../../config/api";
 import SelectClient from "./components/selectClient";
+import {longPressHandlerName} from "react-native-gesture-handler/lib/typescript/handlers/LongPressGestureHandler";
+import selectClient from "./components/selectClient";
 
 const {RFIDModule} = NativeModules;
 
@@ -48,9 +50,7 @@ const Home = (props: any) => {
     const [active, setActive] = useState(false);
     const [tagsData, setTagsData] = useState<Set<any>>(new Set());
     const [unCategorizedTags, setUnCategorizedTags] = useState<Set<any>>(new Set());
-    const [filteredData, setFilteredData] = useState<string[]>([]);
-
-    const [selectClient, setSelectClient] = useState<any>(null);
+    const [selectedClient, setSelectedClient] = useState<any>(null);
     const [clientData, setClientData] = useState<any>([]);
     const [clientDataModal, setClientDataModal] = useState(false);
     const [selectClientName, selSelectClientName] = useState<any>(null);
@@ -140,57 +140,6 @@ const Home = (props: any) => {
         };
     }, [active]);
 
-    const handleInputChange = (name: string, value: string) => {
-        if (name === "filterMask") {
-            const filtered = filterData(value, selectedFilter);
-            setFilteredData(filtered);
-        }
-    };
-    const filterData = (value: string, selectedFilter: any) => {
-        switch (selectedFilter) {
-            case "Contains":
-                return generateMockData(value, 5, true);
-            case "Does Not Contain":
-                return generateMockData(value, 5, false);
-            case "Equals":
-                return generateMockData(value, 1, true);
-            case "Not Equal":
-                return generateMockData(value, 5, true);
-            case "Starts With":
-                return generateMockData(value, 5, true, true);
-            case "Ends With":
-                return generateMockData(value, 5, true, false);
-            default:
-                return [];
-        }
-    };
-    const generateMockData = (value: string, count: number, includeValue: boolean, startsWith = false) => {
-        const data = [];
-        for (let i = 0; i < count; i++) {
-            let entry = "";
-            if (startsWith) {
-                entry = generateRandomString(5);
-            } else {
-                entry = generateRandomString(5) + value;
-            }
-            if (includeValue) {
-                data.push(entry);
-            } else {
-                data.push(generateRandomString(5));
-            }
-        }
-        return data;
-    };
-    const generateRandomString = (length: any) => {
-        let result = "";
-        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        const charactersLength = characters.length;
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return result;
-    };
-
     useEffect(() => {
         Array.from(rfIdData).map((tagId) => {
             fetchWithToken(`${inventoryUrl}?tag=${tagId}`, "GET", "")
@@ -215,20 +164,27 @@ const Home = (props: any) => {
     }, [props?.route?.params?.item]);
 
     useEffect(() => {
-        fetchWithToken(`${batchUrl}?status=Delivered&&assignedTo=${clientData[0]?._id}`, "GET").then((resp) => {
-            if (resp.status === 200) {
-                resp.json().then((data) => {
-                    setClientBatchDetail(data.results);
-                });
-            }
-        });
-    }, []);
+        if(selectedClient) {
+            setLoading(true);
+            fetchWithToken(`${batchUrl}?status=Delivered&&assignedTo=${selectedClient._id}`, "GET").then((resp) => {
+                if (resp.status === 200) {
+                    resp.json().then((data) => {
+                        setClientBatchDetail(data.results);
+                    });
+                }
+            }).finally(() => {
+                setLoading(false);
+            });
+        }
+    }, [selectedClient]);
+
     const receiveBatch = () => {
         setLoading(true);
         const body = {
             status: "PickedUp",
             batchId: selectClientName._id.toString()
         };
+
         fetchWithToken(batchUrl, "PUT", "", JSON.stringify(body))
             .then((resp) => {
                 if (resp.status === 200) {
@@ -305,7 +261,7 @@ const Home = (props: any) => {
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
                             ) : (
-                                <Pressable onPress={handleIconClick}>
+                                <Pressable onPress={handleIconClick}>npm
                                     <PauseSVG width="24" height="24" />
                                 </Pressable>
                             )}
@@ -314,24 +270,14 @@ const Home = (props: any) => {
                             </Pressable>
                         </View>
                     </View>
-                    <View style={[styles.filterMaskView, styles.rowAlignCenter]}>
-                        <H8 style={styles.textHeading}>Filter Mask:</H8>
-                        <View style={{flex: 1}}>
-                            <Input
-                                inputStyle={{borderBottomWidth: 1}}
-                                textStyle={[{color: theme.PrimaryDark}, styles.input]}
-                                bgColor={theme.White}
-                                onChangeText={(value) => handleInputChange("filterMask", value)}
-                            />
-                        </View>
-                    </View>
                     {
                         selectedFilter?.name === "PickUp Batch" &&
                     <>
                         <SelectClient
+                            clientData={clientData}
                             setClientData={setClientData}
-                            selectClient={selectClient}
-                            setSelectClient={setSelectClient}
+                            selectedClient={selectedClient}
+                            setSelectedClient={setSelectedClient}
                         />
 
                         <View style={[margin.mt4, {flexDirection: "row", alignItems: "center"}]}>

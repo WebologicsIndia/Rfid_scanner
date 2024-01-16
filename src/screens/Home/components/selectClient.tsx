@@ -1,19 +1,20 @@
 import React, {useState} from "react";
-import {StyleSheet, View} from "react-native";
-import {H8, Input, margin, padding} from "@WebologicsIndia/react-native-components";
+import {FlatList, Pressable, StyleSheet, View} from "react-native";
+import {Block, fontSize, H7, H8, Input, margin, padding} from "@WebologicsIndia/react-native-components";
 import {theme} from "../../../config/theme";
 import {fetchWithToken} from "../../../config/helper";
 import {clientUrl} from "../../../config/api";
 
 const SelectClient = (props: {
-  selectClient: any,
-  setSelectClient: any,
-  setClientData: any
+  selectedClient: any,
+  setSelectedClient: any,
+  setClientData: any,
+    clientData: any
 }) => {
     const [loading, setLoading] = useState(false);
     const handleInputChange = (value: string) => {
         setLoading(true);
-        props.setSelectClient(value);
+        props.setSelectedClient(value);
         fetchWithToken(`${clientUrl}?name=${value}`, "GET", "").then((resp) => {
             if (resp.status === 200) {
                 resp.json().then((data) => {
@@ -26,24 +27,53 @@ const SelectClient = (props: {
             setLoading(false);
         });
     };
+
+    const handleNameSelect = (client: any) => {
+        props.setSelectedClient(client);
+        props.setClientData([]);
+
+    };
     return (
-        <View style={[styles.filterMaskView, styles.rowAlignCenter, margin.mt4]}>
-            <H8 style={styles.textHeading}>Select Client:</H8>
-            <View style={{flex: 1}}>
-                <Input
-                    inputStyle={{borderBottomWidth: 1}}
-                    textStyle={[{color: theme.PrimaryDark}, styles.input]}
-                    bgColor={theme.White}
-                    onChangeText={(value) => handleInputChange(value)}
-                />
+        <>
+            <View style={[styles.filterMaskView, styles.rowAlignCenter, margin.mt4]}>
+                <H8 style={styles.textHeading}>Select Client:</H8>
+                <View style={{flex: 1}}>
+                    <Input
+                        inputStyle={{borderBottomWidth: 1}}
+                        textStyle={[{color: theme.Primary, ...fontSize.H7}, styles.input]}
+                        bgColor={theme.White}
+                        value={props.selectedClient?.name}
+                        onChangeText={(value) => handleInputChange(value)}
+                    />
+                    {
+                        props.clientData.length?
+                            <View >
+                                <FlatList
+                                    data={props.clientData}
+                                    renderItem={({item}: any) => {
+                                        return <Block
+                                            fluid
+                                        >
+                                            <Pressable onPress={() => handleNameSelect(item)}>
+                                                <H7 style={{color: theme.Primary}}>{item.name}</H7>
+                                            </Pressable>
+                                        </Block>;
+
+                                    }}
+                                />
+                            </View>
+                            : <></>
+                    }
+                </View>
             </View>
-        </View>
+
+        </>
     );
 };
 const styles = StyleSheet.create({
     rowAlignCenter: {
         flexDirection: "row",
-        alignItems: "center"
+        // alignItems: "center"
     },
     filterMaskView: {
         gap: 16

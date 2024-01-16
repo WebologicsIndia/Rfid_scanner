@@ -1,110 +1,39 @@
 import React, {useState} from "react";
 import {borderRadius, Button, Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
 import {theme} from "../../../config/theme";
-import {ActivityIndicator, Pressable, ScrollView, StyleSheet, View} from "react-native";
+import {Pressable, ScrollView, StyleSheet, View} from "react-native";
 import HamburgerSVG from "../../../assets/hamburger.svg";
-import {batchUrl} from "../../../config/api";
 import dayjs from "dayjs";
 import Accordian from "../../../common/accordian";
-import {fetchWithToken} from "../../../config/helper";
-import {setBatch} from "../../../store/reducers/batchSlice";
 import {connect} from "react-redux";
-import {setInventories} from "../../../store/reducers/inventorySlice";
 
 const TrackingDrawer = (props: any) => {
     const [insets] = useState(Insets.getInsets());
-    const [loading, setLoading] = useState(false);
-    const [inventoryData, setInventoryData] = useState([]);
-    const [total, setTotal] = useState();
-    const [update, setUpdate] = useState(false);
     const [expanded, setExpanded] = useState<any>([]);
-
-
-    const getInventories = () => {
-        setLoading(true);
-        fetchWithToken(`${batchUrl}?page=1&results=10`, "GET").then((res) => {
-            if (res.status === 200) {
-                res.json().then((data) => {
-                    props.setBatch({
-                        data: data.results,
-                        page: 1,
-                        total: data.total
-                    });
-                    props.setInventories({
-                        data: data.results
-                    });
-                    setInventoryData(data.results);
-                    setTotal(data.total);
-                });
-            }
-        }).catch(() => {
-            setLoading(false);
-        }).finally(() => {
-            setLoading(false);
-        });
-    };
-
-    React.useEffect(() => {
-        getInventories();
-    }, [update]);
-
-
-    if (loading) {
-        return <View style={{justifyContent: "center", alignItems: "center"}}><ActivityIndicator size={"large"}
-            color={theme.PrimaryDark} /></View>;
-    }
-    const batchList = (() => {
-        props.navigation.openDrawer();
-        setUpdate(!update);
-    });
 
     const toggle = (index: number) => {
         const newExpanded = [...expanded];
         newExpanded[index] = !newExpanded[index];
         setExpanded(newExpanded);
     };
-    const deleteBatch = (id: string, status: string) => {
-        const reqBody = JSON.stringify({
-            status: status,
-            batchId: id
-        });
-        setLoading(true);
-        fetchWithToken(batchUrl, "DELETE", {}, reqBody).then((resp) => {
-            if (resp.status === 200) {
-                resp.json().then((data) => {
-                    console.log(data.message);
-                });
-                getInventories();
-                setLoading(false);
-            } else {
-                resp.json().then((data) => {
-                    console.log(data.message);
-                });
-                setLoading(false);
-            }
-        }).catch(() => {
-            setLoading(false);
-        });
-    };
-
     return (
         <Container
             style={styles.container}
             backgroundColor={theme.White}
             header
-            addIcon={<Pressable onPress={batchList}><HamburgerSVG /></Pressable>}
+            addIcon={<Pressable onPress={() => props.navigation.openDrawer()}><HamburgerSVG /></Pressable>}
             headerText={"Inventories"}
             headerTextStyle={styles.headerText}
             headerColor={theme.Primary}
             bottom={insets.bottom * 1.5}
         >
-            <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {total}</H7>
+            <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {props.batchesData.total}</H7>
             <ScrollView showsVerticalScrollIndicator={false}
                 style={{...padding.px0}}
             >
                 {
-                    inventoryData.length ?
-                        inventoryData.map((item: any, index) => {
+                    props.batchesData.data.length ?
+                        props.batchesData.data.map((item: any, index: any) => {
                             return (
                                 <Accordian
                                     expanded={expanded[index]}
@@ -176,15 +105,14 @@ const TrackingDrawer = (props: any) => {
                                         })
                                         : <></>
                                     }
-                                    <Button
-                                        // onPress={() => {
-                                        //     updateBatchStatus(item._id, item.status);
-                                        // }}
-                                    >
-                                        <H7
-                                            style={[{textTransform: "uppercase", color: theme.White, textAlign: "center"}]}>{
-                                                item.status
-                                            }</H7>
+                                    <Button>
+                                        <H7 style={[{
+                                            textTransform: "uppercase",
+                                            color: theme.White,
+                                            textAlign: "center"
+                                        }]}>
+                                            {item.status}
+                                        </H7>
 
                                     </Button>
 
@@ -210,7 +138,7 @@ const styles = StyleSheet.create({
 });
 const mapStateToProps = (state: any) => {
     return {
-        inventoryDetails: state.inventory
+        batchesData: state.batch
     };
 };
-export default connect(mapStateToProps, {setBatch, setInventories})(TrackingDrawer);
+export default connect(mapStateToProps)(TrackingDrawer);

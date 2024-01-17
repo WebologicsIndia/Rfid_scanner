@@ -26,7 +26,7 @@ const DrawerNavigation = (props: any) => {
                     props.setClient({
                         data: data.results,
                         total: data.total,
-                        page: 1
+                        page: 2
                     });
                 });
             }

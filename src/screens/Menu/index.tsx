@@ -1,17 +1,18 @@
 import React, {useState} from "react";
 import {Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
 import {theme} from "../../config/theme";
-import {ActivityIndicator, Pressable, FlatList, StyleSheet, View} from "react-native";
+import {ActivityIndicator, Pressable, FlatList, StyleSheet, View, VirtualizedList} from "react-native";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import {batchUrl} from "../../config/api";
 import {fetchWithToken} from "../../config/helper";
-import {setBatch} from "../../store/reducers/batchSlice";
+import {setBatch, updateBatch} from "../../store/reducers/batchSlice";
 import {connect} from "react-redux";
 import Items from "./components/Items";
 
 const TrackingDrawer = (props: any) => {
     const [insets] = useState(Insets.getInsets());
     const [loading, setLoading] = useState(false);
+    const [bottomLoading, setBottomLoading] = useState(false);
     const getInventories = () => {
         setLoading(true);
         fetchWithToken(`${batchUrl}?page=1&results=10`, "GET").then((res) => {
@@ -38,18 +39,26 @@ const TrackingDrawer = (props: any) => {
     }
 
     const handlePagination = () => {
-        fetchWithToken(`${batchUrl}?page=${props.batchesData.page}&results=10`, "GET")
+        setBottomLoading(true);
+        if(Math.ceil(props.batchesData.total/props.batchesData.pageSize)<props.batchesData.page){
+            setBottomLoading(false);
+            return;
+        }
+        fetchWithToken(`${batchUrl}?page=${props.batchesData.page}&results=${props.batchesData.pageSize}`, "GET")
             .then((resp) => {
-                if(resp.status === 200) {
+                if (resp.status === 200) {
                     resp.json().then((data) => {
-                        props.setBatch({
+                        props.updateBatch({
                             data: data.results,
-                            page: parseInt(props.batchesData.page) + 1,
                             total: data.total
                         });
                     });
                 }
+            }).finally(() => {
+                console.log("page: ", props.batchesData.page);
+                setBottomLoading(false);
             });
+
     };
 
     return (
@@ -66,21 +75,31 @@ const TrackingDrawer = (props: any) => {
             <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {props.batchesData.total}</H7>
             <FlatList
                 showsVerticalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                onEndReached={handlePagination}
+                onEndReachedThreshold={0}
                 data={props.batchesData.data}
                 renderItem={({item, index}: any) => (
-                    props.batchesData.data.length ? (
-                        <Items
-                            item={item}
-                            index={index}
-                            key={index}
-                            getInventories={getInventories}
-                            navigation={props.navigation}
-                        />
-                    ) :
-                        (<H7>No Data found</H7>)
+                    <Items
+                        item={item}
+                        index={index}
+                        key={index}
+                        getInventories={getInventories}
+                        navigation={props.navigation}
+                    />
                 )}
-                onEndReached={handlePagination}
-                onEndReachedThreshold={0.1}
+
+                ListFooterComponent={() => {
+                    if (bottomLoading) {
+                        return (
+                            <View style={{justifyContent: "center", alignItems: "center"}}>
+                                <ActivityIndicator size={"large"} color={theme.PrimaryDark} />
+                            </View>
+                        );
+                    } else {
+                        return null; // You need to return null when bottomLoading is false
+                    }
+                }}
             />
         </Container>
 
@@ -102,5 +121,5 @@ const mapStateToProps = (state: any) => {
         batchesData: state.batch
     };
 };
-export default connect(mapStateToProps, {setBatch})(TrackingDrawer);
+export default connect(mapStateToProps, {setBatch, updateBatch})(TrackingDrawer);
 

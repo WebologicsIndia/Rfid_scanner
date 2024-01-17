@@ -36,7 +36,7 @@ const DrawerNavigation = (props: any) => {
                 resp.json().then((data) => {
                     props.setBatch({
                         data: data.results,
-                        page: 1,
+                        page: 2,
                         total: data.total
                     });
                 });

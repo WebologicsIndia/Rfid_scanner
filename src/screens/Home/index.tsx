@@ -257,7 +257,7 @@ const Home = (props: any) => {
                                     <PlaySVG width="24" height="24" />
                                 </Pressable>
                             ) : (
-                                <Pressable onPress={handleIconClick}>npm
+                                <Pressable onPress={handleIconClick}>
                                     <PauseSVG width="24" height="24" />
                                 </Pressable>
                             )}
@@ -300,7 +300,7 @@ const Home = (props: any) => {
                         tagsData?.size ?
                             <View style={styles.card}>
                                 <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>
-                  Batch Summary
+                                    Batch Summary
                                 </H7>
                                 {
                                     Array.from(tagsData).length ?

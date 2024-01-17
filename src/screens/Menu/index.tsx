@@ -19,7 +19,7 @@ const TrackingDrawer = (props: any) => {
                 res.json().then((data) => {
                     props.setBatch({
                         data: data.results,
-                        page: 1,
+                        page: 2,
                         total: data.total
                     });
                 });
@@ -36,6 +36,21 @@ const TrackingDrawer = (props: any) => {
         return <View style={{justifyContent: "center", alignItems: "center"}}><ActivityIndicator size={"large"}
             color={theme.PrimaryDark} /></View>;
     }
+
+    const handlePagination = () => {
+        fetchWithToken(`${batchUrl}?page=${props.batchesData.page}&results=10`, "GET")
+            .then((resp) => {
+                if(resp.status === 200) {
+                    resp.json().then((data) => {
+                        props.setBatch({
+                            data: data.results,
+                            page: parseInt(props.batchesData.page) + 1,
+                            total: data.total
+                        });
+                    });
+                }
+            });
+    };
 
     return (
         <Container
@@ -64,6 +79,8 @@ const TrackingDrawer = (props: any) => {
                     ) :
                         (<H7>No Data found</H7>)
                 )}
+                onEndReached={handlePagination}
+                onEndReachedThreshold={0.1}
             />
         </Container>
 

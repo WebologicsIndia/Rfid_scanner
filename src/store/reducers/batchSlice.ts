@@ -6,8 +6,8 @@ const batchReducer = createSlice({
     initialState: batchState,
     reducers: {
         setBatch: (state, action) => {
-            state.data = action.payload.data;
-            state.page = action.payload.page ? action.payload.page : 1;
+            state.data = [...state.data, ...action.payload.data];
+            state.page = action.payload.page ;
             state.total = action.payload.total;
         }
 

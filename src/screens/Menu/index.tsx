@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Container, H7, Insets, margin, padding} from "@WebologicsIndia/react-native-components";
 import {theme} from "../../config/theme";
-import {ActivityIndicator, Pressable, FlatList, StyleSheet, View, VirtualizedList} from "react-native";
+import {ActivityIndicator, Pressable, FlatList, StyleSheet, View} from "react-native";
 import HamburgerSVG from "../../assets/hamburger.svg";
 import {batchUrl} from "../../config/api";
 import {fetchWithToken} from "../../config/helper";
@@ -104,8 +104,7 @@ const TrackingDrawer = (props: any) => {
         </Container>
 
     );
-}
-;
+};
 const styles = StyleSheet.create({
     container: {
         flex: 1
@@ -122,4 +121,3 @@ const mapStateToProps = (state: any) => {
     };
 };
 export default connect(mapStateToProps, {setBatch, updateBatch})(TrackingDrawer);
-

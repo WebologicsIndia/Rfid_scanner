@@ -87,6 +87,7 @@ const ScanTagsScreen = (props: any) => {
             x = setInterval(() => {
                 RFIDModule.readTag(
                     (tag: any) => {
+                        rfIdData.add(tag);
                         setRfIdData(new Set([...rfIdData, tag]));
                     },
                     (error: any) => {
@@ -161,7 +162,7 @@ const ScanTagsScreen = (props: any) => {
                     {rfIdData.size > 0 &&
                         <ScrollView contentContainerStyle={[styles.scrollContent]} style={styles.scrollView}>
                             {Array.from(rfIdData).map((data:any, index:number) => (
-                                <View key={index} style={[padding.py5]}>
+                                <View key={index} style={[padding.py1]}>
                                     <H9 style={{color: theme.PrimaryDark}}>{data}</H9>
                                 </View>
                             ))}

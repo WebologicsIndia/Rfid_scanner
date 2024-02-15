@@ -7,25 +7,25 @@ import {
     H9,
     margin,
     padding,
-    Insets, Button, Input
+    Insets, Button
 } from "@WebologicsIndia/react-native-components";
 import HamburgerSVG from "../../../assets/hamburger.svg";
 import CurrentLocationSVG from "../../../assets/current-location.svg";
 import PlaySVG from "../../../assets/playSVG.svg";
 import ReloadSVG from "../../../assets/reloadSVG.svg";
 import PauseSVG from "../../../assets/pauseSVG.svg";
-import {Image, Pressable, StyleSheet, View, NativeModules, ScrollView} from "react-native";
+import {Image, Pressable, StyleSheet, View, NativeModules} from "react-native";
 import {theme} from "../../../config/theme";
 import FilterModal from "../../../common/FilterModal";
 import DownSvg from "../../../assets/downArrow.svg";
 import Geolocation from "react-native-geolocation-service";
 import Logo from "../../../assets/dr_company_logo.jpg";
-import BatchModal from "../../Home/components/batchModal";
+
 import {fetchWithToken} from "../../../config/helper";
 import {batchUrl, clientUrl, inventoryUrl} from "../../../config/api";
 import {login} from "../../../store/reducers/userSlice";
 import {connect} from "react-redux";
-import {setClient} from "../../../store/reducers/clientSlice";
+
 
 
 const {RFIDModule} = NativeModules;
@@ -42,9 +42,10 @@ const ClientHomeScreen = (props: any) => {
     const [initialized, setInitialized] = useState(false);
     const [active, setActive] = useState(false);
     const [batchesData, setBatchesData] = useState<any>([]);
-    const [tagsData, setTagsData] = useState<Set<any>>(new Set());
+    const [tagsData, setTagsData] = useState<any>([]);
     const [unCategorizedTags, setUnCategorizedTags] = useState<Set<any>>(new Set());
     const [loading, setLoading] = useState<boolean>(false);
+    const [fetchedTags, setFetchedTags] = useState<Set<any>>(new Set());
 
 
     useEffect(() => {
@@ -58,19 +59,24 @@ const ClientHomeScreen = (props: any) => {
     }, []);
 
     useEffect(() => {
-        Array.from(rfIdData).map((tagId) => {
-            fetchWithToken(`${inventoryUrl}?tag=${tagId}`, "GET", "")
-                .then((resp) => {
-                    if(resp.status === 200) {
-                        resp.json().then((data) => {
-                            setTagsData((prevState) => new Set([...prevState, data.itemType]));
-                        });
-                    } else {
-                        setUnCategorizedTags((prevState) => new Set([...prevState, tagId]));
-                    }
-                });
+        Array.from(rfIdData).forEach((tagId) => {
+            if(!fetchedTags.has(tagId)) {
+                fetchWithToken(`${inventoryUrl}?tag=${tagId}`, "GET", "")
+                    .then((resp) => {
+                        if(resp.status === 200) {
+                            resp.json().then((data) => {
+                                fetchedTags.add(tagId);
+                                setTagsData([...tagsData, data]);
+                            });
+                        } else {
+                            unCategorizedTags.add(tagId);
+                            setUnCategorizedTags((prevState) => new Set([...prevState, tagId]));
+                        }
+                    });
+            }
         });
     }, [rfIdData]);
+
 
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
@@ -129,6 +135,8 @@ const ClientHomeScreen = (props: any) => {
     };
     const handleRefreshSvg = () => {
         setRfIdData(new Set());
+        setFetchedTags(new Set());
+        setTagsData([]);
     };
 
     useEffect(() => {
@@ -138,6 +146,7 @@ const ClientHomeScreen = (props: any) => {
                 RFIDModule.readTag(
                     (tag: any) => {
                         // console.log("tag", tag);
+                        rfIdData.add(tag);
                         setRfIdData(new Set([...rfIdData, tag]));
                     },
                     (error: any) => {
@@ -168,7 +177,8 @@ const ClientHomeScreen = (props: any) => {
             }).catch((e) => {
                 console.log("error");
             }).finally(() => {
-                setTagsData(new Set());
+                setTagsData([]);
+                setFetchedTags(new Set());
                 setLoading(false);
                 setSelectedFilter(null);
             });
@@ -221,14 +231,14 @@ const ClientHomeScreen = (props: any) => {
                         </View>
                     </View>
                     {
-                        tagsData.size ?
+                        tagsData.length ?
                             <View style={styles.card}>
                                 <H7 style={{color: theme.PrimaryDark, alignSelf: "center", fontWeight: "bold"}}>Batch Summary</H7>
                                 {
-                                    Array.from(tagsData).length ?
+                                    tagsData.length ?
                                         Object.entries(
-                                            Array.from(tagsData).reduce((acc: any, tag: any) => {
-                                                acc[tag] = (acc[tag] || 0) +1;
+                                            tagsData.reduce((acc: any, tag: any) => {
+                                                acc[tag.itemType] = (acc[tag.itemType] || 0) +1;
                                                 return acc;
                                             }, {})
                                         ).map(([itemType, count], index) => {
@@ -242,13 +252,15 @@ const ClientHomeScreen = (props: any) => {
                                             );
                                         }) : <></>
                                 }
-                                <View style={{flexDirection: "row", alignItems: "center", gap: 8}}>
+                                <View style={{flexDirection: "row", gap: 8}}>
                                     <H7 style={{color: theme.PrimaryDark, textTransform: "capitalize"}}>
                                         {"UnCategorised Tags:"}
                                     </H7>
-                                    {Array.from(unCategorizedTags).map((tag, index) => (
-                                        <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
-                                    ))}
+                                    <View >
+                                        {Array.from(unCategorizedTags).map((tag, index) => (
+                                            <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
+                                        ))}
+                                    </View>
                                 </View>
                                 <View style={[margin.mt4]}>
                                     <Button

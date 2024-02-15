@@ -1,13 +1,14 @@
 import React, {useEffect} from "react";
 import {NavigationContainer} from "@react-navigation/native";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
-import DrawerNavigation from "./Navigation";
+// import DrawerNavigation from "./Navigation/DrawerNavigation";
 import Login from "./Authentication/Login";
 import {connect} from "react-redux";
 import {login, logout} from "../store/reducers/userSlice";
 import {checkValidity} from "../config/helper";
 import {H7} from "@WebologicsIndia/react-native-components";
 import {theme} from "../config/theme";
+import BottomTabs from "./Navigation/BottomTabs";
 
 const Stack = createNativeStackNavigator();
 const Screens = (props: any) => {
@@ -49,7 +50,8 @@ const Screens = (props: any) => {
                         :
                         (
                             <>
-                                <Stack.Screen name={"drawer"} component={DrawerNavigation} />
+                                {/*<Stack.Screen name={"drawer"} component={DrawerNavigation} />*/}
+                                <Stack.Screen name="bottomTabs" component={BottomTabs} />
                             </>
                         )
                 }

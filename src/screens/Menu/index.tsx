@@ -8,6 +8,7 @@ import {fetchWithToken} from "../../config/helper";
 import {setBatch} from "../../store/reducers/batchSlice";
 import {connect} from "react-redux";
 import Items from "./components/Items";
+import {GestureHandlerRootView} from "react-native-gesture-handler";
 
 const TrackingDrawer = (props: any) => {
     const [insets] = useState(Insets.getInsets());
@@ -40,7 +41,7 @@ const TrackingDrawer = (props: any) => {
     const handlePagination = () => {
         fetchWithToken(`${batchUrl}?page=${props.batchesData.page}&results=10`, "GET")
             .then((resp) => {
-                if(resp.status === 200) {
+                if (resp.status === 200) {
                     resp.json().then((data) => {
                         props.setBatch({
                             data: data.results,
@@ -64,24 +65,26 @@ const TrackingDrawer = (props: any) => {
             bottom={insets.bottom * 1.5}
         >
             <H7 style={[padding.py3, {color: theme.PrimaryLight}]}>Total {props.batchesData.total}</H7>
-            <FlatList
-                showsVerticalScrollIndicator={false}
-                data={props.batchesData.data}
-                renderItem={({item, index}: any) => (
-                    props.batchesData.data.length ? (
-                        <Items
-                            item={item}
-                            index={index}
-                            key={index}
-                            getInventories={getInventories}
-                            navigation={props.navigation}
-                        />
-                    ) :
-                        (<H7>No Data found</H7>)
-                )}
-                onEndReached={handlePagination}
-                onEndReachedThreshold={0.1}
-            />
+            <GestureHandlerRootView style={{flex: 1}}>
+                <FlatList
+                    showsVerticalScrollIndicator={false}
+                    data={props.batchesData.data}
+                    renderItem={({item, index}: any) => (
+                        props.batchesData.data.length ? (
+                            <Items
+                                item={item}
+                                index={index}
+                                key={index}
+                                getInventories={getInventories}
+                                navigation={props.navigation}
+                            />
+                        ) :
+                            (<H7>No Data found</H7>)
+                    )}
+                    onEndReached={handlePagination}
+                    onEndReachedThreshold={0.1}
+                />
+            </GestureHandlerRootView>
         </Container>
 
     );

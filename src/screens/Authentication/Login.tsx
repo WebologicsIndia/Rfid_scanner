@@ -132,12 +132,16 @@ const Login = (props: any) => {
                     <H7 style={styles.forgotText}>Forgot Password?</H7>
                 </Pressable>
                 <Button
-                    borderRadius={borderRadius.br2}
+                    gradient
+                    borderRadius={borderRadius.circle}
                     padding={padding.p3}
                     onPress={handleLogin}
                     loading={loading}
+                    color={["#2d80e0", "#7168E9"]}
+                    start={{x: 0, y: 0.5}}
+                    end={{x: 0.9, y: 0.5}}
                 >
-                    <H5 style={{color: theme.TextLight}}>Login</H5>
+                    <H5 style={{color: theme.White}}>Login</H5>
                 </Button>
             </View>
         </Container>

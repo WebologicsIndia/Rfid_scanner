@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
     borderRadius,
     Container,
@@ -42,13 +42,10 @@ const Home = (props: any) => {
     const [selectedFilter, setSelectedFilter] = useState<string>("Contains");
     const [initialized, setInitialized] = useState(false);
     const [active, setActive] = useState(false);
-    // const [modalData, setModalData] = useState([]);
     const [tagsData, setTagsData] = useState<any>([]);
     const [fetchedTags, setFetchedTags] = useState<Set<any>>(new Set());
     const [unCategorizedTags, setUnCategorizedTags] = useState<Set<any>>(new Set());
     const [filteredData, setFilteredData] = useState<string[]>([]);
-
-
 
     const handleLocationIconColor = () => {
         if (locationIconColor === theme.PrimaryDark) {
@@ -82,12 +79,10 @@ const Home = (props: any) => {
         );
     }, []);
 
-
     const handleIconClick = () => {
         if (!active) {
             RFIDModule.startInventory();
             setActive(true);
-
         } else {
             RFIDModule.stopInventory(
                 (success: any) => {
@@ -117,8 +112,10 @@ const Home = (props: any) => {
             x = setInterval(() => {
                 RFIDModule.readTag(
                     (tag: any) => {
-                        rfIdData.add(tag);
-                        setRfIdData(new Set([...rfIdData, tag]));
+                        if(!rfIdData.has(tag)) {
+                            rfIdData.add(tag);
+                            setRfIdData(new Set([...rfIdData, tag]));
+                        }
                     },
                     (error: any) => {
                         console.log(error);
@@ -184,44 +181,23 @@ const Home = (props: any) => {
         return result;
     };
 
-    // useEffect(() => {
-    //     console.log("Keys: ", rfIdData.keys());
-    //     Array.from(rfIdData).map((tagId) => {
-    //         fetchWithToken(`${inventoryUrl}?tag=${tagId}`, "GET", "")
-    //             .then((resp) => {
-    //                 if(resp.status === 200) {
-    //                     resp.json().then((data) => {
-    //                         tagsData.add(data);
-    //                         setTagsData((prevState) => new Set([...prevState, data]));
-    //                     });
-    //                 } else {
-    //                     unCategorizedTags.add(tagId);
-    //                     setUnCategorizedTags((prevState) => new Set([...prevState, tagId]));
-    //                 }
-    //             });
-    //     });
-    // }, [rfIdData.size]);
-
     useEffect(() => {
-        console.log("Fetch: ", fetchedTags);
-        Array.from(rfIdData).forEach((tagId) => {
-            if(!fetchedTags.has(tagId)) {
+        rfIdData.forEach((tagId) => {
+            if (!fetchedTags.has(tagId))  {
                 fetchWithToken(`${inventoryUrl}?tag=${tagId}`, "GET", "")
                     .then((resp) => {
                         if(resp.status === 200) {
                             resp.json().then((data) => {
-                                fetchedTags.add(tagId);
-                                setTagsData([...tagsData, data]);
+                                setTagsData((prevState: any) => [...prevState, data]);
                             });
                         } else {
-                            unCategorizedTags.add(tagId);
-                            setUnCategorizedTags((prevState) => new Set([...prevState, tagId]));
+                            setUnCategorizedTags((prevState) => new Set(prevState.add(tagId)));
                         }
                     });
+                setFetchedTags((prevState) => new Set(prevState.add(tagId)));
             }
         });
     }, [rfIdData]);
-    console.log("RFID: ", tagsData);
     return (
         <>
             <Container
@@ -284,7 +260,10 @@ const Home = (props: any) => {
                                     tagsData.length ?
                                         Object.entries(
                                             tagsData.reduce((acc: any, tag: any) => {
-                                                acc[tag.itemType] = (acc[tag.itemType] || 0) +1;
+                                                if(!acc[tag.itemType]) {
+                                                    acc[tag.itemType] = 0;
+                                                }
+                                                acc[tag.itemType]++;
                                                 return acc;
                                             }, {})
                                         ).map(([itemType, count], index) => {

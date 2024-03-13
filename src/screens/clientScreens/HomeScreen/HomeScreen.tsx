@@ -59,20 +59,19 @@ const ClientHomeScreen = (props: any) => {
     }, []);
 
     useEffect(() => {
-        Array.from(rfIdData).forEach((tagId) => {
+        rfIdData.forEach((tagId) => {
             if(!fetchedTags.has(tagId)) {
                 fetchWithToken(`${inventoryUrl}?tag=${tagId}`, "GET", "")
                     .then((resp) => {
                         if(resp.status === 200) {
                             resp.json().then((data) => {
-                                fetchedTags.add(tagId);
-                                setTagsData([...tagsData, data]);
+                                setTagsData((prevState: any) => [...prevState, data]);
                             });
                         } else {
-                            unCategorizedTags.add(tagId);
-                            setUnCategorizedTags((prevState) => new Set([...prevState, tagId]));
+                            setUnCategorizedTags((prevState) => new Set(prevState.add(tagId)));
                         }
                     });
+                setFetchedTags((prevState) => new Set(prevState.add(tagId)));
             }
         });
     }, [rfIdData]);
@@ -145,9 +144,10 @@ const ClientHomeScreen = (props: any) => {
             x = setInterval(() => {
                 RFIDModule.readTag(
                     (tag: any) => {
-                        // console.log("tag", tag);
-                        rfIdData.add(tag);
-                        setRfIdData(new Set([...rfIdData, tag]));
+                        if(!rfIdData.has(tag)) {
+                            rfIdData.add(tag);
+                            setRfIdData(new Set([...rfIdData, tag]));
+                        }
                     },
                     (error: any) => {
                         console.log(error);
@@ -238,7 +238,10 @@ const ClientHomeScreen = (props: any) => {
                                     tagsData.length ?
                                         Object.entries(
                                             tagsData.reduce((acc: any, tag: any) => {
-                                                acc[tag.itemType] = (acc[tag.itemType] || 0) +1;
+                                                if(!acc[tag.itemType]){
+                                                    acc[tag.itemType] = 0;
+                                                }
+                                                acc[tag.itemType]++;
                                                 return acc;
                                             }, {})
                                         ).map(([itemType, count], index) => {
@@ -258,7 +261,7 @@ const ClientHomeScreen = (props: any) => {
                                     </H7>
                                     <View >
                                         {Array.from(unCategorizedTags).map((tag, index) => (
-                                            <H9 key={index} style={{color: theme.PrimaryDark}}>{tag}</H9>
+                                            <H9 key={`tag_${index}`} style={{color: theme.PrimaryDark}}>{tag}</H9>
                                         ))}
                                     </View>
                                 </View>

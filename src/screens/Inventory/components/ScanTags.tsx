@@ -31,8 +31,6 @@ const ScanTagsScreen = (props: any) => {
     const [modalData, setModalData] = useState({});
     const [modalVisible, setModalVisible] = useState(false);
 
-
-
     const addInventory = () => {
         const body = {
             itemType: itemType,

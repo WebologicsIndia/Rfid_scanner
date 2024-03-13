@@ -26,9 +26,9 @@ const FilterModal = (props: {
             >
                 <View style={styles.modalView}>
                     {
-                        props.modelData.map((item: any) => {
+                        props.modelData.map((item, index) => {
                             return (
-                                <Pressable onPress={() => handleModelItem(item)} key={item}>
+                                <Pressable onPress={() => handleModelItem(item)} key={index}>
                                     <H7 style={{color: theme.PrimaryDark, ...margin.my2}}>{item.name}</H7>
                                 </Pressable>
                             );

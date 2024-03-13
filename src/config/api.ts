@@ -1,5 +1,6 @@
 // const BASE_URL = "http://192.168.0.6:8080";
-const BASE_URL = "https://rfid-reader.onrender.com";
+// const BASE_URL = "https://rfid-reader.onrender.com";
+const BASE_URL = "https://rfid-laundry-2ndphase-k54bovqqbq-ue.a.run.app";
 //
 export const loginUrl = BASE_URL + "/api/v1/auth/login";
 export const refreshUrl = BASE_URL + "/api/v1/auth/refresh";
